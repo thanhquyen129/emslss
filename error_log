@@ -1,0 +1,1288 @@
+[17-Jun-2025 16:29:27 Asia/Ho_Chi_Minh] PHP Warning:  session_start(): Cannot start session when headers already sent in /home/danangit/public_html/vietma/booking/includes/functions.php on line 3
+[17-Jun-2025 16:41:07 Asia/Ho_Chi_Minh] PHP Warning:  session_start(): Cannot start session when headers already sent in /home/danangit/public_html/vietma/booking/includes/functions.php on line 3
+[17-Jun-2025 16:42:01 Asia/Ho_Chi_Minh] PHP Warning:  session_start(): Cannot start session when headers already sent in /home/danangit/public_html/vietma/booking/includes/functions.php on line 3
+[17-Jun-2025 16:42:16 Asia/Ho_Chi_Minh] PHP Warning:  session_start(): Cannot start session when headers already sent in /home/danangit/public_html/vietma/booking/includes/functions.php on line 3
+[17-Jun-2025 16:42:16 Asia/Ho_Chi_Minh] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/danangit/public_html/vietma/booking/login.php:1) in /home/danangit/public_html/vietma/booking/login.php on line 17
+[18-Jun-2025 08:08:47 Asia/Ho_Chi_Minh] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/danangit/public_html/vietma/booking/login.php:1) in /home/danangit/public_html/vietma/booking/login.php on line 17
+[18-Jun-2025 08:09:26 Asia/Ho_Chi_Minh] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/danangit/public_html/vietma/booking/login.php:1) in /home/danangit/public_html/vietma/booking/login.php on line 17
+[18-Jun-2025 08:10:47 Asia/Ho_Chi_Minh] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/danangit/public_html/vietma/booking/login.php:1) in /home/danangit/public_html/vietma/booking/login.php on line 17
+[18-Jun-2025 08:22:21 Asia/Ho_Chi_Minh] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/danangit/public_html/vietma/booking/login.php:1) in /home/danangit/public_html/vietma/booking/login.php on line 17
+[18-Jun-2025 08:53:08 Asia/Ho_Chi_Minh] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/danangit/public_html/vietma/booking/login.php:1) in /home/danangit/public_html/vietma/booking/login.php on line 17
+[18-Jun-2025 08:53:25 Asia/Ho_Chi_Minh] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/danangit/public_html/vietma/booking/includes/config.php:1) in /home/danangit/public_html/vietma/booking/index.php on line 9
+[18-Jun-2025 09:02:55 Asia/Ho_Chi_Minh] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/danangit/public_html/vietma/booking/login.php:1) in /home/danangit/public_html/vietma/booking/login.php on line 17
+[18-Jun-2025 09:03:03 Asia/Ho_Chi_Minh] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/danangit/public_html/vietma/booking/includes/header.php:1) in /home/danangit/public_html/vietma/booking/index.php on line 9
+[18-Jun-2025 09:05:04 Asia/Ho_Chi_Minh] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/danangit/public_html/vietma/booking/login.php:1) in /home/danangit/public_html/vietma/booking/login.php on line 17
+[18-Jun-2025 09:07:09 Asia/Ho_Chi_Minh] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/danangit/public_html/vietma/booking/includes/header.php:1) in /home/danangit/public_html/vietma/booking/index.php on line 9
+[18-Jun-2025 10:04:53 Asia/Ho_Chi_Minh] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/danangit/public_html/vietma/booking/includes/header.php:1) in /home/danangit/public_html/vietma/booking/index.php on line 9
+[18-Jun-2025 10:05:45 Asia/Ho_Chi_Minh] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/danangit/public_html/vietma/booking/includes/header.php:1) in /home/danangit/public_html/vietma/booking/index.php on line 9
+[18-Jun-2025 10:09:51 Asia/Ho_Chi_Minh] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/danangit/public_html/vietma/booking/includes/header.php:1) in /home/danangit/public_html/vietma/booking/index.php on line 8
+[18-Jun-2025 10:33:13 Asia/Ho_Chi_Minh] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/danangit/public_html/vietma/booking/includes/header.php:1) in /home/danangit/public_html/vietma/booking/index.php on line 6
+[18-Jun-2025 10:36:33 Asia/Ho_Chi_Minh] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/danangit/public_html/vietma/booking/includes/header.php:1) in /home/danangit/public_html/vietma/booking/index.php on line 6
+[18-Jun-2025 10:36:42 Asia/Ho_Chi_Minh] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/danangit/public_html/vietma/booking/includes/header.php:1) in /home/danangit/public_html/vietma/booking/index.php on line 6
+[18-Jun-2025 10:42:18 Asia/Ho_Chi_Minh] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/danangit/public_html/vietma/booking/includes/header.php:1) in /home/danangit/public_html/vietma/booking/index.php on line 6
+[18-Jun-2025 10:46:20 Asia/Ho_Chi_Minh] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/danangit/public_html/vietma/booking/includes/header.php:1) in /home/danangit/public_html/vietma/booking/index.php on line 6
+[18-Jun-2025 11:20:57 Asia/Ho_Chi_Minh] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/danangit/public_html/vietma/booking/includes/header.php:1) in /home/danangit/public_html/vietma/booking/index.php on line 6
+[18-Jun-2025 11:23:01 Asia/Ho_Chi_Minh] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/danangit/public_html/vietma/booking/includes/header.php:1) in /home/danangit/public_html/vietma/booking/index.php on line 9
+[18-Jun-2025 12:28:28 Asia/Ho_Chi_Minh] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/danangit/public_html/vietma/booking/includes/header.php:1) in /home/danangit/public_html/vietma/booking/index.php on line 10
+[18-Jun-2025 12:34:56 Asia/Ho_Chi_Minh] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/danangit/public_html/vietma/booking/includes/header.php:1) in /home/danangit/public_html/vietma/booking/index.php on line 10
+[18-Jun-2025 12:35:09 Asia/Ho_Chi_Minh] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'danangit_vmlbooking.vmlbooking_bookings' doesn't exist in /home/danangit/public_html/vietma/booking/index.php:32
+Stack trace:
+#0 /home/danangit/public_html/vietma/booking/index.php(32): PDOStatement->execute(Array)
+#1 {main}
+  thrown in /home/danangit/public_html/vietma/booking/index.php on line 32
+[18-Jun-2025 12:48:21 Asia/Ho_Chi_Minh] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'danangit_vmlbooking.vmlbooking_bookings' doesn't exist in /home/danangit/public_html/vietma/booking/index.php:27
+Stack trace:
+#0 /home/danangit/public_html/vietma/booking/index.php(27): PDOStatement->execute(Array)
+#1 {main}
+  thrown in /home/danangit/public_html/vietma/booking/index.php on line 27
+[18-Jun-2025 12:49:56 Asia/Ho_Chi_Minh] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ma_don_hang' in 'INSERT INTO' in /home/danangit/public_html/vietma/booking/index.php:27
+Stack trace:
+#0 /home/danangit/public_html/vietma/booking/index.php(27): PDOStatement->execute(Array)
+#1 {main}
+  thrown in /home/danangit/public_html/vietma/booking/index.php on line 27
+[18-Jun-2025 14:34:33 Asia/Ho_Chi_Minh] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/danangit/public_html/vietma/booking/includes/header.php:1) in /home/danangit/public_html/vietma/booking/index.php on line 10
+[18-Jun-2025 14:35:17 Asia/Ho_Chi_Minh] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/danangit/public_html/vietma/booking/includes/header.php:1) in /home/danangit/public_html/vietma/booking/index.php on line 10
+[18-Jun-2025 14:35:46 Asia/Ho_Chi_Minh] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ma_don_hang' in 'INSERT INTO' in /home/danangit/public_html/vietma/booking/index.php:27
+Stack trace:
+#0 /home/danangit/public_html/vietma/booking/index.php(27): PDOStatement->execute(Array)
+#1 {main}
+  thrown in /home/danangit/public_html/vietma/booking/index.php on line 27
+[18-Jun-2025 14:52:40 Asia/Ho_Chi_Minh] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/danangit/public_html/vietma/booking/includes/header.php:1) in /home/danangit/public_html/vietma/booking/index.php on line 10
+[18-Jun-2025 17:03:16 Asia/Ho_Chi_Minh] PHP Fatal error:  Uncaught Error: Call to undefined function sanitize_input() in /home/danangit/public_html/vietma/booking/index.php:30
+Stack trace:
+#0 {main}
+  thrown in /home/danangit/public_html/vietma/booking/index.php on line 30
+[24-Jun-2025 11:47:24 Asia/Ho_Chi_Minh] PHP Warning:  Use of undefined constant DB_NAME - assumed 'DB_NAME' (this will throw an Error in a future version of PHP) in /home/danangit/public_html/vietma/booking/update_db_simple.php on line 31
+[24-Jun-2025 11:47:24 Asia/Ho_Chi_Minh] PHP Warning:  Use of undefined constant DB_NAME - assumed 'DB_NAME' (this will throw an Error in a future version of PHP) in /home/danangit/public_html/vietma/booking/update_db_simple.php on line 31
+[24-Jun-2025 11:47:24 Asia/Ho_Chi_Minh] PHP Warning:  Use of undefined constant DB_NAME - assumed 'DB_NAME' (this will throw an Error in a future version of PHP) in /home/danangit/public_html/vietma/booking/update_db_simple.php on line 31
+[24-Jun-2025 17:17:39 Asia/Ho_Chi_Minh] PHP Warning:  imagecreatefrompng(): gd-png: libpng warning: iCCP: known incorrect sRGB profile in /home/danangit/public_html/vietma/booking/includes/tcpdf/tcpdf.php on line 7427
+[24-Jun-2025 17:17:40 Asia/Ho_Chi_Minh] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/danangit/public_html/vietma/booking/includes/tcpdf/tcpdf.php:7427) in /home/danangit/public_html/vietma/booking/includes/tcpdf/tcpdf.php on line 7764
+[27-Jun-2025 14:37:15 Asia/Ho_Chi_Minh] PHP Warning:  Use of undefined constant DB_HOST - assumed 'DB_HOST' (this will throw an Error in a future version of PHP) in /home/danangit/public_html/vietma/booking/debug_status_column.php on line 15
+[27-Jun-2025 14:37:15 Asia/Ho_Chi_Minh] PHP Warning:  Use of undefined constant DB_NAME - assumed 'DB_NAME' (this will throw an Error in a future version of PHP) in /home/danangit/public_html/vietma/booking/debug_status_column.php on line 15
+[27-Jun-2025 14:37:15 Asia/Ho_Chi_Minh] PHP Warning:  Use of undefined constant DB_USER - assumed 'DB_USER' (this will throw an Error in a future version of PHP) in /home/danangit/public_html/vietma/booking/debug_status_column.php on line 15
+[27-Jun-2025 14:37:15 Asia/Ho_Chi_Minh] PHP Warning:  Use of undefined constant DB_PASS - assumed 'DB_PASS' (this will throw an Error in a future version of PHP) in /home/danangit/public_html/vietma/booking/debug_status_column.php on line 15
+[05-Jul-2025 22:02:15 Asia/Ho_Chi_Minh] PHP Notice:  Undefined index: booking_status in /home/danangit/public_html/vietma/booking/edit_booking.php on line 241
+[05-Jul-2025 22:02:15 Asia/Ho_Chi_Minh] PHP Notice:  Undefined index: booking_status in /home/danangit/public_html/vietma/booking/edit_booking.php on line 242
+[05-Jul-2025 22:02:15 Asia/Ho_Chi_Minh] PHP Notice:  Undefined index: booking_status in /home/danangit/public_html/vietma/booking/edit_booking.php on line 243
+[05-Jul-2025 22:02:15 Asia/Ho_Chi_Minh] PHP Notice:  Undefined index: booking_status in /home/danangit/public_html/vietma/booking/edit_booking.php on line 244
+[05-Jul-2025 22:02:15 Asia/Ho_Chi_Minh] PHP Notice:  Undefined index: booking_status in /home/danangit/public_html/vietma/booking/edit_booking.php on line 245
+[05-Jul-2025 22:02:15 Asia/Ho_Chi_Minh] PHP Notice:  Undefined index: cost in /home/danangit/public_html/vietma/booking/edit_booking.php on line 249
+[05-Jul-2025 22:03:05 Asia/Ho_Chi_Minh] PHP Notice:  Undefined index: booking_status in /home/danangit/public_html/vietma/booking/print_bill.php on line 227
+[05-Jul-2025 22:03:05 Asia/Ho_Chi_Minh] PHP Notice:  Undefined index: cost in /home/danangit/public_html/vietma/booking/print_bill.php on line 228
+[05-Jul-2025 22:04:31 Asia/Ho_Chi_Minh] PHP Notice:  Undefined index: booking_status in /home/danangit/public_html/vietma/booking/print_bill.php on line 227
+[05-Jul-2025 22:04:31 Asia/Ho_Chi_Minh] PHP Notice:  Undefined index: cost in /home/danangit/public_html/vietma/booking/print_bill.php on line 228
+[05-Jul-2025 22:12:29 Asia/Ho_Chi_Minh] PHP Notice:  Undefined index: booking_status in /home/danangit/public_html/vietma/booking/edit_booking.php on line 241
+[05-Jul-2025 22:12:29 Asia/Ho_Chi_Minh] PHP Notice:  Undefined index: booking_status in /home/danangit/public_html/vietma/booking/edit_booking.php on line 242
+[05-Jul-2025 22:12:29 Asia/Ho_Chi_Minh] PHP Notice:  Undefined index: booking_status in /home/danangit/public_html/vietma/booking/edit_booking.php on line 243
+[05-Jul-2025 22:12:29 Asia/Ho_Chi_Minh] PHP Notice:  Undefined index: booking_status in /home/danangit/public_html/vietma/booking/edit_booking.php on line 244
+[05-Jul-2025 22:12:29 Asia/Ho_Chi_Minh] PHP Notice:  Undefined index: booking_status in /home/danangit/public_html/vietma/booking/edit_booking.php on line 245
+[05-Jul-2025 22:12:29 Asia/Ho_Chi_Minh] PHP Notice:  Undefined index: cost in /home/danangit/public_html/vietma/booking/edit_booking.php on line 249
+[05-Jul-2025 23:27:04 Asia/Ho_Chi_Minh] PHP Notice:  Undefined index: booking_status in /home/danangit/public_html/vietma/booking/print_bill.php on line 227
+[05-Jul-2025 23:27:04 Asia/Ho_Chi_Minh] PHP Notice:  Undefined index: cost in /home/danangit/public_html/vietma/booking/print_bill.php on line 228
+[06-Jul-2025 16:48:54 Asia/Ho_Chi_Minh] PHP Fatal error:  Uncaught Error: Class 'TCPDF_Barcode1D' not found in /home/danangit/public_html/vietma/booking/render_barcode_image.php:40
+Stack trace:
+#0 {main}
+  thrown in /home/danangit/public_html/vietma/booking/render_barcode_image.php on line 40
+[06-Jul-2025 16:49:20 Asia/Ho_Chi_Minh] PHP Fatal error:  Uncaught Error: Class 'TCPDF_Barcode1D' not found in /home/danangit/public_html/vietma/booking/render_barcode_image.php:40
+Stack trace:
+#0 {main}
+  thrown in /home/danangit/public_html/vietma/booking/render_barcode_image.php on line 40
+[06-Jul-2025 17:21:40 Asia/Ho_Chi_Minh] PHP Fatal error:  Uncaught Error: Class 'Picqer\Barcode\Types\TypeCode128' not found in /home/danangit/public_html/vietma/booking/includes/barcode_generator/BarcodeGenerator.php:152
+Stack trace:
+#0 /home/danangit/public_html/vietma/booking/includes/barcode_generator/BarcodeGenerator.php(110): Picqer\Barcode\BarcodeGenerator->createDataBuilderForType('C128')
+#1 /home/danangit/public_html/vietma/booking/includes/barcode_generator/BarcodeGeneratorPNG.php(24): Picqer\Barcode\BarcodeGenerator->getBarcodeData('VMLA00769020', 'C128')
+#2 /home/danangit/public_html/vietma/booking/generate_barcode.php(22): Picqer\Barcode\BarcodeGeneratorPNG->getBarcode('VMLA00769020', 'C128', 2, 60)
+#3 {main}
+  thrown in /home/danangit/public_html/vietma/booking/includes/barcode_generator/BarcodeGenerator.php on line 152
+[06-Jul-2025 17:22:00 Asia/Ho_Chi_Minh] PHP Fatal error:  Uncaught Error: Class 'Picqer\Barcode\Types\TypeCode128' not found in /home/danangit/public_html/vietma/booking/includes/barcode_generator/BarcodeGenerator.php:152
+Stack trace:
+#0 /home/danangit/public_html/vietma/booking/includes/barcode_generator/BarcodeGenerator.php(110): Picqer\Barcode\BarcodeGenerator->createDataBuilderForType('C128')
+#1 /home/danangit/public_html/vietma/booking/includes/barcode_generator/BarcodeGeneratorPNG.php(24): Picqer\Barcode\BarcodeGenerator->getBarcodeData('VMLA68181954', 'C128')
+#2 /home/danangit/public_html/vietma/booking/generate_barcode.php(22): Picqer\Barcode\BarcodeGeneratorPNG->getBarcode('VMLA68181954', 'C128', 2, 60)
+#3 {main}
+  thrown in /home/danangit/public_html/vietma/booking/includes/barcode_generator/BarcodeGenerator.php on line 152
+[06-Jul-2025 17:22:06 Asia/Ho_Chi_Minh] PHP Fatal error:  Uncaught Error: Class 'Picqer\Barcode\Types\TypeCode128' not found in /home/danangit/public_html/vietma/booking/includes/barcode_generator/BarcodeGenerator.php:152
+Stack trace:
+#0 /home/danangit/public_html/vietma/booking/includes/barcode_generator/BarcodeGenerator.php(110): Picqer\Barcode\BarcodeGenerator->createDataBuilderForType('C128')
+#1 /home/danangit/public_html/vietma/booking/includes/barcode_generator/BarcodeGeneratorPNG.php(24): Picqer\Barcode\BarcodeGenerator->getBarcodeData('VMLA54300997', 'C128')
+#2 /home/danangit/public_html/vietma/booking/generate_barcode.php(22): Picqer\Barcode\BarcodeGeneratorPNG->getBarcode('VMLA54300997', 'C128', 2, 60)
+#3 {main}
+  thrown in /home/danangit/public_html/vietma/booking/includes/barcode_generator/BarcodeGenerator.php on line 152
+[06-Jul-2025 17:34:11 Asia/Ho_Chi_Minh] PHP Notice:  Undefined index: booking_status in /home/danangit/public_html/vietma/booking/print_bill.php on line 244
+[06-Jul-2025 17:34:11 Asia/Ho_Chi_Minh] PHP Notice:  Undefined index: cost in /home/danangit/public_html/vietma/booking/print_bill.php on line 245
+[06-Jul-2025 17:34:11 Asia/Ho_Chi_Minh] PHP Fatal error:  Uncaught Error: Class 'Picqer\Barcode\Types\TypeCode128' not found in /home/danangit/public_html/vietma/booking/includes/barcode_generator/BarcodeGenerator.php:152
+Stack trace:
+#0 /home/danangit/public_html/vietma/booking/includes/barcode_generator/BarcodeGenerator.php(110): Picqer\Barcode\BarcodeGenerator->createDataBuilderForType('C128')
+#1 /home/danangit/public_html/vietma/booking/includes/barcode_generator/BarcodeGeneratorPNG.php(24): Picqer\Barcode\BarcodeGenerator->getBarcodeData('VMLA54455316', 'C128')
+#2 /home/danangit/public_html/vietma/booking/generate_barcode.php(22): Picqer\Barcode\BarcodeGeneratorPNG->getBarcode('VMLA54455316', 'C128', 2, 60)
+#3 {main}
+  thrown in /home/danangit/public_html/vietma/booking/includes/barcode_generator/BarcodeGenerator.php on line 152
+[06-Jul-2025 17:36:14 Asia/Ho_Chi_Minh] PHP Fatal error:  Uncaught Error: Class 'Picqer\Barcode\Types\TypeCode128' not found in /home/danangit/public_html/vietma/booking/includes/barcode_generator/BarcodeGenerator.php:152
+Stack trace:
+#0 /home/danangit/public_html/vietma/booking/includes/barcode_generator/BarcodeGenerator.php(110): Picqer\Barcode\BarcodeGenerator->createDataBuilderForType('C128')
+#1 /home/danangit/public_html/vietma/booking/includes/barcode_generator/BarcodeGeneratorPNG.php(24): Picqer\Barcode\BarcodeGenerator->getBarcodeData('TEST12345', 'C128')
+#2 /home/danangit/public_html/vietma/booking/generate_barcode.php(22): Picqer\Barcode\BarcodeGeneratorPNG->getBarcode('TEST12345', 'C128', 2, 60)
+#3 {main}
+  thrown in /home/danangit/public_html/vietma/booking/includes/barcode_generator/BarcodeGenerator.php on line 152
+[06-Jul-2025 18:15:17 Asia/Ho_Chi_Minh] PHP Fatal error:  Uncaught Error: Class 'Picqer\Barcode\Types\TypeCode128' not found in /home/danangit/public_html/vietma/booking/includes/barcode_generator/BarcodeGenerator.php:152
+Stack trace:
+#0 /home/danangit/public_html/vietma/booking/includes/barcode_generator/BarcodeGenerator.php(110): Picqer\Barcode\BarcodeGenerator->createDataBuilderForType('C128')
+#1 /home/danangit/public_html/vietma/booking/includes/barcode_generator/BarcodeGeneratorPNG.php(24): Picqer\Barcode\BarcodeGenerator->getBarcodeData('TEST12345', 'C128')
+#2 /home/danangit/public_html/vietma/booking/generate_barcode.php(22): Picqer\Barcode\BarcodeGeneratorPNG->getBarcode('TEST12345', 'C128', 2, 60)
+#3 {main}
+  thrown in /home/danangit/public_html/vietma/booking/includes/barcode_generator/BarcodeGenerator.php on line 152
+[06-Jul-2025 23:54:54 Asia/Ho_Chi_Minh] PHP Parse error:  syntax error, unexpected end of file, expecting variable (T_VARIABLE) or quoted-string and whitespace (T_ENCAPSED_AND_WHITESPACE) or ${ (T_DOLLAR_OPEN_CURLY_BRACES) or {$ (T_CURLY_OPEN) in /home/danangit/public_html/vietma/booking/generate_shipping_mark.php on line 135
+[06-Jul-2025 23:55:13 Asia/Ho_Chi_Minh] PHP Parse error:  syntax error, unexpected end of file, expecting variable (T_VARIABLE) or quoted-string and whitespace (T_ENCAPSED_AND_WHITESPACE) or ${ (T_DOLLAR_OPEN_CURLY_BRACES) or {$ (T_CURLY_OPEN) in /home/danangit/public_html/vietma/booking/generate_shipping_mark.php on line 135
+[07-Jul-2025 09:17:34 Asia/Ho_Chi_Minh] PHP Notice:  Undefined index: booking_status in /home/danangit/public_html/vietma/booking/edit_booking.php on line 93
+[07-Jul-2025 09:17:34 Asia/Ho_Chi_Minh] PHP Notice:  Undefined index: cost in /home/danangit/public_html/vietma/booking/edit_booking.php on line 99
+[07-Jul-2025 11:53:55 Asia/Ho_Chi_Minh] PDOException in edit_booking.php: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'cost' in 'SET'
+[07-Jul-2025 11:54:27 Asia/Ho_Chi_Minh] PDOException in edit_booking.php: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'cost' in 'SET'
+[07-Jul-2025 11:55:04 Asia/Ho_Chi_Minh] PDOException in edit_booking.php: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'cost' in 'SET'
+[07-Jul-2025 11:56:55 Asia/Ho_Chi_Minh] PDOException in edit_booking.php: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'cost' in 'SET'
+[08-Jul-2025 17:34:31 Asia/Ho_Chi_Minh] PHP Fatal error:  Uncaught ArgumentCountError: Too few arguments to function TCPDF::getStringHeight(), 1 passed in /home/danangit/public_html/vietma/booking/generate_shipping_mark.php on line 192 and at least 2 expected in /home/danangit/public_html/vietma/booking/includes/tcpdf/tcpdf.php:6397
+Stack trace:
+#0 /home/danangit/public_html/vietma/booking/generate_shipping_mark.php(192): TCPDF->getStringHeight('VMLA54455316')
+#1 {main}
+  thrown in /home/danangit/public_html/vietma/booking/includes/tcpdf/tcpdf.php on line 6397
+[08-Jul-2025 17:34:36 Asia/Ho_Chi_Minh] PHP Fatal error:  Uncaught ArgumentCountError: Too few arguments to function TCPDF::getStringHeight(), 1 passed in /home/danangit/public_html/vietma/booking/generate_shipping_mark.php on line 192 and at least 2 expected in /home/danangit/public_html/vietma/booking/includes/tcpdf/tcpdf.php:6397
+Stack trace:
+#0 /home/danangit/public_html/vietma/booking/generate_shipping_mark.php(192): TCPDF->getStringHeight('VMLA54455316')
+#1 {main}
+  thrown in /home/danangit/public_html/vietma/booking/includes/tcpdf/tcpdf.php on line 6397
+[08-Jul-2025 17:34:42 Asia/Ho_Chi_Minh] PHP Fatal error:  Uncaught ArgumentCountError: Too few arguments to function TCPDF::getStringHeight(), 1 passed in /home/danangit/public_html/vietma/booking/generate_shipping_mark.php on line 192 and at least 2 expected in /home/danangit/public_html/vietma/booking/includes/tcpdf/tcpdf.php:6397
+Stack trace:
+#0 /home/danangit/public_html/vietma/booking/generate_shipping_mark.php(192): TCPDF->getStringHeight('VMLA00769020')
+#1 {main}
+  thrown in /home/danangit/public_html/vietma/booking/includes/tcpdf/tcpdf.php on line 6397
+[08-Jul-2025 17:37:05 Asia/Ho_Chi_Minh] PHP Fatal error:  Uncaught ArgumentCountError: Too few arguments to function TCPDF::getStringHeight(), 1 passed in /home/danangit/public_html/vietma/booking/generate_shipping_mark.php on line 215 and at least 2 expected in /home/danangit/public_html/vietma/booking/includes/tcpdf/tcpdf.php:6397
+Stack trace:
+#0 /home/danangit/public_html/vietma/booking/generate_shipping_mark.php(215): TCPDF->getStringHeight('Company: ')
+#1 {main}
+  thrown in /home/danangit/public_html/vietma/booking/includes/tcpdf/tcpdf.php on line 6397
+[08-Jul-2025 17:37:20 Asia/Ho_Chi_Minh] PHP Fatal error:  Uncaught ArgumentCountError: Too few arguments to function TCPDF::getStringHeight(), 1 passed in /home/danangit/public_html/vietma/booking/generate_shipping_mark.php on line 215 and at least 2 expected in /home/danangit/public_html/vietma/booking/includes/tcpdf/tcpdf.php:6397
+Stack trace:
+#0 /home/danangit/public_html/vietma/booking/generate_shipping_mark.php(215): TCPDF->getStringHeight('Company: ')
+#1 {main}
+  thrown in /home/danangit/public_html/vietma/booking/includes/tcpdf/tcpdf.php on line 6397
+[09-Jul-2025 11:25:51 Asia/Ho_Chi_Minh] PHP Notice:  Undefined variable: box_padding in /home/danangit/public_html/vietma/booking/print_bill.php on line 108
+[09-Jul-2025 11:25:51 Asia/Ho_Chi_Minh] PHP Notice:  Undefined variable: box_padding in /home/danangit/public_html/vietma/booking/print_bill.php on line 110
+[09-Jul-2025 11:25:51 Asia/Ho_Chi_Minh] PHP Notice:  Undefined variable: box_padding in /home/danangit/public_html/vietma/booking/print_bill.php on line 115
+[09-Jul-2025 11:25:51 Asia/Ho_Chi_Minh] PHP Notice:  Undefined variable: box_padding in /home/danangit/public_html/vietma/booking/print_bill.php on line 117
+[09-Jul-2025 11:25:51 Asia/Ho_Chi_Minh] PHP Notice:  Undefined variable: box_padding in /home/danangit/public_html/vietma/booking/print_bill.php on line 124
+[09-Jul-2025 11:25:51 Asia/Ho_Chi_Minh] PHP Notice:  Undefined variable: box_padding in /home/danangit/public_html/vietma/booking/print_bill.php on line 126
+[09-Jul-2025 11:25:51 Asia/Ho_Chi_Minh] PHP Notice:  Undefined variable: box_padding in /home/danangit/public_html/vietma/booking/print_bill.php on line 134
+[09-Jul-2025 11:25:51 Asia/Ho_Chi_Minh] PHP Notice:  Undefined variable: box_padding in /home/danangit/public_html/vietma/booking/print_bill.php on line 134
+[09-Jul-2025 11:25:51 Asia/Ho_Chi_Minh] PHP Notice:  Undefined variable: box_padding in /home/danangit/public_html/vietma/booking/print_bill.php on line 137
+[09-Jul-2025 11:25:51 Asia/Ho_Chi_Minh] PHP Notice:  Undefined variable: box_padding in /home/danangit/public_html/vietma/booking/print_bill.php on line 138
+[09-Jul-2025 11:25:51 Asia/Ho_Chi_Minh] PHP Notice:  Undefined variable: box_padding in /home/danangit/public_html/vietma/booking/print_bill.php on line 173
+[09-Jul-2025 11:25:51 Asia/Ho_Chi_Minh] PHP Notice:  Undefined variable: box_padding in /home/danangit/public_html/vietma/booking/print_bill.php on line 173
+[09-Jul-2025 11:25:51 Asia/Ho_Chi_Minh] PHP Notice:  Undefined variable: box_padding in /home/danangit/public_html/vietma/booking/print_bill.php on line 176
+[09-Jul-2025 11:25:51 Asia/Ho_Chi_Minh] PHP Notice:  Undefined variable: box_padding in /home/danangit/public_html/vietma/booking/print_bill.php on line 177
+[09-Jul-2025 11:25:51 Asia/Ho_Chi_Minh] PHP Notice:  Undefined variable: box_padding in /home/danangit/public_html/vietma/booking/print_bill.php on line 201
+[09-Jul-2025 11:25:51 Asia/Ho_Chi_Minh] PHP Notice:  Undefined variable: box_padding in /home/danangit/public_html/vietma/booking/print_bill.php on line 240
+[09-Jul-2025 11:25:51 Asia/Ho_Chi_Minh] PHP Notice:  Undefined variable: box_padding in /home/danangit/public_html/vietma/booking/print_bill.php on line 240
+[09-Jul-2025 11:25:51 Asia/Ho_Chi_Minh] PHP Notice:  Undefined variable: box_padding in /home/danangit/public_html/vietma/booking/print_bill.php on line 243
+[09-Jul-2025 11:25:51 Asia/Ho_Chi_Minh] PHP Notice:  Undefined variable: box_padding in /home/danangit/public_html/vietma/booking/print_bill.php on line 244
+[09-Jul-2025 11:25:51 Asia/Ho_Chi_Minh] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/danangit/public_html/vietma/booking/print_bill.php:108) in /home/danangit/public_html/vietma/booking/includes/tcpdf/tcpdf.php on line 7764
+[09-Jul-2025 12:05:43 Asia/Ho_Chi_Minh] PHP Fatal error:  Uncaught Error: Class 'TCPPDF' not found in /home/danangit/public_html/vietma/booking/print_bill.php:34
+Stack trace:
+#0 {main}
+  thrown in /home/danangit/public_html/vietma/booking/print_bill.php on line 34
+[09-Jul-2025 17:57:38 Asia/Ho_Chi_Minh] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/danangit/public_html/vietma/booking/print_bill.php:7) in /home/danangit/public_html/vietma/booking/includes/tcpdf/tcpdf.php on line 7764
+[09-Jul-2025 17:58:04 Asia/Ho_Chi_Minh] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/danangit/public_html/vietma/booking/print_bill.php:7) in /home/danangit/public_html/vietma/booking/includes/tcpdf/tcpdf.php on line 7764
+[14-Jul-2025 11:47:57 Asia/Ho_Chi_Minh] PHP Warning:  require_once(/home/danangit/public_html/vietma/booking/../includes/config.php): failed to open stream: No such file or directory in /home/danangit/public_html/vietma/booking/run_db_migration.php on line 24
+[14-Jul-2025 11:47:57 Asia/Ho_Chi_Minh] PHP Fatal error:  require_once(): Failed opening required '/home/danangit/public_html/vietma/booking/../includes/config.php' (include_path='.:/opt/cpanel/ea-php74/root/usr/share/pear') in /home/danangit/public_html/vietma/booking/run_db_migration.php on line 24
+[15-Jul-2025 12:15:49 Asia/Ho_Chi_Minh] PHP Parse error:  syntax error, unexpected 'endif' (T_ENDIF) in /home/danangit/public_html/vietma/booking/index.php on line 920
+[15-Jul-2025 12:15:54 Asia/Ho_Chi_Minh] PHP Parse error:  syntax error, unexpected 'endif' (T_ENDIF) in /home/danangit/public_html/vietma/booking/index.php on line 920
+[15-Jul-2025 12:16:01 Asia/Ho_Chi_Minh] PHP Parse error:  syntax error, unexpected 'endif' (T_ENDIF) in /home/danangit/public_html/vietma/booking/index.php on line 920
+[15-Jul-2025 12:16:03 Asia/Ho_Chi_Minh] PHP Parse error:  syntax error, unexpected 'endif' (T_ENDIF) in /home/danangit/public_html/vietma/booking/index.php on line 920
+[15-Jul-2025 12:16:05 Asia/Ho_Chi_Minh] PHP Parse error:  syntax error, unexpected 'endif' (T_ENDIF) in /home/danangit/public_html/vietma/booking/index.php on line 920
+[15-Jul-2025 12:16:10 Asia/Ho_Chi_Minh] PHP Parse error:  syntax error, unexpected 'endif' (T_ENDIF) in /home/danangit/public_html/vietma/booking/index.php on line 920
+[15-Jul-2025 12:16:17 Asia/Ho_Chi_Minh] PHP Parse error:  syntax error, unexpected 'endif' (T_ENDIF) in /home/danangit/public_html/vietma/booking/index.php on line 920
+[15-Jul-2025 12:35:18 Asia/Ho_Chi_Minh] PHP Parse error:  syntax error, unexpected 'endif' (T_ENDIF) in /home/danangit/public_html/vietma/booking/index.php on line 920
+[15-Jul-2025 12:35:18 Asia/Ho_Chi_Minh] PHP Parse error:  syntax error, unexpected 'endif' (T_ENDIF) in /home/danangit/public_html/vietma/booking/index.php on line 920
+[24-Jul-2025 11:56:34 Asia/Ho_Chi_Minh] PHP Warning:  require_once(vendor/autoload.php): failed to open stream: No such file or directory in /home/danangit/public_html/vietma/booking/download_excel_template.php on line 7
+[24-Jul-2025 11:56:34 Asia/Ho_Chi_Minh] PHP Fatal error:  require_once(): Failed opening required 'vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php74/root/usr/share/pear') in /home/danangit/public_html/vietma/booking/download_excel_template.php on line 7
+[24-Jul-2025 17:15:04 Asia/Ho_Chi_Minh] PHP Fatal error:  Uncaught RuntimeException: Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.2.0". You are running 7.4.33. in /home/danangit/public_html/vietma/booking/vendor/composer/platform_check.php:26
+Stack trace:
+#0 /home/danangit/public_html/vietma/booking/vendor/composer/autoload_real.php(25): require()
+#1 /home/danangit/public_html/vietma/booking/vendor/autoload.php(22): ComposerAutoloaderInit62e10e6c8df9afc192311b196c75bb33::getLoader()
+#2 /home/danangit/public_html/vietma/booking/download_excel_template.php(7): require_once('/home/danangit/...')
+#3 {main}
+  thrown in /home/danangit/public_html/vietma/booking/vendor/composer/platform_check.php on line 26
+[24-Jul-2025 17:47:30 Asia/Ho_Chi_Minh] PHP Fatal error:  Uncaught RuntimeException: Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.0.0". You are running 7.4.33. in /home/danangit/public_html/vietma/booking/vendor/composer/platform_check.php:22
+Stack trace:
+#0 /home/danangit/public_html/vietma/booking/vendor/composer/autoload_real.php(25): require()
+#1 /home/danangit/public_html/vietma/booking/vendor/autoload.php(22): ComposerAutoloaderInita363c2e7ff3e0ed9437fd1041e531cd6::getLoader()
+#2 /home/danangit/public_html/vietma/booking/download_excel_template.php(7): require_once('/home/danangit/...')
+#3 {main}
+  thrown in /home/danangit/public_html/vietma/booking/vendor/composer/platform_check.php on line 22
+[24-Jul-2025 17:47:33 Asia/Ho_Chi_Minh] PHP Fatal error:  Uncaught RuntimeException: Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.0.0". You are running 7.4.33. in /home/danangit/public_html/vietma/booking/vendor/composer/platform_check.php:22
+Stack trace:
+#0 /home/danangit/public_html/vietma/booking/vendor/composer/autoload_real.php(25): require()
+#1 /home/danangit/public_html/vietma/booking/vendor/autoload.php(22): ComposerAutoloaderInita363c2e7ff3e0ed9437fd1041e531cd6::getLoader()
+#2 /home/danangit/public_html/vietma/booking/download_excel_template.php(7): require_once('/home/danangit/...')
+#3 {main}
+  thrown in /home/danangit/public_html/vietma/booking/vendor/composer/platform_check.php on line 22
+[24-Jul-2025 17:47:35 Asia/Ho_Chi_Minh] PHP Fatal error:  Uncaught RuntimeException: Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.0.0". You are running 7.4.33. in /home/danangit/public_html/vietma/booking/vendor/composer/platform_check.php:22
+Stack trace:
+#0 /home/danangit/public_html/vietma/booking/vendor/composer/autoload_real.php(25): require()
+#1 /home/danangit/public_html/vietma/booking/vendor/autoload.php(22): ComposerAutoloaderInita363c2e7ff3e0ed9437fd1041e531cd6::getLoader()
+#2 /home/danangit/public_html/vietma/booking/download_excel_template.php(7): require_once('/home/danangit/...')
+#3 {main}
+  thrown in /home/danangit/public_html/vietma/booking/vendor/composer/platform_check.php on line 22
+[24-Jul-2025 17:47:58 Asia/Ho_Chi_Minh] PHP Fatal error:  Uncaught RuntimeException: Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.0.0". You are running 7.4.33. in /home/danangit/public_html/vietma/booking/vendor/composer/platform_check.php:22
+Stack trace:
+#0 /home/danangit/public_html/vietma/booking/vendor/composer/autoload_real.php(25): require()
+#1 /home/danangit/public_html/vietma/booking/vendor/autoload.php(22): ComposerAutoloaderInita363c2e7ff3e0ed9437fd1041e531cd6::getLoader()
+#2 /home/danangit/public_html/vietma/booking/download_excel_template.php(7): require_once('/home/danangit/...')
+#3 {main}
+  thrown in /home/danangit/public_html/vietma/booking/vendor/composer/platform_check.php on line 22
+[24-Jul-2025 17:51:20 Asia/Ho_Chi_Minh] PHP Fatal error:  Uncaught RuntimeException: Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.0.0". You are running 7.4.33. in /home/danangit/public_html/vietma/booking/vendor/composer/platform_check.php:22
+Stack trace:
+#0 /home/danangit/public_html/vietma/booking/vendor/composer/autoload_real.php(25): require()
+#1 /home/danangit/public_html/vietma/booking/vendor/autoload.php(22): ComposerAutoloaderInita363c2e7ff3e0ed9437fd1041e531cd6::getLoader()
+#2 /home/danangit/public_html/vietma/booking/download_excel_template.php(7): require_once('/home/danangit/...')
+#3 {main}
+  thrown in /home/danangit/public_html/vietma/booking/vendor/composer/platform_check.php on line 22
+[24-Jul-2025 18:01:07 Asia/Ho_Chi_Minh] PHP Fatal error:  Uncaught RuntimeException: Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.0.0". You are running 7.4.33. in /home/danangit/public_html/vietma/booking/vendor/composer/platform_check.php:22
+Stack trace:
+#0 /home/danangit/public_html/vietma/booking/vendor/composer/autoload_real.php(25): require()
+#1 /home/danangit/public_html/vietma/booking/vendor/autoload.php(22): ComposerAutoloaderInita363c2e7ff3e0ed9437fd1041e531cd6::getLoader()
+#2 /home/danangit/public_html/vietma/booking/download_excel_template.php(7): require_once('/home/danangit/...')
+#3 {main}
+  thrown in /home/danangit/public_html/vietma/booking/vendor/composer/platform_check.php on line 22
+[26-Jul-2025 11:04:06 Asia/Ho_Chi_Minh] PHP Notice:  Undefined variable: booking_data in /home/danangit/public_html/vietma/booking/upload_bookings_excel.php on line 142
+[26-Jul-2025 11:04:06 Asia/Ho_Chi_Minh] PHP Notice:  Trying to access array offset on value of type null in /home/danangit/public_html/vietma/booking/upload_bookings_excel.php on line 142
+[26-Jul-2025 11:04:06 Asia/Ho_Chi_Minh] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/danangit/public_html/vietma/booking/upload_bookings_excel.php:142) in /home/danangit/public_html/vietma/booking/upload_bookings_excel.php on line 265
+[26-Jul-2025 12:11:16 Asia/Ho_Chi_Minh] DEBUG: Processing row 2
+[26-Jul-2025 12:11:16 Asia/Ho_Chi_Minh] DEBUG: Raw booking_data for row 2: Array
+(
+    [shipper_contact] => Mr Phạm thanh Hùng
+    [shipper_address] => 123 Lê Lợi st
+    [shipper_phone] => 321021245
+    [shipper_id_tax] => 12456235
+    [shipper_email] => hunggggg@gmail.com
+    [shipper_country] => Vietnam
+    [gross_weight] => 21
+    [number_of_packages] => 2
+    [dimensions_text] => 40x50x60
+50x60x30
+    [service_type] => DHL
+    [shipment_type] => Parcel
+    [warehouse] => 
+    [receiver_country] => PH
+    [receiver_company] => Hungnson
+    [receiver_contact] => Sons Hung
+    [receiver_phone] => 545122454
+    [receiver_tax_id] => 2544125
+    [receiver_email] => hungsssongg@gmail.com
+    [receiver_postal_code] => 545400
+    [receiver_city] => phil
+    [receiver_state] => phil
+    [receiver_address1] => 456 abc
+    [receiver_address2] => 
+    [receiver_address3] => 
+    [cost] => 
+    [sales_price] => 
+    [note] => 
+)
+
+[26-Jul-2025 12:11:16 Asia/Ho_Chi_Minh] DEBUG: shipper_contact value for row 2: 'Mr Phạm thanh Hùng' (Length: 21)
+[26-Jul-2025 12:11:16 Asia/Ho_Chi_Minh] DEBUG: receiver_address1 value for row 2: '456 abc' (Length: 7)
+[26-Jul-2025 13:31:06 Asia/Ho_Chi_Minh] DEBUG: Processing row 2
+[26-Jul-2025 13:31:06 Asia/Ho_Chi_Minh] DEBUG: Raw booking_data for row 2: Array
+(
+    [shipper_contact] => Mr Phạm thanh Hùng
+    [shipper_address] => 123 Lê Lợi st
+    [shipper_phone] => 321021245
+    [shipper_id_tax] => 12456235
+    [shipper_email] => hunggggg@gmail.com
+    [shipper_country] => Vietnam
+    [gross_weight] => 21
+    [number_of_packages] => 2
+    [dimensions_text] => 40x50x60
+50x60x30
+    [service_type] => DHL
+    [shipment_type] => Parcel
+    [warehouse] => 
+    [receiver_country] => PH
+    [receiver_company] => Hungnson
+    [receiver_contact] => Sons Hung
+    [receiver_phone] => 545122454
+    [receiver_tax_id] => 2544125
+    [receiver_email] => hungsssongg@gmail.com
+    [receiver_postal_code] => 545400
+    [receiver_city] => phil
+    [receiver_state] => phil
+    [receiver_address1] => 456 abc
+    [receiver_address2] => 
+    [receiver_address3] => 
+    [cost] => 
+    [sales_price] => 
+    [note] => 
+)
+
+[26-Jul-2025 13:31:06 Asia/Ho_Chi_Minh] DEBUG: shipper_contact value for row 2: 'Mr Phạm thanh Hùng' (Length: 21)
+[26-Jul-2025 13:31:06 Asia/Ho_Chi_Minh] DEBUG: receiver_address1 value for row 2: '456 abc' (Length: 7)
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Excel Headers (trimmed): Array
+(
+    [Người LH (contact name) (Người gửi)] => 0
+    [Địa chỉ (Người gửi)] => 1
+    [ĐT (tel) (Người gửi)] => 2
+    [Mã số thuế/CCCD/CMND (Người gửi)] => 3
+    [Email (Người gửi)] => 4
+    [Quốc gia (Người gửi)] => 5
+    [Cân nặng (gross weight) (kg)] => 6
+    [Số lượng kiện (No. of packages)] => 7
+    [Kích thước (Dài x Rộng x Cao) (cm)] => 8
+    [Loại hình dịch vụ (Service Type)] => 9
+    [Loại (type)] => 10
+    [Kho hàng] => 11
+    [Nước đến (country)] => 12
+    [Cty (company name) (Người nhận)] => 13
+    [Người LH (contact name) (Người nhận)] => 14
+    [ĐT (tel) (Người nhận)] => 15
+    [Tax ID (Người nhận)] => 16
+    [Email (Người nhận)] => 17
+    [Postal code (Người nhận)] => 18
+    [Thành phố (city) (Người nhận)] => 19
+    [Tỉnh (State) (Người nhận)] => 20
+    [Địa chỉ 1 (address 1) (Người nhận)] => 21
+    [Địa chỉ 2 (address 2) (Người nhận)] => 22
+    [Địa chỉ 3 (address 3) (Người nhận)] => 23
+    [Chi phí (Cost)] => 24
+    [Giá bán (Sales Price)] => 25
+    [Ghi chú (Note)] => 26
+)
+
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Người LH (contact name) (Người gửi)'
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Người LH (contact name) (Người gửi)': 0
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Người LH (contact name) (Người gửi)': 'Mr Phạm thanh Hùng' (Length: 21)
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Địa chỉ (Người gửi)'
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Địa chỉ (Người gửi)': 1
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Địa chỉ (Người gửi)': '123 Lê Lợi st' (Length: 16)
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'ĐT (tel) (Người gửi)'
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'ĐT (tel) (Người gửi)': 2
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'ĐT (tel) (Người gửi)': '321021245' (Length: 9)
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Mã số thuế/CCCD/CMND (Người gửi)'
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Mã số thuế/CCCD/CMND (Người gửi)': 3
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Mã số thuế/CCCD/CMND (Người gửi)': '12456235' (Length: 8)
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Email (Người gửi)'
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Email (Người gửi)': 4
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Email (Người gửi)': 'hunggggg@gmail.com' (Length: 18)
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Quốc gia (Người gửi)'
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Quốc gia (Người gửi)': 5
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Quốc gia (Người gửi)': 'Vietnam' (Length: 7)
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Cân nặng (gross weight) (kg)'
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Cân nặng (gross weight) (kg)': 6
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Cân nặng (gross weight) (kg)': '21' (Length: 2)
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Số lượng kiện (No. of packages)'
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Số lượng kiện (No. of packages)': 7
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Số lượng kiện (No. of packages)': '2' (Length: 1)
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Kích thước (Dài x Rộng x Cao) (cm)'
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Kích thước (Dài x Rộng x Cao) (cm)': 8
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Kích thước (Dài x Rộng x Cao) (cm)': '40x50x60
+50x60x30' (Length: 17)
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Loại hình dịch vụ (Service Type)'
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Loại hình dịch vụ (Service Type)': 9
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Loại hình dịch vụ (Service Type)': 'DHL' (Length: 3)
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Loại (type)'
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Loại (type)': 10
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Loại (type)': 'Parcel' (Length: 6)
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Kho hàng'
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Kho hàng': 11
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Data for 'Kho hàng' is not set or col_index is null.
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Nước đến (country)'
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Nước đến (country)': 12
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Nước đến (country)': 'PH' (Length: 2)
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Cty (company name) (Người nhận)'
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Cty (company name) (Người nhận)': 13
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Cty (company name) (Người nhận)': 'Hungnson' (Length: 8)
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Người LH (contact name) (Người nhận)'
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Người LH (contact name) (Người nhận)': 14
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Người LH (contact name) (Người nhận)': 'Sons Hung' (Length: 9)
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'ĐT (tel) (Người nhận)'
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'ĐT (tel) (Người nhận)': 15
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'ĐT (tel) (Người nhận)': '545122454' (Length: 9)
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Tax ID (Người nhận)'
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Tax ID (Người nhận)': 16
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Tax ID (Người nhận)': '2544125' (Length: 7)
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Email (Người nhận)'
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Email (Người nhận)': 17
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Email (Người nhận)': 'hungsssongg@gmail.com' (Length: 21)
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Postal code (Người nhận)'
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Postal code (Người nhận)': 18
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Postal code (Người nhận)': '545400' (Length: 6)
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Thành phố (city) (Người nhận)'
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Thành phố (city) (Người nhận)': 19
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Thành phố (city) (Người nhận)': 'phil' (Length: 4)
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Tỉnh (State) (Người nhận)'
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Tỉnh (State) (Người nhận)': 20
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Tỉnh (State) (Người nhận)': 'phil' (Length: 4)
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Địa chỉ 1 (address 1) (Người nhận)'
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Địa chỉ 1 (address 1) (Người nhận)': 21
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Địa chỉ 1 (address 1) (Người nhận)': '456 abc' (Length: 7)
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Địa chỉ 2 (address 2) (Người nhận)'
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Địa chỉ 2 (address 2) (Người nhận)': 22
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Data for 'Địa chỉ 2 (address 2) (Người nhận)' is not set or col_index is null.
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Địa chỉ 3 (address 3) (Người nhận)'
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Địa chỉ 3 (address 3) (Người nhận)': 23
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Data for 'Địa chỉ 3 (address 3) (Người nhận)' is not set or col_index is null.
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Chi phí (Cost)'
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Chi phí (Cost)': 24
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Data for 'Chi phí (Cost)' is not set or col_index is null.
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Giá bán (Sales Price)'
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Giá bán (Sales Price)': 25
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Data for 'Giá bán (Sales Price)' is not set or col_index is null.
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Ghi chú (Note)'
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Ghi chú (Note)': 26
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Data for 'Ghi chú (Note)' is not set or col_index is null.
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Processing row 2
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: Final booking_data for row 2: Array
+(
+    [shipper_contact] => Mr Phạm thanh Hùng
+    [shipper_address] => 123 Lê Lợi st
+    [shipper_phone] => 321021245
+    [shipper_id_tax] => 12456235
+    [shipper_email] => hunggggg@gmail.com
+    [shipper_country] => Vietnam
+    [gross_weight] => 21
+    [number_of_packages] => 2
+    [dimensions_text] => 40x50x60
+50x60x30
+    [service_type] => DHL
+    [shipment_type] => Parcel
+    [warehouse] => 
+    [receiver_country] => PH
+    [receiver_company] => Hungnson
+    [receiver_contact] => Sons Hung
+    [receiver_phone] => 545122454
+    [receiver_tax_id] => 2544125
+    [receiver_email] => hungsssongg@gmail.com
+    [receiver_postal_code] => 545400
+    [receiver_city] => phil
+    [receiver_state] => phil
+    [receiver_address1] => 456 abc
+    [receiver_address2] => 
+    [receiver_address3] => 
+    [cost] => 
+    [sales_price] => 
+    [note] => 
+)
+
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: shipper_contact value for row 2: 'Mr Phạm thanh Hùng' (Length: 21)
+[26-Jul-2025 13:38:40 Asia/Ho_Chi_Minh] DEBUG: receiver_address1 value for row 2: '456 abc' (Length: 7)
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Excel Headers (trimmed): Array
+(
+    [Người LH (contact name) (Người gửi)] => 0
+    [Địa chỉ (Người gửi)] => 1
+    [ĐT (tel) (Người gửi)] => 2
+    [Mã số thuế/CCCD/CMND (Người gửi)] => 3
+    [Email (Người gửi)] => 4
+    [Quốc gia (Người gửi)] => 5
+    [Cân nặng (gross weight) (kg)] => 6
+    [Số lượng kiện (No. of packages)] => 7
+    [Kích thước (Dài x Rộng x Cao) (cm)] => 8
+    [Loại hình dịch vụ (Service Type)] => 9
+    [Loại (type)] => 10
+    [Kho hàng] => 11
+    [Nước đến (country)] => 12
+    [Cty (company name) (Người nhận)] => 13
+    [Người LH (contact name) (Người nhận)] => 14
+    [ĐT (tel) (Người nhận)] => 15
+    [Tax ID (Người nhận)] => 16
+    [Email (Người nhận)] => 17
+    [Postal code (Người nhận)] => 18
+    [Thành phố (city) (Người nhận)] => 19
+    [Tỉnh (State) (Người nhận)] => 20
+    [Địa chỉ 1 (address 1) (Người nhận)] => 21
+    [Địa chỉ 2 (address 2) (Người nhận)] => 22
+    [Địa chỉ 3 (address 3) (Người nhận)] => 23
+    [Chi phí (Cost)] => 24
+    [Giá bán (Sales Price)] => 25
+    [Ghi chú (Note)] => 26
+)
+
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Người LH (contact name) (Người gửi)'
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Người LH (contact name) (Người gửi)': 0
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Người LH (contact name) (Người gửi)': 'Mr Phạm thanh Hùng' (Length: 21)
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Địa chỉ (Người gửi)'
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Địa chỉ (Người gửi)': 1
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Địa chỉ (Người gửi)': '123 Lê Lợi st' (Length: 16)
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'ĐT (tel) (Người gửi)'
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'ĐT (tel) (Người gửi)': 2
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'ĐT (tel) (Người gửi)': '321021245' (Length: 9)
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Mã số thuế/CCCD/CMND (Người gửi)'
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Mã số thuế/CCCD/CMND (Người gửi)': 3
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Mã số thuế/CCCD/CMND (Người gửi)': '12456235' (Length: 8)
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Email (Người gửi)'
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Email (Người gửi)': 4
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Email (Người gửi)': 'hunggggg@gmail.com' (Length: 18)
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Quốc gia (Người gửi)'
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Quốc gia (Người gửi)': 5
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Quốc gia (Người gửi)': 'Vietnam' (Length: 7)
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Cân nặng (gross weight) (kg)'
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Cân nặng (gross weight) (kg)': 6
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Cân nặng (gross weight) (kg)': '21' (Length: 2)
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Số lượng kiện (No. of packages)'
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Số lượng kiện (No. of packages)': 7
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Số lượng kiện (No. of packages)': '2' (Length: 1)
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Kích thước (Dài x Rộng x Cao) (cm)'
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Kích thước (Dài x Rộng x Cao) (cm)': 8
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Kích thước (Dài x Rộng x Cao) (cm)': '40x50x60
+50x60x30' (Length: 17)
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Loại hình dịch vụ (Service Type)'
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Loại hình dịch vụ (Service Type)': 9
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Loại hình dịch vụ (Service Type)': 'DHL' (Length: 3)
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Loại (type)'
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Loại (type)': 10
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Loại (type)': 'Parcel' (Length: 6)
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Kho hàng'
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Kho hàng': 11
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Data for 'Kho hàng' is not set or col_index is null.
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Nước đến (country)'
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Nước đến (country)': 12
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Nước đến (country)': 'PH' (Length: 2)
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Cty (company name) (Người nhận)'
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Cty (company name) (Người nhận)': 13
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Cty (company name) (Người nhận)': 'Hungnson' (Length: 8)
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Người LH (contact name) (Người nhận)'
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Người LH (contact name) (Người nhận)': 14
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Người LH (contact name) (Người nhận)': 'Sons Hung' (Length: 9)
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'ĐT (tel) (Người nhận)'
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'ĐT (tel) (Người nhận)': 15
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'ĐT (tel) (Người nhận)': '545122454' (Length: 9)
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Tax ID (Người nhận)'
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Tax ID (Người nhận)': 16
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Tax ID (Người nhận)': '2544125' (Length: 7)
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Email (Người nhận)'
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Email (Người nhận)': 17
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Email (Người nhận)': 'hungsssongg@gmail.com' (Length: 21)
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Postal code (Người nhận)'
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Postal code (Người nhận)': 18
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Postal code (Người nhận)': '545400' (Length: 6)
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Thành phố (city) (Người nhận)'
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Thành phố (city) (Người nhận)': 19
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Thành phố (city) (Người nhận)': 'phil' (Length: 4)
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Tỉnh (State) (Người nhận)'
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Tỉnh (State) (Người nhận)': 20
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Tỉnh (State) (Người nhận)': 'phil' (Length: 4)
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Địa chỉ 1 (address 1) (Người nhận)'
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Địa chỉ 1 (address 1) (Người nhận)': 21
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Địa chỉ 1 (address 1) (Người nhận)': '456 abc' (Length: 7)
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Địa chỉ 2 (address 2) (Người nhận)'
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Địa chỉ 2 (address 2) (Người nhận)': 22
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Data for 'Địa chỉ 2 (address 2) (Người nhận)' is not set or col_index is null.
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Địa chỉ 3 (address 3) (Người nhận)'
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Địa chỉ 3 (address 3) (Người nhận)': 23
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Data for 'Địa chỉ 3 (address 3) (Người nhận)' is not set or col_index is null.
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Chi phí (Cost)'
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Chi phí (Cost)': 24
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Data for 'Chi phí (Cost)' is not set or col_index is null.
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Giá bán (Sales Price)'
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Giá bán (Sales Price)': 25
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Data for 'Giá bán (Sales Price)' is not set or col_index is null.
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Ghi chú (Note)'
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Ghi chú (Note)': 26
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Data for 'Ghi chú (Note)' is not set or col_index is null.
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Processing row 2
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: Final booking_data for row 2: Array
+(
+    [shipper_contact] => Mr Phạm thanh Hùng
+    [shipper_address] => 123 Lê Lợi st
+    [shipper_phone] => 321021245
+    [shipper_id_tax] => 12456235
+    [shipper_email] => hunggggg@gmail.com
+    [shipper_country] => Vietnam
+    [gross_weight] => 21
+    [number_of_packages] => 2
+    [dimensions_text] => 40x50x60
+50x60x30
+    [service_type] => DHL
+    [shipment_type] => Parcel
+    [warehouse] => 
+    [receiver_country] => PH
+    [receiver_company] => Hungnson
+    [receiver_contact] => Sons Hung
+    [receiver_phone] => 545122454
+    [receiver_tax_id] => 2544125
+    [receiver_email] => hungsssongg@gmail.com
+    [receiver_postal_code] => 545400
+    [receiver_city] => phil
+    [receiver_state] => phil
+    [receiver_address1] => 456 abc
+    [receiver_address2] => 
+    [receiver_address3] => 
+    [cost] => 
+    [sales_price] => 
+    [note] => 
+)
+
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: shipper_contact value before empty check: 'Mr Phạm thanh Hùng' (Length: 21)
+[26-Jul-2025 13:45:26 Asia/Ho_Chi_Minh] DEBUG: receiver_address1 value before empty check: '456 abc' (Length: 7)
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Excel Headers (trimmed): Array
+(
+    [Người LH (contact name) (Người gửi)] => 0
+    [Địa chỉ (Người gửi)] => 1
+    [ĐT (tel) (Người gửi)] => 2
+    [Mã số thuế/CCCD/CMND (Người gửi)] => 3
+    [Email (Người gửi)] => 4
+    [Quốc gia (Người gửi)] => 5
+    [Cân nặng (gross weight) (kg)] => 6
+    [Số lượng kiện (No. of packages)] => 7
+    [Kích thước (Dài x Rộng x Cao) (cm)] => 8
+    [Loại hình dịch vụ (Service Type)] => 9
+    [Loại (type)] => 10
+    [Kho hàng] => 11
+    [Nước đến (country)] => 12
+    [Cty (company name) (Người nhận)] => 13
+    [Người LH (contact name) (Người nhận)] => 14
+    [ĐT (tel) (Người nhận)] => 15
+    [Tax ID (Người nhận)] => 16
+    [Email (Người nhận)] => 17
+    [Postal code (Người nhận)] => 18
+    [Thành phố (city) (Người nhận)] => 19
+    [Tỉnh (State) (Người nhận)] => 20
+    [Địa chỉ 1 (address 1) (Người nhận)] => 21
+    [Địa chỉ 2 (address 2) (Người nhận)] => 22
+    [Địa chỉ 3 (address 3) (Người nhận)] => 23
+    [Chi phí (Cost)] => 24
+    [Giá bán (Sales Price)] => 25
+    [Ghi chú (Note)] => 26
+)
+
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Người LH (contact name) (Người gửi)'
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Người LH (contact name) (Người gửi)': 0
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Người LH (contact name) (Người gửi)': 'Mr Phạm thanh Hùng' (Length: 21)
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Địa chỉ (Người gửi)'
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Địa chỉ (Người gửi)': 1
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Địa chỉ (Người gửi)': '123 Lê Lợi st' (Length: 16)
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'ĐT (tel) (Người gửi)'
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'ĐT (tel) (Người gửi)': 2
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'ĐT (tel) (Người gửi)': '321021245' (Length: 9)
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Mã số thuế/CCCD/CMND (Người gửi)'
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Mã số thuế/CCCD/CMND (Người gửi)': 3
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Mã số thuế/CCCD/CMND (Người gửi)': '12456235' (Length: 8)
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Email (Người gửi)'
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Email (Người gửi)': 4
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Email (Người gửi)': 'hunggggg@gmail.com' (Length: 18)
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Quốc gia (Người gửi)'
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Quốc gia (Người gửi)': 5
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Quốc gia (Người gửi)': 'Vietnam' (Length: 7)
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Cân nặng (gross weight) (kg)'
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Cân nặng (gross weight) (kg)': 6
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Cân nặng (gross weight) (kg)': '21' (Length: 2)
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Số lượng kiện (No. of packages)'
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Số lượng kiện (No. of packages)': 7
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Số lượng kiện (No. of packages)': '2' (Length: 1)
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Kích thước (Dài x Rộng x Cao) (cm)'
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Kích thước (Dài x Rộng x Cao) (cm)': 8
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Kích thước (Dài x Rộng x Cao) (cm)': '40x50x60
+50x60x30' (Length: 17)
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Loại hình dịch vụ (Service Type)'
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Loại hình dịch vụ (Service Type)': 9
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Loại hình dịch vụ (Service Type)': 'DHL' (Length: 3)
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Loại (type)'
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Loại (type)': 10
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Loại (type)': 'Parcel' (Length: 6)
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Kho hàng'
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Kho hàng': 11
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Data for 'Kho hàng' is not set or col_index is null.
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Nước đến (country)'
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Nước đến (country)': 12
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Nước đến (country)': 'PH' (Length: 2)
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Cty (company name) (Người nhận)'
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Cty (company name) (Người nhận)': 13
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Cty (company name) (Người nhận)': 'Hungnson' (Length: 8)
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Người LH (contact name) (Người nhận)'
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Người LH (contact name) (Người nhận)': 14
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Người LH (contact name) (Người nhận)': 'Sons Hung' (Length: 9)
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'ĐT (tel) (Người nhận)'
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'ĐT (tel) (Người nhận)': 15
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'ĐT (tel) (Người nhận)': '545122454' (Length: 9)
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Tax ID (Người nhận)'
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Tax ID (Người nhận)': 16
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Tax ID (Người nhận)': '2544125' (Length: 7)
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Email (Người nhận)'
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Email (Người nhận)': 17
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Email (Người nhận)': 'hungsssongg@gmail.com' (Length: 21)
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Postal code (Người nhận)'
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Postal code (Người nhận)': 18
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Postal code (Người nhận)': '545400' (Length: 6)
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Thành phố (city) (Người nhận)'
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Thành phố (city) (Người nhận)': 19
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Thành phố (city) (Người nhận)': 'phil' (Length: 4)
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Tỉnh (State) (Người nhận)'
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Tỉnh (State) (Người nhận)': 20
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Tỉnh (State) (Người nhận)': 'phil' (Length: 4)
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Địa chỉ 1 (address 1) (Người nhận)'
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Địa chỉ 1 (address 1) (Người nhận)': 21
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Địa chỉ 1 (address 1) (Người nhận)': '456 abc' (Length: 7)
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Địa chỉ 2 (address 2) (Người nhận)'
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Địa chỉ 2 (address 2) (Người nhận)': 22
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Data for 'Địa chỉ 2 (address 2) (Người nhận)' is not set or col_index is null.
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Địa chỉ 3 (address 3) (Người nhận)'
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Địa chỉ 3 (address 3) (Người nhận)': 23
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Data for 'Địa chỉ 3 (address 3) (Người nhận)' is not set or col_index is null.
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Chi phí (Cost)'
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Chi phí (Cost)': 24
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Data for 'Chi phí (Cost)' is not set or col_index is null.
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Giá bán (Sales Price)'
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Giá bán (Sales Price)': 25
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Data for 'Giá bán (Sales Price)' is not set or col_index is null.
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Ghi chú (Note)'
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Ghi chú (Note)': 26
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Data for 'Ghi chú (Note)' is not set or col_index is null.
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Processing row 2
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: Final booking_data for row 2: Array
+(
+    [shipper_contact] => Mr Phạm thanh Hùng
+    [shipper_address] => 123 Lê Lợi st
+    [shipper_phone] => 321021245
+    [shipper_id_tax] => 12456235
+    [shipper_email] => hunggggg@gmail.com
+    [shipper_country] => Vietnam
+    [gross_weight] => 21
+    [number_of_packages] => 2
+    [dimensions_text] => 40x50x60
+50x60x30
+    [service_type] => DHL
+    [shipment_type] => Parcel
+    [warehouse] => 
+    [receiver_country] => PH
+    [receiver_company] => Hungnson
+    [receiver_contact] => Sons Hung
+    [receiver_phone] => 545122454
+    [receiver_tax_id] => 2544125
+    [receiver_email] => hungsssongg@gmail.com
+    [receiver_postal_code] => 545400
+    [receiver_city] => phil
+    [receiver_state] => phil
+    [receiver_address1] => 456 abc
+    [receiver_address2] => 
+    [receiver_address3] => 
+    [cost] => 
+    [sales_price] => 
+    [note] => 
+)
+
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: shipper_contact value before empty check: 'Mr Phạm thanh Hùng' (Length: 21)
+[29-Jul-2025 15:02:44 Asia/Ho_Chi_Minh] DEBUG: receiver_address1 value before empty check: '456 abc' (Length: 7)
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Excel Headers (trimmed): Array
+(
+    [Người LH (contact name) (Người gửi)] => 0
+    [Địa chỉ (Người gửi)] => 1
+    [ĐT (tel) (Người gửi)] => 2
+    [Mã số thuế/CCCD/CMND (Người gửi)] => 3
+    [Email (Người gửi)] => 4
+    [Quốc gia (Người gửi)] => 5
+    [Cân nặng (gross weight) (kg)] => 6
+    [Số lượng kiện (No. of packages)] => 7
+    [Kích thước (Dài x Rộng x Cao) (cm)] => 8
+    [Loại hình dịch vụ (Service Type)] => 9
+    [Loại (type)] => 10
+    [Kho hàng] => 11
+    [Nước đến (country)] => 12
+    [Cty (company name) (Người nhận)] => 13
+    [Người LH (contact name) (Người nhận)] => 14
+    [ĐT (tel) (Người nhận)] => 15
+    [Tax ID (Người nhận)] => 16
+    [Email (Người nhận)] => 17
+    [Postal code (Người nhận)] => 18
+    [Thành phố (city) (Người nhận)] => 19
+    [Tỉnh (State) (Người nhận)] => 20
+    [Địa chỉ 1 (address 1) (Người nhận)] => 21
+    [Địa chỉ 2 (address 2) (Người nhận)] => 22
+    [Địa chỉ 3 (address 3) (Người nhận)] => 23
+    [Chi phí (Cost)] => 24
+    [Giá bán (Sales Price)] => 25
+    [Ghi chú (Note)] => 26
+)
+
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Người LH (contact name) (Người gửi)'
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Người LH (contact name) (Người gửi)': 0
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Người LH (contact name) (Người gửi)': 'Mr Phạm thanh Hùng' (Length: 21)
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Địa chỉ (Người gửi)'
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Địa chỉ (Người gửi)': 1
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Địa chỉ (Người gửi)': '123 Lê Lợi st' (Length: 16)
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'ĐT (tel) (Người gửi)'
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'ĐT (tel) (Người gửi)': 2
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'ĐT (tel) (Người gửi)': '321021245' (Length: 9)
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Mã số thuế/CCCD/CMND (Người gửi)'
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Mã số thuế/CCCD/CMND (Người gửi)': 3
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Mã số thuế/CCCD/CMND (Người gửi)': '12456235' (Length: 8)
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Email (Người gửi)'
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Email (Người gửi)': 4
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Email (Người gửi)': 'hunggggg@gmail.com' (Length: 18)
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Quốc gia (Người gửi)'
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Quốc gia (Người gửi)': 5
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Quốc gia (Người gửi)': 'Vietnam' (Length: 7)
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Cân nặng (gross weight) (kg)'
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Cân nặng (gross weight) (kg)': 6
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Cân nặng (gross weight) (kg)': '21' (Length: 2)
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Số lượng kiện (No. of packages)'
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Số lượng kiện (No. of packages)': 7
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Số lượng kiện (No. of packages)': '2' (Length: 1)
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Kích thước (Dài x Rộng x Cao) (cm)'
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Kích thước (Dài x Rộng x Cao) (cm)': 8
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Kích thước (Dài x Rộng x Cao) (cm)': '40x50x60
+50x60x30' (Length: 17)
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Loại hình dịch vụ (Service Type)'
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Loại hình dịch vụ (Service Type)': 9
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Loại hình dịch vụ (Service Type)': 'DHL' (Length: 3)
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Loại (type)'
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Loại (type)': 10
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Loại (type)': 'Parcel' (Length: 6)
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Kho hàng'
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Kho hàng': 11
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Data for 'Kho hàng' is not set or col_index is null.
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Nước đến (country)'
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Nước đến (country)': 12
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Nước đến (country)': 'PH' (Length: 2)
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Cty (company name) (Người nhận)'
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Cty (company name) (Người nhận)': 13
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Cty (company name) (Người nhận)': 'Hungnson' (Length: 8)
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Người LH (contact name) (Người nhận)'
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Người LH (contact name) (Người nhận)': 14
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Người LH (contact name) (Người nhận)': 'Sons Hung' (Length: 9)
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'ĐT (tel) (Người nhận)'
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'ĐT (tel) (Người nhận)': 15
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'ĐT (tel) (Người nhận)': '545122454' (Length: 9)
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Tax ID (Người nhận)'
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Tax ID (Người nhận)': 16
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Tax ID (Người nhận)': '2544125' (Length: 7)
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Email (Người nhận)'
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Email (Người nhận)': 17
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Email (Người nhận)': 'hungsssongg@gmail.com' (Length: 21)
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Postal code (Người nhận)'
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Postal code (Người nhận)': 18
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Postal code (Người nhận)': '545400' (Length: 6)
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Thành phố (city) (Người nhận)'
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Thành phố (city) (Người nhận)': 19
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Thành phố (city) (Người nhận)': 'phil' (Length: 4)
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Tỉnh (State) (Người nhận)'
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Tỉnh (State) (Người nhận)': 20
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Tỉnh (State) (Người nhận)': 'phil' (Length: 4)
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Địa chỉ 1 (address 1) (Người nhận)'
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Địa chỉ 1 (address 1) (Người nhận)': 21
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Địa chỉ 1 (address 1) (Người nhận)': '456 abc' (Length: 7)
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Địa chỉ 2 (address 2) (Người nhận)'
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Địa chỉ 2 (address 2) (Người nhận)': 22
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Data for 'Địa chỉ 2 (address 2) (Người nhận)' is not set or col_index is null.
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Địa chỉ 3 (address 3) (Người nhận)'
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Địa chỉ 3 (address 3) (Người nhận)': 23
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Data for 'Địa chỉ 3 (address 3) (Người nhận)' is not set or col_index is null.
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Chi phí (Cost)'
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Chi phí (Cost)': 24
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Data for 'Chi phí (Cost)' is not set or col_index is null.
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Giá bán (Sales Price)'
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Giá bán (Sales Price)': 25
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Data for 'Giá bán (Sales Price)' is not set or col_index is null.
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Ghi chú (Note)'
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Ghi chú (Note)': 26
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Data for 'Ghi chú (Note)' is not set or col_index is null.
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Processing row 2
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: Final booking_data for row 2: Array
+(
+    [shipper_contact] => Mr Phạm thanh Hùng
+    [shipper_address] => 123 Lê Lợi st
+    [shipper_phone] => 321021245
+    [shipper_id_tax] => 12456235
+    [shipper_email] => hunggggg@gmail.com
+    [shipper_country] => Vietnam
+    [gross_weight] => 21
+    [number_of_packages] => 2
+    [dimensions_text] => 40x50x60
+50x60x30
+    [service_type] => DHL
+    [shipment_type] => Parcel
+    [warehouse] => 
+    [receiver_country] => PH
+    [receiver_company] => Hungnson
+    [receiver_contact] => Sons Hung
+    [receiver_phone] => 545122454
+    [receiver_tax_id] => 2544125
+    [receiver_email] => hungsssongg@gmail.com
+    [receiver_postal_code] => 545400
+    [receiver_city] => phil
+    [receiver_state] => phil
+    [receiver_address1] => 456 abc
+    [receiver_address2] => 
+    [receiver_address3] => 
+    [cost] => 
+    [sales_price] => 
+    [note] => 
+)
+
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: shipper_contact value after aggressive trim: 'Mr Phạm thanh Hùng' (Length: 21)
+[29-Jul-2025 15:14:57 Asia/Ho_Chi_Minh] DEBUG: receiver_address1 value after aggressive trim: '456 abc' (Length: 7)
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Excel Headers (trimmed): Array
+(
+    [Người LH (contact name) (Người gửi)] => 0
+    [Địa chỉ (Người gửi)] => 1
+    [ĐT (tel) (Người gửi)] => 2
+    [Mã số thuế/CCCD/CMND (Người gửi)] => 3
+    [Email (Người gửi)] => 4
+    [Quốc gia (Người gửi)] => 5
+    [Cân nặng (gross weight) (kg)] => 6
+    [Số lượng kiện (No. of packages)] => 7
+    [Kích thước (Dài x Rộng x Cao) (cm)] => 8
+    [Loại hình dịch vụ (Service Type)] => 9
+    [Loại (type)] => 10
+    [Kho hàng] => 11
+    [Nước đến (country)] => 12
+    [Cty (company name) (Người nhận)] => 13
+    [Người LH (contact name) (Người nhận)] => 14
+    [ĐT (tel) (Người nhận)] => 15
+    [Tax ID (Người nhận)] => 16
+    [Email (Người nhận)] => 17
+    [Postal code (Người nhận)] => 18
+    [Thành phố (city) (Người nhận)] => 19
+    [Tỉnh (State) (Người nhận)] => 20
+    [Địa chỉ 1 (address 1) (Người nhận)] => 21
+    [Địa chỉ 2 (address 2) (Người nhận)] => 22
+    [Địa chỉ 3 (address 3) (Người nhận)] => 23
+    [Chi phí (Cost)] => 24
+    [Giá bán (Sales Price)] => 25
+    [Ghi chú (Note)] => 26
+)
+
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Người LH (contact name) (Người gửi)'
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Người LH (contact name) (Người gửi)': 0
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Người LH (contact name) (Người gửi)': 'Mr Phạm thanh Hùng' (Length: 21)
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Địa chỉ (Người gửi)'
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Địa chỉ (Người gửi)': 1
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Địa chỉ (Người gửi)': '123 Lê Lợi st' (Length: 16)
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'ĐT (tel) (Người gửi)'
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'ĐT (tel) (Người gửi)': 2
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'ĐT (tel) (Người gửi)': '321021245' (Length: 9)
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Mã số thuế/CCCD/CMND (Người gửi)'
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Mã số thuế/CCCD/CMND (Người gửi)': 3
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Mã số thuế/CCCD/CMND (Người gửi)': '12456235' (Length: 8)
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Email (Người gửi)'
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Email (Người gửi)': 4
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Email (Người gửi)': 'hunggggg@gmail.com' (Length: 18)
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Quốc gia (Người gửi)'
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Quốc gia (Người gửi)': 5
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Quốc gia (Người gửi)': 'Vietnam' (Length: 7)
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Cân nặng (gross weight) (kg)'
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Cân nặng (gross weight) (kg)': 6
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Cân nặng (gross weight) (kg)': '21' (Length: 2)
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Số lượng kiện (No. of packages)'
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Số lượng kiện (No. of packages)': 7
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Số lượng kiện (No. of packages)': '2' (Length: 1)
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Kích thước (Dài x Rộng x Cao) (cm)'
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Kích thước (Dài x Rộng x Cao) (cm)': 8
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Kích thước (Dài x Rộng x Cao) (cm)': '40x50x60
+50x60x30' (Length: 17)
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Loại hình dịch vụ (Service Type)'
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Loại hình dịch vụ (Service Type)': 9
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Loại hình dịch vụ (Service Type)': 'DHL' (Length: 3)
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Loại (type)'
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Loại (type)': 10
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Loại (type)': 'Parcel' (Length: 6)
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Kho hàng'
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Kho hàng': 11
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Data for 'Kho hàng' is not set or col_index is null.
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Nước đến (country)'
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Nước đến (country)': 12
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Nước đến (country)': 'PH' (Length: 2)
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Cty (company name) (Người nhận)'
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Cty (company name) (Người nhận)': 13
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Cty (company name) (Người nhận)': 'Hungnson' (Length: 8)
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Người LH (contact name) (Người nhận)'
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Người LH (contact name) (Người nhận)': 14
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Người LH (contact name) (Người nhận)': 'Sons Hung' (Length: 9)
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'ĐT (tel) (Người nhận)'
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'ĐT (tel) (Người nhận)': 15
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'ĐT (tel) (Người nhận)': '545122454' (Length: 9)
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Tax ID (Người nhận)'
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Tax ID (Người nhận)': 16
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Tax ID (Người nhận)': '2544125' (Length: 7)
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Email (Người nhận)'
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Email (Người nhận)': 17
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Email (Người nhận)': 'hungsssongg@gmail.com' (Length: 21)
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Postal code (Người nhận)'
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Postal code (Người nhận)': 18
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Postal code (Người nhận)': '545400' (Length: 6)
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Thành phố (city) (Người nhận)'
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Thành phố (city) (Người nhận)': 19
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Thành phố (city) (Người nhận)': 'phil' (Length: 4)
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Tỉnh (State) (Người nhận)'
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Tỉnh (State) (Người nhận)': 20
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Tỉnh (State) (Người nhận)': 'phil' (Length: 4)
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Địa chỉ 1 (address 1) (Người nhận)'
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Địa chỉ 1 (address 1) (Người nhận)': 21
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Raw data from Excel for 'Địa chỉ 1 (address 1) (Người nhận)': '456 abc' (Length: 7)
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Địa chỉ 2 (address 2) (Người nhận)'
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Địa chỉ 2 (address 2) (Người nhận)': 22
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Data for 'Địa chỉ 2 (address 2) (Người nhận)' is not set or col_index is null.
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Địa chỉ 3 (address 3) (Người nhận)'
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Địa chỉ 3 (address 3) (Người nhận)': 23
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Data for 'Địa chỉ 3 (address 3) (Người nhận)' is not set or col_index is null.
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Chi phí (Cost)'
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Chi phí (Cost)': 24
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Data for 'Chi phí (Cost)' is not set or col_index is null.
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Giá bán (Sales Price)'
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Giá bán (Sales Price)': 25
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Data for 'Giá bán (Sales Price)' is not set or col_index is null.
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Row 2, Excel Column Name: 'Ghi chú (Note)'
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Col Index found for 'Ghi chú (Note)': 26
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Data for 'Ghi chú (Note)' is not set or col_index is null.
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Processing row 2
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Final booking_data for row 2: Array
+(
+    [shipper_contact] => Mr Phạm thanh Hùng
+    [shipper_address] => 123 Lê Lợi st
+    [shipper_phone] => 321021245
+    [shipper_id_tax] => 12456235
+    [shipper_email] => hunggggg@gmail.com
+    [shipper_country] => Vietnam
+    [gross_weight] => 21
+    [number_of_packages] => 2
+    [dimensions_text] => 40x50x60
+50x60x30
+    [service_type] => DHL
+    [shipment_type] => Parcel
+    [warehouse] => 
+    [receiver_country] => PH
+    [receiver_company] => Hungnson
+    [receiver_contact] => Sons Hung
+    [receiver_phone] => 545122454
+    [receiver_tax_id] => 2544125
+    [receiver_email] => hungsssongg@gmail.com
+    [receiver_postal_code] => 545400
+    [receiver_city] => phil
+    [receiver_state] => phil
+    [receiver_address1] => 456 abc
+    [receiver_address2] => 
+    [receiver_address3] => 
+    [cost] => 
+    [sales_price] => 
+    [note] => 
+)
+
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: shipper_contact value after aggressive trim: 'Mr Phạm thanh Hùng' (Length: 21)
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: receiver_address1 value after aggressive trim: '456 abc' (Length: 7)
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Final SQL query: INSERT INTO vmlbooking_orders (user_id, shipper_agency_name, reference_code, booking_status, created_at, updated_at,
+            shipper_contact, shipper_address, shipper_phone, shipper_id_tax, shipper_email, shipper_country,
+            gross_weight, number_of_packages, dimensions_text, service_type, shipment_type, warehouse,
+            receiver_country, receiver_company, receiver_contact, receiver_phone, receiver_tax_id, receiver_email, receiver_postal_code,
+            receiver_city, receiver_state, receiver_address1, receiver_address2, receiver_address3) VALUES (?, ?, ?, ?, NOW(), NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Number of parameters for execute: 28
+[29-Jul-2025 15:19:42 Asia/Ho_Chi_Minh] DEBUG: Parameters array: Array
+(
+    [0] => 1
+    [1] => Đại lý số 1
+    [2] => 1357863665
+    [3] => Pending
+    [4] => Mr Phạm thanh Hùng
+    [5] => 123 Lê Lợi st
+    [6] => 321021245
+    [7] => 12456235
+    [8] => hunggggg@gmail.com
+    [9] => Vietnam
+    [10] => 21
+    [11] => 2
+    [12] => 40x50x60
+50x60x30
+    [13] => DHL
+    [14] => Parcel
+    [15] => 
+    [16] => PH
+    [17] => Hungnson
+    [18] => Sons Hung
+    [19] => 545122454
+    [20] => 2544125
+    [21] => hungsssongg@gmail.com
+    [22] => 545400
+    [23] => phil
+    [24] => phil
+    [25] => 456 abc
+    [26] => 
+    [27] => 
+)
+
+[29-Jul-2025 18:01:36 Asia/Ho_Chi_Minh] PHP Fatal error:  Uncaught Error: Call to undefined method TCPDF::GetLineStyle() in /home/danangit/public_html/vietma/booking/print_bill.php:185
+Stack trace:
+#0 {main}
+  thrown in /home/danangit/public_html/vietma/booking/print_bill.php on line 185
+[30-Jul-2025 10:16:58 Asia/Ho_Chi_Minh] PHP Fatal error:  Uncaught Error: Call to undefined method TCPDF::GetLineStyle() in /home/danangit/public_html/vietma/booking/print_bill.php:185
+Stack trace:
+#0 {main}
+  thrown in /home/danangit/public_html/vietma/booking/print_bill.php on line 185
+[31-Jul-2025 12:15:30 Asia/Ho_Chi_Minh] PHP Warning:  require_once(includes/db_config.php): failed to open stream: No such file or directory in /home/danangit/public_html/vietma/booking/setup_vmlbooking_status_history.php on line 6
+[31-Jul-2025 12:15:30 Asia/Ho_Chi_Minh] PHP Fatal error:  require_once(): Failed opening required 'includes/db_config.php' (include_path='.:/opt/cpanel/ea-php74/root/usr/share/pear') in /home/danangit/public_html/vietma/booking/setup_vmlbooking_status_history.php on line 6
+[31-Jul-2025 12:19:47 Asia/Ho_Chi_Minh] PHP Warning:  require_once(includes/db_config.php): failed to open stream: No such file or directory in /home/danangit/public_html/vietma/booking/setup_vmlbooking_status_history.php on line 6
+[31-Jul-2025 12:19:47 Asia/Ho_Chi_Minh] PHP Fatal error:  require_once(): Failed opening required 'includes/db_config.php' (include_path='.:/opt/cpanel/ea-php74/root/usr/share/pear') in /home/danangit/public_html/vietma/booking/setup_vmlbooking_status_history.php on line 6
+[31-Jul-2025 12:19:49 Asia/Ho_Chi_Minh] PHP Warning:  require_once(includes/db_config.php): failed to open stream: No such file or directory in /home/danangit/public_html/vietma/booking/setup_vmlbooking_status_history.php on line 6
+[31-Jul-2025 12:19:49 Asia/Ho_Chi_Minh] PHP Fatal error:  require_once(): Failed opening required 'includes/db_config.php' (include_path='.:/opt/cpanel/ea-php74/root/usr/share/pear') in /home/danangit/public_html/vietma/booking/setup_vmlbooking_status_history.php on line 6
+[31-Jul-2025 12:20:12 Asia/Ho_Chi_Minh] PHP Warning:  require_once(includes/db_config.php): failed to open stream: No such file or directory in /home/danangit/public_html/vietma/booking/setup_vmlbooking_status_history.php on line 6
+[31-Jul-2025 12:20:12 Asia/Ho_Chi_Minh] PHP Fatal error:  require_once(): Failed opening required 'includes/db_config.php' (include_path='.:/opt/cpanel/ea-php74/root/usr/share/pear') in /home/danangit/public_html/vietma/booking/setup_vmlbooking_status_history.php on line 6
+[31-Jul-2025 16:35:26 Asia/Ho_Chi_Minh] PHP Fatal error:  Uncaught Error: Call to undefined function is_logged_in() in /home/danangit/public_html/vietma/booking/update_booking_status_page.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/danangit/public_html/vietma/booking/update_booking_status_page.php on line 10
+[31-Jul-2025 16:37:53 Asia/Ho_Chi_Minh] PHP Fatal error:  Uncaught Error: Call to undefined function is_logged_in() in /home/danangit/public_html/vietma/booking/update_booking_status_page.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/danangit/public_html/vietma/booking/update_booking_status_page.php on line 10
+[31-Jul-2025 16:53:40 Asia/Ho_Chi_Minh] PHP Fatal error:  Uncaught Error: Call to undefined function is_logged_in() in /home/danangit/public_html/vietma/booking/update_booking_status_page.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/danangit/public_html/vietma/booking/update_booking_status_page.php on line 10
+[31-Jul-2025 17:13:51 Asia/Ho_Chi_Minh] PHP Fatal error:  Uncaught Error: Call to undefined function is_logged_in() in /home/danangit/public_html/vietma/booking/update_booking_status.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 10
+[31-Jul-2025 17:18:20 Asia/Ho_Chi_Minh] PHP Fatal error:  Uncaught Error: Call to undefined function is_logged_in() in /home/danangit/public_html/vietma/booking/update_booking_status.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 10
+[31-Jul-2025 17:18:33 Asia/Ho_Chi_Minh] PHP Fatal error:  Uncaught Error: Call to undefined function is_logged_in() in /home/danangit/public_html/vietma/booking/update_booking_status.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 10
+[31-Jul-2025 17:20:30 Asia/Ho_Chi_Minh] PHP Fatal error:  Uncaught Error: Call to undefined function is_logged_in() in /home/danangit/public_html/vietma/booking/update_booking_status.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 12
+[31-Jul-2025 18:16:57 Asia/Ho_Chi_Minh] PHP Warning:  require_once(/home/danangit/public_html/vietma/booking/../includes/db_config.php): failed to open stream: No such file or directory in /home/danangit/public_html/vietma/booking/create_status_logs_table.php on line 8
+[31-Jul-2025 18:16:57 Asia/Ho_Chi_Minh] PHP Fatal error:  require_once(): Failed opening required '/home/danangit/public_html/vietma/booking/../includes/db_config.php' (include_path='.:/opt/cpanel/ea-php74/root/usr/share/pear') in /home/danangit/public_html/vietma/booking/create_status_logs_table.php on line 8
+[31-Jul-2025 18:27:22 Asia/Ho_Chi_Minh] PHP Warning:  require_once(/home/danangit/public_html/vietma/booking/../includes/db_config.php): failed to open stream: No such file or directory in /home/danangit/public_html/vietma/booking/create_status_logs_table.php on line 11
+[31-Jul-2025 18:27:22 Asia/Ho_Chi_Minh] PHP Fatal error:  require_once(): Failed opening required '/home/danangit/public_html/vietma/booking/../includes/db_config.php' (include_path='.:/opt/cpanel/ea-php74/root/usr/share/pear') in /home/danangit/public_html/vietma/booking/create_status_logs_table.php on line 11
+[31-Jul-2025 18:29:02 Asia/Ho_Chi_Minh] PHP Warning:  require_once(/home/danangit/public_html/vietma/booking/../includes/config.php): failed to open stream: No such file or directory in /home/danangit/public_html/vietma/booking/create_status_logs_table.php on line 11
+[31-Jul-2025 18:29:02 Asia/Ho_Chi_Minh] PHP Fatal error:  require_once(): Failed opening required '/home/danangit/public_html/vietma/booking/../includes/config.php' (include_path='.:/opt/cpanel/ea-php74/root/usr/share/pear') in /home/danangit/public_html/vietma/booking/create_status_logs_table.php on line 11
+[01-Aug-2025 15:29:07 Asia/Ho_Chi_Minh] PHP Warning:  require_once(db_config.php): failed to open stream: No such file or directory in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 8
+[01-Aug-2025 15:29:07 Asia/Ho_Chi_Minh] PHP Fatal error:  require_once(): Failed opening required 'db_config.php' (include_path='.:/opt/cpanel/ea-php74/root/usr/share/pear') in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 8
+[01-Aug-2025 15:30:09 Asia/Ho_Chi_Minh] PHP Warning:  require_once(config.php): failed to open stream: No such file or directory in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 8
+[01-Aug-2025 15:30:09 Asia/Ho_Chi_Minh] PHP Fatal error:  require_once(): Failed opening required 'config.php' (include_path='.:/opt/cpanel/ea-php74/root/usr/share/pear') in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 8
+[03-Aug-2025 09:36:12 Asia/Ho_Chi_Minh] PHP Warning:  require_once(db_config.php): failed to open stream: No such file or directory in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 10
+[03-Aug-2025 09:36:12 Asia/Ho_Chi_Minh] PHP Fatal error:  require_once(): Failed opening required 'db_config.php' (include_path='.:/opt/cpanel/ea-php74/root/usr/share/pear') in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 10
+[03-Aug-2025 10:02:22 Asia/Ho_Chi_Minh] PHP Parse error:  syntax error, unexpected '->' (T_OBJECT_OPERATOR), expecting ')' in /home/danangit/public_html/vietma/booking/edit_status_process.php on line 45
+[03-Aug-2025 10:05:16 Asia/Ho_Chi_Minh] PHP Fatal error:  Uncaught Error: Cannot pass parameter 2 by reference in /home/danangit/public_html/vietma/booking/update_booking_status.php:147
+Stack trace:
+#0 {main}
+  thrown in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 147
+[03-Aug-2025 10:30:46 Asia/Ho_Chi_Minh] PHP Notice:  Undefined index: customer_name in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 296
+[03-Aug-2025 10:30:46 Asia/Ho_Chi_Minh] PHP Notice:  Undefined index: customer_email in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 297
+[03-Aug-2025 10:30:46 Asia/Ho_Chi_Minh] PHP Notice:  Undefined index: customer_phone in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 298
+[03-Aug-2025 10:30:46 Asia/Ho_Chi_Minh] PHP Notice:  Undefined index: service_name in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 299
+[03-Aug-2025 10:30:46 Asia/Ho_Chi_Minh] PHP Notice:  Undefined index: booking_date in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 300
+[03-Aug-2025 10:30:46 Asia/Ho_Chi_Minh] PHP Notice:  Undefined index: booking_time in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 301
+[03-Aug-2025 10:30:46 Asia/Ho_Chi_Minh] PHP Notice:  Undefined index: notes in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 303
+[03-Aug-2025 10:30:46 Asia/Ho_Chi_Minh] PHP Notice:  Undefined index: notes in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 354
+[03-Aug-2025 10:30:46 Asia/Ho_Chi_Minh] PHP Notice:  Undefined index: user_id in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 355
+[03-Aug-2025 10:30:46 Asia/Ho_Chi_Minh] PHP Notice:  Undefined index: notes in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 354
+[03-Aug-2025 10:30:46 Asia/Ho_Chi_Minh] PHP Notice:  Undefined index: user_id in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 355
+[03-Aug-2025 10:31:12 Asia/Ho_Chi_Minh] PHP Parse error:  syntax error, unexpected '->' (T_OBJECT_OPERATOR), expecting ')' in /home/danangit/public_html/vietma/booking/edit_status_process.php on line 45
+[03-Aug-2025 10:34:04 Asia/Ho_Chi_Minh] PHP Parse error:  syntax error, unexpected '->' (T_OBJECT_OPERATOR), expecting ')' in /home/danangit/public_html/vietma/booking/edit_status_process.php on line 45
+[03-Aug-2025 10:34:35 Asia/Ho_Chi_Minh] PHP Fatal error:  Uncaught Error: Cannot pass parameter 2 by reference in /home/danangit/public_html/vietma/booking/update_booking_status.php:147
+Stack trace:
+#0 {main}
+  thrown in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 147
+[03-Aug-2025 10:49:57 Asia/Ho_Chi_Minh] PHP Parse error:  syntax error, unexpected '->' (T_OBJECT_OPERATOR), expecting ')' in /home/danangit/public_html/vietma/booking/edit_status_process.php on line 45
+[03-Aug-2025 18:02:05 Asia/Ho_Chi_Minh] PHP Warning:  require_once(../../includes/config.php): failed to open stream: No such file or directory in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 11
+[03-Aug-2025 18:02:05 Asia/Ho_Chi_Minh] PHP Fatal error:  require_once(): Failed opening required '../../includes/config.php' (include_path='.:/opt/cpanel/ea-php74/root/usr/share/pear') in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 11
+[03-Aug-2025 18:03:39 Asia/Ho_Chi_Minh] PHP Warning:  require_once(/includes/config.php): failed to open stream: No such file or directory in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 11
+[03-Aug-2025 18:03:39 Asia/Ho_Chi_Minh] PHP Fatal error:  require_once(): Failed opening required '/includes/config.php' (include_path='.:/opt/cpanel/ea-php74/root/usr/share/pear') in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 11
+[03-Aug-2025 18:05:38 Asia/Ho_Chi_Minh] DEBUG: Trạng thái chính của booking ID 8 đã được cập nhật thành: departed
+[05-Aug-2025 16:48:50 Asia/Ho_Chi_Minh] DEBUG: Trạng thái chính của booking ID 9 đã được cập nhật thành: confirmed
+[05-Aug-2025 18:16:53 Asia/Ho_Chi_Minh] DEBUG: Bắt đầu updateMainBookingStatus cho Booking ID: 9
+[05-Aug-2025 18:16:53 Asia/Ho_Chi_Minh] DEBUG: Log trạng thái mới nhất tìm thấy cho Booking ID 9: confirmed (Created At: 2025-08-05 16:48:00)
+[05-Aug-2025 18:16:53 Asia/Ho_Chi_Minh] DEBUG: Trạng thái chính mới sẽ được đặt cho Booking ID 9: confirmed
+[05-Aug-2025 18:16:53 Asia/Ho_Chi_Minh] DEBUG: Trạng thái chính của booking ID 9 đã được cập nhật thành: confirmed thành công.
+[05-Aug-2025 18:23:02 Asia/Ho_Chi_Minh] PHP Fatal error:  Cannot redeclare redirect() (previously declared in /home/danangit/public_html/vietma/booking/edit_status_process.php:16) in /home/danangit/public_html/vietma/booking/includes/functions.php on line 120
+[05-Aug-2025 18:23:31 Asia/Ho_Chi_Minh] PHP Fatal error:  Cannot redeclare redirect() (previously declared in /home/danangit/public_html/vietma/booking/edit_status_process.php:16) in /home/danangit/public_html/vietma/booking/includes/functions.php on line 120
+[05-Aug-2025 18:25:43 Asia/Ho_Chi_Minh] PHP Fatal error:  Cannot redeclare redirect() (previously declared in /home/danangit/public_html/vietma/booking/edit_status_process.php:16) in /home/danangit/public_html/vietma/booking/includes/functions.php on line 120
+[06-Aug-2025 16:28:43 Asia/Ho_Chi_Minh] DEBUG: Bắt đầu updateMainBookingStatus cho Booking ID: 9
+[06-Aug-2025 16:28:43 Asia/Ho_Chi_Minh] DEBUG: Log trạng thái mới nhất tìm thấy cho Booking ID 9: in transit (Created At: 2025-08-05 17:48:00)
+[06-Aug-2025 16:28:43 Asia/Ho_Chi_Minh] DEBUG: Trạng thái chính mới sẽ được đặt cho Booking ID 9: in transit
+[06-Aug-2025 16:28:43 Asia/Ho_Chi_Minh] DEBUG: Trạng thái chính của booking ID 9 đã được cập nhật thành: in transit thành công.
+[06-Aug-2025 16:41:03 Asia/Ho_Chi_Minh] DEBUG: Bắt đầu updateMainBookingStatus cho Booking ID: 12
+[06-Aug-2025 16:41:03 Asia/Ho_Chi_Minh] DEBUG: Log trạng thái mới nhất tìm thấy cho Booking ID 12: confirmed (Created At: 2025-08-06 16:40:00)
+[06-Aug-2025 16:41:03 Asia/Ho_Chi_Minh] DEBUG: Trạng thái chính mới sẽ được đặt cho Booking ID 12: confirmed
+[06-Aug-2025 16:41:03 Asia/Ho_Chi_Minh] DEBUG: Trạng thái chính của booking ID 12 đã được cập nhật thành: confirmed thành công.
+[06-Aug-2025 16:42:28 Asia/Ho_Chi_Minh] DEBUG: Bắt đầu updateMainBookingStatus cho Booking ID: 13
+[06-Aug-2025 16:42:28 Asia/Ho_Chi_Minh] DEBUG: Log trạng thái mới nhất tìm thấy cho Booking ID 13: confirmed (Created At: 2025-08-06 16:42:00)
+[06-Aug-2025 16:42:28 Asia/Ho_Chi_Minh] DEBUG: Trạng thái chính mới sẽ được đặt cho Booking ID 13: confirmed
+[06-Aug-2025 16:42:28 Asia/Ho_Chi_Minh] DEBUG: Trạng thái chính của booking ID 13 đã được cập nhật thành: confirmed thành công.
+[06-Aug-2025 16:43:22 Asia/Ho_Chi_Minh] DEBUG: Bắt đầu updateMainBookingStatus cho Booking ID: 13
+[06-Aug-2025 16:43:22 Asia/Ho_Chi_Minh] DEBUG: Log trạng thái mới nhất tìm thấy cho Booking ID 13: holded (Created At: 2025-08-06 16:43:00)
+[06-Aug-2025 16:43:22 Asia/Ho_Chi_Minh] DEBUG: Trạng thái chính mới sẽ được đặt cho Booking ID 13: holded
+[06-Aug-2025 16:43:22 Asia/Ho_Chi_Minh] DEBUG: Trạng thái chính của booking ID 13 đã được cập nhật thành: holded thành công.
+[06-Aug-2025 16:44:38 Asia/Ho_Chi_Minh] DEBUG: Bắt đầu updateMainBookingStatus cho Booking ID: 12
+[06-Aug-2025 16:44:38 Asia/Ho_Chi_Minh] DEBUG: Log trạng thái mới nhất tìm thấy cho Booking ID 12: departed (Created At: 2025-08-06 16:44:00)
+[06-Aug-2025 16:44:38 Asia/Ho_Chi_Minh] DEBUG: Trạng thái chính mới sẽ được đặt cho Booking ID 12: departed
+[06-Aug-2025 16:44:38 Asia/Ho_Chi_Minh] DEBUG: Trạng thái chính của booking ID 12 đã được cập nhật thành: departed thành công.
+[06-Aug-2025 16:45:15 Asia/Ho_Chi_Minh] DEBUG: Bắt đầu updateMainBookingStatus cho Booking ID: 12
+[06-Aug-2025 16:45:15 Asia/Ho_Chi_Minh] DEBUG: Log trạng thái mới nhất tìm thấy cho Booking ID 12: in transit (Created At: 2025-08-06 16:45:00)
+[06-Aug-2025 16:45:15 Asia/Ho_Chi_Minh] DEBUG: Trạng thái chính mới sẽ được đặt cho Booking ID 12: in transit
+[06-Aug-2025 16:45:15 Asia/Ho_Chi_Minh] DEBUG: Trạng thái chính của booking ID 12 đã được cập nhật thành: in transit thành công.
+[06-Aug-2025 16:46:06 Asia/Ho_Chi_Minh] DEBUG: Bắt đầu updateMainBookingStatus cho Booking ID: 12
+[06-Aug-2025 16:46:06 Asia/Ho_Chi_Minh] DEBUG: Log trạng thái mới nhất tìm thấy cho Booking ID 12: holded (Created At: 2025-08-06 16:46:00)
+[06-Aug-2025 16:46:06 Asia/Ho_Chi_Minh] DEBUG: Trạng thái chính mới sẽ được đặt cho Booking ID 12: holded
+[06-Aug-2025 16:46:06 Asia/Ho_Chi_Minh] DEBUG: Trạng thái chính của booking ID 12 đã được cập nhật thành: holded thành công.
+[06-Aug-2025 16:48:16 Asia/Ho_Chi_Minh] DEBUG: Bắt đầu updateMainBookingStatus cho Booking ID: 13
+[06-Aug-2025 16:48:16 Asia/Ho_Chi_Minh] DEBUG: Log trạng thái mới nhất tìm thấy cho Booking ID 13: in transit (Created At: 2025-08-06 16:46:00)
+[06-Aug-2025 16:48:16 Asia/Ho_Chi_Minh] DEBUG: Trạng thái chính mới sẽ được đặt cho Booking ID 13: in transit
+[06-Aug-2025 16:48:16 Asia/Ho_Chi_Minh] DEBUG: Trạng thái chính của booking ID 13 đã được cập nhật thành: in transit thành công.
+[08-Aug-2025 15:39:26 Asia/Ho_Chi_Minh] DEBUG: Bắt đầu updateMainBookingStatus cho Booking ID: 12
+[08-Aug-2025 15:39:26 Asia/Ho_Chi_Minh] DEBUG: Log trạng thái mới nhất tìm thấy cho Booking ID 12: pending (Created At: 2025-08-08 15:38:00)
+[08-Aug-2025 15:39:26 Asia/Ho_Chi_Minh] DEBUG: Trạng thái chính mới sẽ được đặt cho Booking ID 12: pending
+[08-Aug-2025 15:39:26 Asia/Ho_Chi_Minh] DEBUG: Trạng thái chính của booking ID 12 đã được cập nhật thành: pending thành công.
+[08-Aug-2025 16:53:11 Asia/Ho_Chi_Minh] PHP Parse error:  syntax error, unexpected ' ' (T_STRING) in /home/danangit/public_html/vietma/booking/cancel_booking.php on line 10
+[08-Aug-2025 16:53:35 Asia/Ho_Chi_Minh] PHP Parse error:  syntax error, unexpected ' ' (T_STRING) in /home/danangit/public_html/vietma/booking/cancel_booking.php on line 10
+[23-Sep-2025 02:57:25 UTC] PHP Deprecated:  Constant FILTER_SANITIZE_STRING is deprecated in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 137
+[23-Sep-2025 02:57:25 UTC] PHP Deprecated:  Constant FILTER_SANITIZE_STRING is deprecated in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 138
+[23-Sep-2025 02:57:25 UTC] PHP Deprecated:  Constant FILTER_SANITIZE_STRING is deprecated in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 139
+[23-Sep-2025 02:57:25 UTC] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/danangit/public_html/vietma/booking/update_booking_status.php:137) in /home/danangit/public_html/vietma/booking/includes/functions.php on line 127
+[23-Sep-2025 02:58:20 UTC] PHP Deprecated:  Constant FILTER_SANITIZE_STRING is deprecated in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 137
+[23-Sep-2025 02:58:20 UTC] PHP Deprecated:  Constant FILTER_SANITIZE_STRING is deprecated in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 138
+[23-Sep-2025 02:58:20 UTC] PHP Deprecated:  Constant FILTER_SANITIZE_STRING is deprecated in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 139
+[23-Sep-2025 02:58:20 UTC] DEBUG: Bắt đầu updateMainBookingStatus cho Booking ID: 12
+[23-Sep-2025 02:58:20 UTC] DEBUG: Log trạng thái mới nhất tìm thấy cho Booking ID 12: in transit (Created At: 2025-09-23 02:56:00)
+[23-Sep-2025 02:58:20 UTC] DEBUG: Trạng thái chính mới sẽ được đặt cho Booking ID 12: in transit
+[23-Sep-2025 02:58:20 UTC] DEBUG: Trạng thái chính của booking ID 12 đã được cập nhật thành: in transit thành công.
+[23-Sep-2025 02:58:20 UTC] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/danangit/public_html/vietma/booking/update_booking_status.php:137) in /home/danangit/public_html/vietma/booking/includes/functions.php on line 127
+[10-Jan-2026 07:08:43 UTC] PHP Deprecated:  Constant FILTER_SANITIZE_STRING is deprecated in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 137
+[10-Jan-2026 07:08:43 UTC] PHP Deprecated:  Constant FILTER_SANITIZE_STRING is deprecated in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 138
+[10-Jan-2026 07:08:43 UTC] PHP Deprecated:  Constant FILTER_SANITIZE_STRING is deprecated in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 139
+[10-Jan-2026 07:08:43 UTC] DEBUG: Bắt đầu updateMainBookingStatus cho Booking ID: 15
+[10-Jan-2026 07:08:43 UTC] DEBUG: Log trạng thái mới nhất tìm thấy cho Booking ID 15: departed (Created At: 2026-01-10 07:07:00)
+[10-Jan-2026 07:08:43 UTC] DEBUG: Trạng thái chính mới sẽ được đặt cho Booking ID 15: departed
+[10-Jan-2026 07:08:43 UTC] DEBUG: Trạng thái chính của booking ID 15 đã được cập nhật thành: departed thành công.
+[10-Jan-2026 07:08:43 UTC] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/danangit/public_html/vietma/booking/update_booking_status.php:137) in /home/danangit/public_html/vietma/booking/includes/functions.php on line 127
+[10-Jan-2026 09:09:24 UTC] PHP Deprecated:  Constant FILTER_SANITIZE_STRING is deprecated in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 137
+[10-Jan-2026 09:09:24 UTC] PHP Deprecated:  Constant FILTER_SANITIZE_STRING is deprecated in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 138
+[10-Jan-2026 09:09:24 UTC] PHP Deprecated:  Constant FILTER_SANITIZE_STRING is deprecated in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 139
+[10-Jan-2026 09:09:24 UTC] DEBUG: Bắt đầu updateMainBookingStatus cho Booking ID: 15
+[10-Jan-2026 09:09:24 UTC] DEBUG: Log trạng thái mới nhất tìm thấy cho Booking ID 15: arrived (Created At: 2026-01-10 15:32:00)
+[10-Jan-2026 09:09:24 UTC] DEBUG: Trạng thái chính mới sẽ được đặt cho Booking ID 15: arrived
+[10-Jan-2026 09:09:24 UTC] DEBUG: Trạng thái chính của booking ID 15 đã được cập nhật thành: arrived thành công.
+[10-Jan-2026 09:09:24 UTC] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/danangit/public_html/vietma/booking/update_booking_status.php:137) in /home/danangit/public_html/vietma/booking/includes/functions.php on line 127
+[12-Jan-2026 08:02:39 UTC] PHP Deprecated:  Constant FILTER_SANITIZE_STRING is deprecated in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 137
+[12-Jan-2026 08:02:39 UTC] PHP Deprecated:  Constant FILTER_SANITIZE_STRING is deprecated in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 138
+[12-Jan-2026 08:02:39 UTC] PHP Deprecated:  Constant FILTER_SANITIZE_STRING is deprecated in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 139
+[12-Jan-2026 08:02:39 UTC] DEBUG: Bắt đầu updateMainBookingStatus cho Booking ID: 15
+[12-Jan-2026 08:02:39 UTC] DEBUG: Log trạng thái mới nhất tìm thấy cho Booking ID 15: delivered (Created At: 2026-01-10 19:16:00)
+[12-Jan-2026 08:02:39 UTC] DEBUG: Trạng thái chính mới sẽ được đặt cho Booking ID 15: delivered
+[12-Jan-2026 08:02:39 UTC] DEBUG: Trạng thái chính của booking ID 15 đã được cập nhật thành: delivered thành công.
+[12-Jan-2026 08:02:39 UTC] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/danangit/public_html/vietma/booking/update_booking_status.php:137) in /home/danangit/public_html/vietma/booking/includes/functions.php on line 127
+[13-Jan-2026 03:55:17 UTC] PHP Deprecated:  Constant FILTER_SANITIZE_STRING is deprecated in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 137
+[13-Jan-2026 03:55:17 UTC] PHP Deprecated:  Constant FILTER_SANITIZE_STRING is deprecated in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 138
+[13-Jan-2026 03:55:17 UTC] PHP Deprecated:  Constant FILTER_SANITIZE_STRING is deprecated in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 139
+[13-Jan-2026 03:55:17 UTC] DEBUG: Bắt đầu updateMainBookingStatus cho Booking ID: 16
+[13-Jan-2026 03:55:17 UTC] DEBUG: Log trạng thái mới nhất tìm thấy cho Booking ID 16: in transit (Created At: 2026-01-13 10:44:00)
+[13-Jan-2026 03:55:17 UTC] DEBUG: Trạng thái chính mới sẽ được đặt cho Booking ID 16: in transit
+[13-Jan-2026 03:55:17 UTC] DEBUG: Trạng thái chính của booking ID 16 đã được cập nhật thành: in transit thành công.
+[13-Jan-2026 03:55:17 UTC] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/danangit/public_html/vietma/booking/update_booking_status.php:137) in /home/danangit/public_html/vietma/booking/includes/functions.php on line 127
+[13-Jan-2026 04:47:59 UTC] PHP Deprecated:  Constant FILTER_SANITIZE_STRING is deprecated in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 137
+[13-Jan-2026 04:47:59 UTC] PHP Deprecated:  Constant FILTER_SANITIZE_STRING is deprecated in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 138
+[13-Jan-2026 04:47:59 UTC] PHP Deprecated:  Constant FILTER_SANITIZE_STRING is deprecated in /home/danangit/public_html/vietma/booking/update_booking_status.php on line 139
+[13-Jan-2026 04:47:59 UTC] DEBUG: Bắt đầu updateMainBookingStatus cho Booking ID: 17
+[13-Jan-2026 04:47:59 UTC] DEBUG: Log trạng thái mới nhất tìm thấy cho Booking ID 17: in transit (Created At: 2026-01-13 11:36:00)
+[13-Jan-2026 04:47:59 UTC] DEBUG: Trạng thái chính mới sẽ được đặt cho Booking ID 17: in transit
+[13-Jan-2026 04:47:59 UTC] DEBUG: Trạng thái chính của booking ID 17 đã được cập nhật thành: in transit thành công.
+[13-Jan-2026 04:47:59 UTC] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/danangit/public_html/vietma/booking/update_booking_status.php:137) in /home/danangit/public_html/vietma/booking/includes/functions.php on line 127

@@ -1,0 +1,663 @@
+/*
+ * public_html/vietma/booking/assets/style.css
+ * File này chứa tất cả các style chung của ứng dụng để dễ dàng quản lý.
+ */
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background-color: #f4f4f4;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* ==================================== */
+/* Styles cho Header & Navigation (Menu)*/
+/* ==================================== */
+.header {
+    background-color: #007bff; /* Màu nền xanh cho header */
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border-radius: 8px 8px 0 0; /* Bo góc trên cho header */
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 1.8em;
+}
+
+.header .user-info {
+    font-size: 1em;
+}
+
+.header .user-info strong {
+    color: #ffda47; /* Màu vàng */
+}
+
+.header .user-info a {
+    color: white; /* Màu link đăng xuất */
+    text-decoration: underline;
+    margin-left: 10px;
+}
+.header .user-info a:hover {
+    color: #e0e0e0;
+}
+
+.main-nav {
+    background-color: #f2f2f2; /* Màu nền nhẹ cho menu */
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+    margin-top: 10px; /* Khoảng cách với header phía trên */
+    text-align: center; /* Căn giữa các nút */
+}
+
+.main-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: inline-block; /* Để ul có thể được căn giữa */
+}
+
+.main-nav ul li {
+    display: inline-block; /* Hiển thị các mục menu trên cùng một hàng */
+    margin: 0 10px; /* Khoảng cách giữa các nút */
+}
+
+.main-nav ul li a {
+    text-decoration: none;
+    color: #333; /* Màu chữ mặc định */
+    font-weight: bold;
+    padding: 8px 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    white-space: nowrap; /* Ngăn không cho nút bị ngắt dòng */
+}
+
+.main-nav ul li a:hover {
+    background-color: #e0e0e0;
+    color: #007bff;
+}
+
+.main-nav ul li a.active {
+    background-color: #007bff; /* Nút active */
+    color: white;
+    border-color: #007bff;
+}
+
+/* ==================================== */
+/* Styles cho Container chính của trang*/
+/* ==================================== */
+.container {
+    max-width: 1200px; /* Chiều rộng tối đa */
+    margin: 20px auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 0 0 8px 8px; /* Bo góc dưới cho container */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    color: #0056b3;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+/* ==================================== */
+/* Styles cho Trạng thái Booking */
+/* ==================================== */
+.search-form-section {
+    background-color: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.search-form-section h2 {
+    color: #0056b3;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.search-form-section form {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+.search-form-section input[type="text"] {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.search-form-section button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+    white-space: nowrap;
+}
+
+.search-form-section button:hover {
+    background-color: #0056b3;
+}
+
+.booking-details {
+    padding: 20px;
+    background-color: #fdfdfd;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.booking-details h2 {
+    margin-top: 0;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.detail-item {
+    padding: 8px 0;
+    border-bottom: 1px dotted #e0e0e0;
+}
+.detail-label {
+    font-weight: bold;
+    color: #555;
+    display: inline-block;
+    width: 150px;
+}
+.detail-value {
+    color: #333;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: bold;
+    color: white;
+}
+.status-pending { background-color: #ffc107; } /* yellow */
+.status-confirmed { background-color: #007bff; } /* blue */
+.status-in-transit { background-color: #6610f2; } /* indigo */
+.status-departed { background-color: #28a745; } /* green */
+.status-arrived { background-color: #17a2b8; } /* cyan */
+.status-delivered { background-color: #28a745; } /* emerald */
+.status-holded { background-color: #fd7e14; } /* orange */
+.status-cancelled { background-color: #dc3545; } /* red */
+
+/* ==================================== */
+/* CSS for Two-Column Form Layout */
+/* ==================================== */
+.form-section-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.form-column {
+    flex: 1;
+    min-width: 450px;
+    padding: 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #fdfdfd;
+}
+
+.form-column h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #0056b3;
+    font-size: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.form-column label {
+    display: block;
+    margin-bottom: 5px;
+    margin-top: 15px;
+    font-weight: bold;
+    color: #555;
+    font-size: 14px;
+}
+
+.form-column input[type="text"],
+.form-column input[type="number"],
+.form-column input[type="email"],
+.form-column select,
+.form-column textarea {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 15px;
+}
+
+.form-actions {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.form-actions button[type="submit"] {
+    background-color: #28a745;
+    color: white;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 18px;
+    transition: background-color 0.3s ease;
+}
+
+.form-actions button[type="submit"]:hover {
+    background-color: #218838;
+}
+
+/* ==================================== */
+/* General Styles (keep existing)       */
+/* ==================================== */
+.message {
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.message.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.table-responsive {
+    margin-bottom: 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+}
+
+table {
+    width: 100%;
+    min-width: 1000px;
+    border-collapse: collapse;
+    margin-top: 0;
+}
+
+table th, table td {
+    border: 1px solid #e0e0e0;
+    padding: 10px;
+    text-align: left;
+    font-size: 14px;
+    vertical-align: top;
+    white-space: nowrap;
+}
+
+table td.wrap-text {
+    white-space: normal;
+}
+
+
+table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+    color: #666;
+}
+
+table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+table tr:hover {
+    background-color: #f0f0f0;
+}
+
+table td form {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+}
+
+table td form input[type="file"] {
+    flex-grow: 1;
+    width: auto;
+    min-width: 100px;
+    padding: 5px;
+    margin: 0;
+    font-size: 13px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+table td form button[type="submit"] {
+    padding: 5px 10px;
+    font-size: 13px;
+    margin: 0;
+    background-color: #6c757d;
+    border-radius: 3px;
+    transition: background-color 0.3s;
+    white-space: nowrap;
+}
+
+table td form button[type="submit"]:hover {
+    background-color: #5a6268;
+}
+
+.document-links {
+    max-width: 200px;
+    white-space: normal;
+}
+.document-links a {
+    word-break: break-all;
+}
+
+.button-delete-doc {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    padding: 2px 6px;
+    cursor: pointer;
+    font-size: 0.7em;
+    line-height: 1;
+    transition: background-color 0.3s ease;
+}
+
+.button-delete-doc:hover {
+    background-color: #c82333;
+}
+
+.action-links {
+    margin-bottom: 5px;
+}
+
+.action-links a,
+.actions-buttons-group a.button {
+    color: white;
+    text-decoration: none;
+    display: inline-block;
+    padding: 4px 8px;
+    border: 1px solid;
+    border-radius: 3px;
+    font-size: 13px;
+    transition: background-color 0.3s, color 0.3s;
+    white-space: nowrap;
+    margin-bottom: 5px;
+}
+
+.actions-buttons-group a.button.view { background-color: #007bff; border-color: #007bff; }
+.actions-buttons-group a.button.view:hover { background-color: #0056b3; border-color: #0056b3; }
+
+.actions-buttons-group a.button.edit { background-color: #ffc107; border-color: #ffc107; color: #333; }
+.actions-buttons-group a.button.edit:hover { background-color: #e0a800; border-color: #e0a800; }
+
+.actions-buttons-group a.button.delete { background-color: #dc3545; border-color: #dc3545; }
+.actions-buttons-group a.button.delete:hover { background-color: #c82333; border-color: #c82333; }
+
+.button {
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 14px;
+    display: inline-block;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+    border: 1px solid;
+    color: white;
+}
+
+.button.primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+.button.primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+.button.small {
+    padding: 5px 10px;
+    font-size: 12px;
+}
+td > a.button.small {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    margin-bottom: 5px;
+}
+
+td > a.button.small:hover,
+td > button.button.small:hover {
+    background-color: #5a6268;
+    border-color: #5a6268;
+}
+
+td > button.button.small {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: white;
+    cursor: pointer;
+}
+
+
+.read-only-field {
+    background-color: #e9ecef;
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    font-size: 15px;
+    color: #495057;
+}
+
+.filter-form-wrapper {
+    background-color: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.filter-form-wrapper form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: flex-end;
+}
+
+.filter-form-wrapper label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+    font-size: 13px;
+}
+
+.filter-form-wrapper input[type="text"],
+.filter-form-wrapper input[type="date"] {
+    padding: 8px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.filter-form-wrapper button {
+    padding: 8px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.filter-form-wrapper button[type="button"] {
+    background-color: #6c757d;
+}
+
+.filter-form-wrapper button:hover {
+    background-color: #0056b3;
+}
+.filter-form-wrapper button[type="button"]:hover {
+    background-color: #5a6268;
+}
+
+.action-buttons-top {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.action-buttons-top .button {
+    padding: 10px 20px;
+    font-size: 16px;
+}
+
+.pagination {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.pagination a {
+    display: inline-block;
+    padding: 8px 16px;
+    text-decoration: none;
+    color: #007bff;
+    border: 1px solid #007bff;
+    margin: 0 4px;
+    border-radius: 4px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.pagination a.active {
+    background-color: #007bff;
+    color: white;
+    border: 1px solid #007bff;
+}
+
+.pagination a:hover:not(.active) {
+    background-color: #e9ecef;
+}
+
+@media (max-width: 1200px) {
+    .container {
+        max-width: 95%;
+    }
+}
+
+@media (max-width: 900px) {
+    .form-section-wrapper {
+        flex-direction: column;
+    }
+    .form-column {
+        min-width: unset;
+        width: 100%;
+    }
+    table {
+        min-width: 800px;
+    }
+    .filter-form-wrapper form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .filter-form-wrapper input[type="text"],
+    .filter-form-wrapper input[type="date"] {
+        width: 100%;
+    }
+}
+
+@media (max-width: 600px) {
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .user-info {
+        margin-top: 10px;
+    }
+    .user-info a {
+        margin-left: 0;
+        margin-top: 10px;
+        display: inline-block;
+    }
+    .container {
+        padding: 15px;
+    }
+    table {
+        min-width: 600px;
+    }
+    table th, table td {
+        padding: 8px;
+        font-size: 13px;
+    }
+    .action-buttons-top {
+        flex-direction: column;
+        gap: 8px;
+    }
+    .action-buttons-top .button {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+.hidden-admin {
+    display: none;
+}
+.admin-only .hidden-admin {
+    display: table-cell;
+}
+
+.top-scrollbar-container {
+    width: 100%;
+    overflow-x: auto;
+    height: 15px;
+    margin-bottom: 5px;
+    visibility: hidden;
+    background-color: #f9f9f9;
+    border-bottom: 1px solid #ddd;
+}
+
+.top-scrollbar-container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.top-scrollbar-container::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 4px;
+}
+
+.top-scrollbar-container::-webkit-scrollbar-track {
+    background-color: #f1f1f1;
+}
+
+.top-scrollbar-track {
+    height: 1px;
+}
