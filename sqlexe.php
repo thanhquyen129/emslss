@@ -129,16 +129,19 @@ if ($conn !== null && !$conn->connect_error) {
 <body class="p-4 md:p-8">
 
     <div class="max-w-6xl mx-auto">
-        <header class="mb-8">
+        <!--header class="mb-8">
             <h1 class="text-4xl font-extrabold text-gray-900 mb-2">Trình Thực Thi SQL Đơn Giản</h1>
             <p class="text-lg text-gray-600">Nhập câu lệnh SQL của bạn vào ô bên dưới và nhấn **Thực Thi**.</p>
-        </header>
+        </header-->
 
         <!-- CẢNH BÁO AN TOÀN -->
         <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg shadow-md mb-6" role="alert">
-            <p class="font-bold">⚠️ CẢNH BÁO BẢO MẬT</p>
-            <p class="text-sm mt-1">Công cụ này có khả năng thực thi **MỌI lệnh SQL**. KHÔNG sử dụng trong môi trường Production mà không có xác thực và bảo mật nghiêm ngặt. Bất kỳ lỗi nào cũng có thể làm hỏng dữ liệu.</p>
+ <!--            <p class="font-bold">⚠️ CẢNH BÁO BẢO MẬT</p>
+            <p class="text-sm mt-1">Công cụ này có khả năng thực thi **MỌI lệnh SQL**. KHÔNG sử dụng trong môi trường Production mà không có xác thực và bảo mật nghiêm ngặt. Bất kỳ lỗi nào cũng có thể làm hỏng dữ liệu.</p>-->
             <p class="text-sm mt-1">Xem cấu trúc bảng: DESCRIBE ten_bang.</p>
+            <p class="text-sm mt-1">SELECT TABLE_NAME, COLUMN_NAME, DATA_TYPE, IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA 'tên_database_của_bạn';</p>
+            <p class="text-sm mt-1">UPDATE users SET username = LOWER(REPLACE(hovaten, ' ', ''));</p>
+            <p class="text-sm mt-1">UPDATE emslss_users SET username = CONCAT(LOWER('dis'),'_',LOWER(REPLACE(full_name, ' ', ''))) where role = 'dispatcher'</p>
         </div>
 
         <!-- HIỂN THỊ THÔNG BÁO LỖI HOẶC THÀNH CÔNG -->

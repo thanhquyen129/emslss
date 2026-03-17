@@ -110,7 +110,7 @@ elseif($r['status']=='delivered'){
 <?= $r['post_office_address'] ?>
 </td>
 
-<td><?= $r['post_office_contact'] ?></td>
+<td><?= $r['holder_name'] ?> - <?= $r['holder_phone'] ?></td>
 
 <td><?= $r['status'] ?></td>
 

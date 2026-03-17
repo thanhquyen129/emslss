@@ -1,159 +1,249 @@
 <?php
-ob_start();
-include '../config/auth.php';
+session_start();
 include '../config/db.php';
 
-if(!isset($_GET['id']) || !is_numeric($_GET['id'])){
-    die("Invalid order");
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit;
 }
 
-$id = intval($_GET['id']);
+date_default_timezone_set('Asia/Ho_Chi_Minh');
 
-$stmt = $conn->prepare("
-SELECT * FROM emslss_orders
-WHERE id=?
-LIMIT 1
-");
+$user_id = $_SESSION['user_id'];
+$role    = $_SESSION['role'];
 
-$stmt->bind_param("i",$id);
-$stmt->execute();
+if (!isset($_GET['id'])) {
+    die("Thiếu ID đơn");
+}
 
-$result = $stmt->get_result();
+$order_id = intval($_GET['id']);
 
-if($result->num_rows==0){
-    die("Order not found");
+/*
+|--------------------------------------------------------------------------
+| Query order
+|--------------------------------------------------------------------------
+*/
+
+if ($role == 'shipper') {
+    $sql = "
+        SELECT *
+        FROM emslss_orders
+        WHERE id = $order_id
+        AND pickup_shipper_id = $user_id
+        LIMIT 1
+    ";
+} else {
+    $sql = "
+        SELECT *
+        FROM emslss_orders
+        WHERE id = $order_id
+        LIMIT 1
+    ";
+}
+
+$result = $conn->query($sql);
+
+if ($result->num_rows == 0) {
+    die("Không tìm thấy đơn");
 }
 
 $order = $result->fetch_assoc();
 
-$message='';
+$message = '';
 
-if($_SERVER['REQUEST_METHOD']=='POST'){
+/*
+|--------------------------------------------------------------------------
+| Confirm pickup
+|--------------------------------------------------------------------------
+*/
 
-    $barcode = trim($_POST['barcode']);
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-    if($barcode == $order['ems_code']){
+    $scanned_code = trim($_POST['scanned_code']);
+    $note         = trim($_POST['note']);
 
-        $stmt = $conn->prepare("
-        UPDATE emslss_orders
-        SET status='picked_up'
-        WHERE id=?
-        ");
-
-        $stmt->bind_param("i",$id);
-        $stmt->execute();
-
-        $note='Pickup confirmed';
-
-        $stmt2 = $conn->prepare("
-        INSERT INTO emslss_tracking(order_id,status,note,created_by)
-        VALUES(?,?,?,?)
-        ");
-
-        $status='picked_up';
-        $uid=$_SESSION['user_id'];
-
-        $stmt2->bind_param("issi",$id,$status,$note,$uid);
-        $stmt2->execute();
-
-        $message='Pickup confirmed successfully';
-
+    if ($scanned_code != $order['ems_code']) {
+        $message = '<div class="alert alert-danger">❌ Mã EMS không khớp</div>';
     } else {
 
-        $message='Barcode not match EMS code';
+        /*
+        |--------------------------------------------------------------------------
+        | Update order
+        |--------------------------------------------------------------------------
+        */
 
+        $update = "
+            UPDATE emslss_orders
+            SET status='picked_up',
+                updated_at=NOW()
+            WHERE id=$order_id
+        ";
+
+        $conn->query($update);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Insert tracking
+        |--------------------------------------------------------------------------
+        */
+
+        $tracking = "
+            INSERT INTO emslss_tracking(order_id,status,note,created_by,created_at)
+            VALUES($order_id,'picked_up','$note',$user_id,NOW())
+        ";
+
+        $conn->query($tracking);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Upload images
+        |--------------------------------------------------------------------------
+        */
+
+        if (!empty($_FILES['images']['name'][0])) {
+
+            $upload_dir = 'uploads/';
+
+            if (!is_dir($upload_dir)) {
+                mkdir($upload_dir, 0777, true);
+            }
+
+            foreach ($_FILES['images']['tmp_name'] as $key => $tmp_name) {
+
+                $file_name = time() . '_' . basename($_FILES['images']['name'][$key]);
+                $target = $upload_dir . $file_name;
+
+                if (move_uploaded_file($tmp_name, $target)) {
+
+                    $img_sql = "
+                        INSERT INTO emslss_images(order_id,image_path,uploaded_by,created_at)
+                        VALUES($order_id,'$target',$user_id,NOW())
+                    ";
+
+                    $conn->query($img_sql);
+                }
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | TODO callback EMS phase sau
+        |--------------------------------------------------------------------------
+        */
+
+        header("Location: pickup_complete.php?id=".$order_id);
+        exit;
     }
 }
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <title>Pickup Scan</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<script src="https://unpkg.com/html5-qrcode"></script>
-</head>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
+<script src="https://unpkg.com/html5-qrcode"></script>
+
+<style>
+body{
+    background:#f5f7fb;
+}
+
+.box{
+    background:white;
+    border-radius:16px;
+    padding:18px;
+    box-shadow:0 4px 14px rgba(0,0,0,.07);
+    margin-bottom:16px;
+}
+
+.btn-action{
+    border-radius:12px;
+}
+
+#reader{
+    width:100%;
+}
+
+.label{
+    font-size:13px;
+    color:#777;
+}
+
+.value{
+    font-weight:600;
+}
+</style>
+</head>
 <body>
 
-<div class="container mt-3">
+<div class="container py-3">
 
-<h4>Pickup Scan</h4>
+    <div class="box">
+        <h5><?= htmlspecialchars($order['ems_code']) ?></h5>
+        <small class="text-muted">Scan xác nhận pickup</small>
+    </div>
 
-<div class="card p-3 mb-3">
+    <?= $message ?>
 
-<p><strong>EMS:</strong> <?= htmlspecialchars($order['ems_code']) ?></p>
-<p><strong>Bưu cục:</strong> <?= htmlspecialchars($order['post_office']) ?></p>
-<p><strong>Người giữ thư:</strong> <?= htmlspecialchars($order['holder_name']) ?></p>
-<p><strong>Phone:</strong>
-<a href="tel:<?= $order['holder_phone'] ?>">
-<?= htmlspecialchars($order['holder_phone']) ?>
-</a>
-</p>
+    <form method="POST" enctype="multipart/form-data">
 
-</div>
+        <div class="box">
+            <div class="mb-3">
+                <label class="form-label">📷 Camera scan EMS</label>
+                <div id="reader"></div>
+            </div>
 
-<?php if($message!=''){ ?>
+            <div class="mb-3">
+                <label class="form-label">Hoặc nhập mã EMS</label>
+                <input type="text" name="scanned_code" id="scanned_code" class="form-control" required>
+            </div>
+        </div>
 
-<div class="alert alert-info">
-<?= $message ?>
-</div>
+        <div class="box">
+            <div class="mb-3">
+                <label class="form-label">📸 Ảnh bằng chứng</label>
+                <input type="file" name="images[]" class="form-control" multiple accept="image/*" capture="environment">
+            </div>
 
-<?php } ?>
+            <div class="mb-3">
+                <label class="form-label">📝 Ghi chú</label>
+                <textarea name="note" class="form-control" rows="3" placeholder="Ví dụ: Nhận tại quầy số 2"></textarea>
+            </div>
+        </div>
 
-<div class="card p-3 mb-3">
+        <div class="d-grid gap-2 pb-4">
+            <button type="submit" class="btn btn-primary btn-lg btn-action">
+                ✅ Xác nhận đã pickup
+            </button>
 
-<h5>Camera Scan</h5>
+            <a href="pickup_detail.php?id=<?= $order_id ?>" class="btn btn-outline-secondary btn-action">
+                ← Quay lại
+            </a>
+        </div>
 
-<div id="reader" style="width:100%;"></div>
-
-</div>
-
-<form method="post">
-
-<div class="mb-3">
-
-<label>Barcode / EMS Code</label>
-
-<input id="barcode"
-name="barcode"
-class="form-control"
-required>
-
-</div>
-
-<button class="btn btn-success w-100">
-Confirm Pickup
-</button>
-
-</form>
-
-<a href="pickup_dashboard.php" class="btn btn-secondary mt-3 w-100">
-Back Dashboard
-</a>
+    </form>
 
 </div>
 
 <script>
-
-function onScanSuccess(decodedText){
-
-    document.getElementById('barcode').value = decodedText;
-
+function onScanSuccess(decodedText) {
+    document.getElementById('scanned_code').value = decodedText;
 }
 
-new Html5Qrcode("reader").start(
-    { facingMode:"environment" },
+let html5QrcodeScanner = new Html5QrcodeScanner(
+    "reader",
     {
-        fps:10,
-        qrbox:250
-    },
-    onScanSuccess
+        fps: 10,
+        qrbox: 250
+    }
 );
 
+html5QrcodeScanner.render(onScanSuccess);
 </script>
 
 </body>
