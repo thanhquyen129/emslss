@@ -208,7 +208,7 @@ body{
 <?php while($r = $latest->fetch_assoc()): ?>
 
 <tr>
-<td><?= $r['ems_code'] ?></td>
+<td><a href="admin_order_detail.php?id=<?= $r['id'] ?>" class="btn btn-sm btn-primary"><?= $r['ems_code'] ?></a></td>
 <td><?= htmlspecialchars($r['receiver_name']) ?></td>
 <td><?= $r['status'] ?></td>
 <td><?= $r['created_at'] ?></td>
