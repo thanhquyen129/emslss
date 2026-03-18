@@ -29,7 +29,7 @@ if($_SERVER['REQUEST_METHOD']=='POST')
 		}
 		else
 		{
-			header("Location: dashboard.php");
+			header("Location: admin/dashboard.php");
 			exit;
 		}
 

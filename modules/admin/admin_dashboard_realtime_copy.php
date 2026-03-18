@@ -1,9 +1,10 @@
 <?php
 session_start();
-require_once '../config/db.php';
+require_once '../../config/db.php';
+include '../../templates/admin_topbar.php';
 
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
+    header("Location: ../login.php");
     exit;
 }
 
@@ -124,61 +125,61 @@ body{
 
 <div class="row g-3 mb-4">
 
-<div class="col-md-3">
-<div class="card card-box p-3">
-<div>📥 Đơn mới</div>
-<div class="kpi-number text-primary"><?= $kpi['new_order'] ?></div>
-</div>
-</div>
+	<div class="col-md-3">
+		<div class="card card-box p-3">
+			<div>📥 Đơn mới</div>
+			<div class="kpi-number text-primary"><?= $kpi['new_order'] ?></div>
+		</div>
+	</div>
 
-<div class="col-md-3">
-<div class="card card-box p-3">
-<div>🚚 Pickup</div>
-<div class="kpi-number text-warning"><?= $kpi['assigned_pickup'] ?></div>
-</div>
-</div>
+	<div class="col-md-3">
+		<div class="card card-box p-3">
+			<div>🚚 Pickup</div>
+			<div class="kpi-number text-warning"><?= $kpi['assigned_pickup'] ?></div>
+		</div>
+	</div>
 
-<div class="col-md-3">
-<div class="card card-box p-3">
-<div>📦 Delivery</div>
-<div class="kpi-number text-info"><?= $kpi['assigned_delivery'] ?></div>
-</div>
-</div>
+	<div class="col-md-3">
+		<div class="card card-box p-3">
+			<div>📦 Delivery</div>
+			<div class="kpi-number text-info"><?= $kpi['assigned_delivery'] ?></div>
+		</div>
+	</div>
 
-<div class="col-md-3">
-<div class="card card-box p-3">
-<div>✅ Delivered</div>
-<div class="kpi-number text-success"><?= $kpi['delivered'] ?></div>
-</div>
-</div>
+	<div class="col-md-3">
+		<div class="card card-box p-3">
+			<div>✅ Delivered</div>
+			<div class="kpi-number text-success"><?= $kpi['delivered'] ?></div>
+		</div>
+	</div>
 
-<div class="col-md-3">
-<div class="card card-box p-3">
-<div>⚠️ Failed</div>
-<div class="kpi-number text-danger"><?= $kpi['failed'] ?></div>
-</div>
-</div>
+	<div class="col-md-3">
+		<div class="card card-box p-3">
+			<div>⚠️ Failed</div>
+			<div class="kpi-number text-danger"><?= $kpi['failed'] ?></div>
+		</div>
+	</div>
 
-<div class="col-md-3">
-<div class="card card-box p-3">
-<div>📡 Callback Fail</div>
-<div class="kpi-number text-danger"><?= $callback_fail ?></div>
-</div>
-</div>
+	<div class="col-md-3">
+		<div class="card card-box p-3">
+			<div>📡 Callback Fail</div>
+			<div class="kpi-number text-danger"><?= $callback_fail ?></div>
+		</div>
+	</div>
 
-<div class="col-md-3">
-<div class="card card-box p-3">
-<div>💀 Dead Queue</div>
-<div class="kpi-number text-dark"><?= $callback_dead ?></div>
-</div>
-</div>
+	<div class="col-md-3">
+		<div class="card card-box p-3">
+			<div>💀 Dead Queue</div>
+			<div class="kpi-number text-dark"><?= $callback_dead ?></div>
+		</div>
+	</div>
 
-<div class="col-md-3">
-<div class="card card-box p-3">
-<div>🚛 In Transit</div>
-<div class="kpi-number text-secondary"><?= $kpi['in_transit'] ?></div>
-</div>
-</div>
+	<div class="col-md-3">
+		<div class="card card-box p-3">
+			<div>🚛 In Transit</div>
+			<div class="kpi-number text-secondary"><?= $kpi['in_transit'] ?></div>
+		</div>
+	</div>
 
 </div>
 

@@ -1,6 +1,7 @@
 <?php
 session_start();
-include '../config/db.php';
+include '../../config/db.php';
+include '../../templates/admin_topbar.php';
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");

@@ -1,10 +1,10 @@
-<?php
+<?php ini_set('display_errors', '1');
 session_start();
-require '../config/db.php';
-
+require '../../config/db.php';
+include '../../templates/admin_topbar.php';
 if(!isset($_SESSION['user_id']))
 {
-	 header("Location:login.php");
+	 header("Location:../modules/login.php");
 	 exit;
 }
 else
