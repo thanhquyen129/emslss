@@ -4,7 +4,7 @@ require '../../config/db.php';
 include '../../templates/admin_topbar.php';
 if(!isset($_SESSION['user_id']))
 {
-	 header("Location:../modules/login.php");
+		header("Location: ../login.php");
 	 exit;
 }
 else

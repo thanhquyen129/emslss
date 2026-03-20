@@ -24,7 +24,7 @@ if($_SERVER['REQUEST_METHOD']=='POST')
         $_SESSION['full_name'] = $user['full_name'];
 		if($user['role']=='shipper')
 		{
-			header("Location: pickup_dashboard.php");
+			header("Location: shipper/shipper_dashboard.php");
 			exit;
 		}
 		else
