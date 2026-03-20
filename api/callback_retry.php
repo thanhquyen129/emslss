@@ -1,41 +1,63 @@
 <?php
-include '../config/db.php';
+require_once 'bootstrap.php';
 
-$data=json_decode(file_get_contents("php://input"),true);
+safeExecute(function(){
 
-$stmt=$conn->prepare("
-INSERT INTO emslss_orders
-(
- ems_code,
- service_type,
- pickup_name,
- pickup_phone,
- pickup_address,
- receiver_name,
- receiver_phone,
- receiver_address,
- note
-)
-VALUES (?,?,?,?,?,?,?,?,?)
-");
+    global $conn;
 
-$stmt->bind_param(
-"sssssssss",
-$data['ems_code'],
-$data['service_type'],
-$data['pickup_name'],
-$data['pickup_phone'],
-$data['pickup_address'],
-$data['receiver_name'],
-$data['receiver_phone'],
-$data['receiver_address'],
-$data['note']
-);
+    $res = $conn->query("
+        SELECT id,source,payload
+        FROM emslss_api_logs
+        WHERE response LIKE '%error%'
+        ORDER BY id ASC
+        LIMIT 20
+    ");
 
-$stmt->execute();
+    while($row = $res->fetch_assoc()){
 
-echo json_encode([
- "success"=>true,
- "order_id"=>$conn->insert_id
-]);
+        $url = '';
+
+        if($row['source'] === 'CALLBACK_PICKUP'){
+            $url = 'https://ems-api.example.com/pickup';
+        }
+
+        if($row['source'] === 'CALLBACK_DELIVERY'){
+            $url = 'https://ems-api.example.com/delivery';
+        }
+
+        if(!$url){
+            continue;
+        }
+
+        $ch = curl_init($url);
+
+        curl_setopt_array($ch,[
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_HTTPHEADER => [
+                'Content-Type: application/json'
+            ],
+            CURLOPT_POSTFIELDS => $row['payload'],
+            CURLOPT_TIMEOUT => 10
+        ]);
+
+        $response = curl_exec($ch);
+
+        if(curl_errno($ch)){
+            $response = curl_error($ch);
+        }
+
+        curl_close($ch);
+
+        apiLog(
+            'CALLBACK_RETRY',
+            $row['payload'],
+            $response
+        );
+    }
+
+    responseSuccess([
+        'message' => 'Retry completed'
+    ]);
+});
 ?>
