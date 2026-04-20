@@ -1,9 +1,9 @@
 <?php
 session_start();
-include '../config/db.php';
+include __DIR__ . '/../config/db.php';
 
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
+    header("Location: /modules/login.php");
     exit;
 }
 
@@ -11,6 +11,11 @@ date_default_timezone_set('Asia/Ho_Chi_Minh');
 
 $order_id = intval($_GET['id']);
 $user_id = $_SESSION['user_id'];
+$role = $_SESSION['role'] ?? '';
+
+if (!in_array($role, ['shipper', 'operation', 'admin'], true)) {
+    die("Access denied");
+}
 
 $sql = "
     SELECT *
@@ -67,7 +72,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         $conn->query($tracking);
 
-        header("Location: operation_dashboard.php");
+        if (in_array($role, ['operation', 'admin'], true)) {
+            header("Location: /modules/operation/dashboard.php");
+        } else {
+            header("Location: /modules/shipper/shipper_dashboard.php");
+        }
         exit;
     }
 }

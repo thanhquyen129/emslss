@@ -1,9 +1,9 @@
 <?php
 session_start();
-require_once "../config/db.php";
+require_once __DIR__ . "/../config/db.php";
 
 if(!isset($_SESSION['user_id'])){
-    header("Location: index.php");
+    header("Location: /modules/login.php");
     exit;
 }
 
@@ -12,7 +12,7 @@ if($_SESSION['role'] != 'operation' && $_SESSION['role'] != 'admin'){
 }
 
 $user_id = $_SESSION['user_id'];
-$full_name = $_SESSION['full_name'];
+$full_name = $_SESSION['full_name'] ?? 'Operation';
 
 /* load delivery shipper */
 
@@ -98,7 +98,7 @@ font-size:12px;
 
 Xin chào <b><?php echo $full_name ?></b>
 
-<a href="logout.php" class="btn btn-sm btn-danger ms-3">Logout</a>
+<a href="../logout.php" class="btn btn-sm btn-danger ms-3">Logout</a>
 
 </div>
 
@@ -161,14 +161,14 @@ Chờ xử lý
 <tr>
 
 <td>
-<b><?php echo $o['ems_code'] ?></b>
+<b><a href="/modules/admin/admin_order_detail.php?id=<?php echo intval($o['id']) ?>"><?php echo htmlspecialchars($o['ems_code']) ?></a></b>
 </td>
 
-<td><?php echo $o['receiver_name'] ?></td>
+<td><?php echo htmlspecialchars($o['receiver_name']) ?></td>
 
-<td><?php echo $o['receiver_phone'] ?></td>
+<td><?php echo htmlspecialchars($o['receiver_phone']) ?></td>
 
-<td><?php echo $o['receiver_address'] ?></td>
+<td><?php echo htmlspecialchars($o['receiver_address']) ?></td>
 
 <td>
 
@@ -178,8 +178,8 @@ Chờ xử lý
 
 <?php foreach($shippers as $s){ ?>
 
-<option value="<?php echo $s['id'] ?>">
-<?php echo $s['full_name'] ?>
+<option value="<?php echo intval($s['id']) ?>">
+<?php echo htmlspecialchars($s['full_name']) ?>
 </option>
 
 <?php } ?>
@@ -190,6 +190,9 @@ Chờ xử lý
 
 </tr>
 
+<?php } ?>
+<?php if($new_orders->num_rows === 0){ ?>
+<tr><td colspan="5" class="text-center text-muted">Không có đơn chờ xử lý</td></tr>
 <?php } ?>
 
 </tbody>
@@ -232,13 +235,13 @@ Chờ xử lý
 
 <tr>
 
-<td><?php echo $o['ems_code'] ?></td>
+<td><a href="/modules/admin/admin_order_detail.php?id=<?php echo intval($o['id']) ?>"><?php echo htmlspecialchars($o['ems_code']) ?></a></td>
 
-<td><?php echo $o['receiver_name'] ?></td>
+<td><?php echo htmlspecialchars($o['receiver_name']) ?></td>
 
 <td>
 <span class="badge bg-primary">
-<?php echo $o['shipper_name'] ?>
+<?php echo htmlspecialchars($o['shipper_name'] ?? '-') ?>
 </span>
 </td>
 
@@ -250,6 +253,9 @@ Assigned Delivery
 
 </tr>
 
+<?php } ?>
+<?php if($assigned_orders->num_rows === 0){ ?>
+<tr><td colspan="4" class="text-center text-muted">Chưa có đơn assigned delivery</td></tr>
 <?php } ?>
 
 </tbody>
@@ -292,11 +298,11 @@ Assigned Delivery
 
 <tr>
 
-<td><?php echo $o['ems_code'] ?></td>
+<td><a href="/modules/admin/admin_order_detail.php?id=<?php echo intval($o['id']) ?>"><?php echo htmlspecialchars($o['ems_code']) ?></a></td>
 
-<td><?php echo $o['receiver_name'] ?></td>
+<td><?php echo htmlspecialchars($o['receiver_name']) ?></td>
 
-<td><?php echo $o['shipper_name'] ?></td>
+<td><?php echo htmlspecialchars($o['shipper_name'] ?? '-') ?></td>
 
 <td>
 
@@ -308,6 +314,9 @@ Delivered
 
 </tr>
 
+<?php } ?>
+<?php if($done_orders->num_rows === 0){ ?>
+<tr><td colspan="4" class="text-center text-muted">Chưa có đơn delivered</td></tr>
 <?php } ?>
 
 </tbody>
@@ -339,21 +348,24 @@ let shipper_id = this.value
 
 if(!shipper_id) return
 
-fetch("operation_assign_delivery.php",{
+fetch("/modules/operation/assign_delivery.php",{
 
 method:"POST",
 headers:{'Content-Type':'application/x-www-form-urlencoded'},
-body:`order_id=${order_id}&shipper_id=${shipper_id}`
+body:`order_id=${encodeURIComponent(order_id)}&shipper_id=${encodeURIComponent(shipper_id)}`
 
 })
-.then(res=>res.text())
+.then(res=>res.json())
 .then(r=>{
-
-alert("Assigned successfully")
-
-location.reload()
+if(r.success){
+    alert("Assigned successfully")
+    location.reload()
+}else{
+    alert(r.message || "Assign failed")
+}
 
 })
+.catch(()=>alert("Assign failed"))
 
 })
 

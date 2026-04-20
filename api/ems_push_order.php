@@ -35,7 +35,7 @@ safeExecute(function() {
 
     if ($dup) {
         apiLog('EMS_PUSH_DUPLICATE', $payload, json_encode($dup));
-        responseDuplicate($dup);
+        responseDuplicate($dup, $ems_code);
     }
 
     beginTx();
@@ -109,11 +109,11 @@ safeExecute(function() {
     apiLog(
         'EMS_PUSH',
         $payload,
-        json_encode(['order_id'=>$order_id])
+        json_encode(['ems_code'=>$ems_code])
     );
 
     responseSuccess([
-        'order_id'=>$order_id
+        'ems_code'=>$ems_code
     ]);
 });
 ?>

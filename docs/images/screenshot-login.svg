@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" role="img" aria-labelledby="t1">
+  <title id="t1">Giao diÇn ng nh­p EMS-LSS (minh hÍa)</title>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e8f2ec"/>
+      <stop offset="100%" style="stop-color:#d4e8dc"/>
+    </linearGradient>
+    <filter id="s" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+  <rect width="960" height="540" fill="url(#bg)"/>
+  <rect x="40" y="36" width="880" height="468" rx="14" fill="#fff" filter="url(#s)"/>
+  <rect x="40" y="36" width="880" height="48" rx="14" fill="#006341"/>
+  <rect x="40" y="70" width="880" height="14" fill="#006341"/>
+  <circle cx="72" cy="60" r="8" fill="#ffcc00"/>
+  <text x="100" y="66" fill="#fff" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="600">EMS-LSS</text>
+  <rect x="380" y="160" width="200" height="220" rx="10" fill="#f8faf9" stroke="#c5ddd0" stroke-width="1"/>
+  <text x="480" y="200" text-anchor="middle" fill="#006341" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="700">ng nh­p</text>
+  <rect x="400" y="220" width="160" height="36" rx="6" fill="#fff" stroke="#b8d4c4"/>
+  <rect x="400" y="272" width="160" height="36" rx="6" fill="#fff" stroke="#b8d4c4"/>
+  <rect x="400" y="324" width="160" height="40" rx="8" fill="#006341"/>
+  <text x="480" y="350" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="600">ng nh­p</text>
+  <text x="480" y="500" text-anchor="middle" fill="#5a7a6a" font-family="Segoe UI, Arial, sans-serif" font-size="13">Minh hÍa  thay b±ng £nh chåp màn hình th­t (PNG) n¿u c§n</text>
+</svg>

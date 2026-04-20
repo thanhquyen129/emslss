@@ -11,9 +11,9 @@ ini_set('display_startup_errors', '1');
 // 1. CẤU HÌNH KẾT NỐI DATABASE (BẠN CẦN THAY ĐỔI CÁC GIÁ TRỊ NÀY)
 // *******************************************************************
 $servername = "localhost";    // Địa chỉ host
-$username = "wamvietn_tincode";   // Tên người dùng database
-$password = "p6]L@7iTS5"; // Mật khẩu database
-$dbname = "wamvietn_tincode";     // Tên database
+$username = "posacb_db";   // Tên người dùng database
+$password = "837e7d126f1088"; // Mật khẩu database
+$dbname = "posacb_db";     // Tên database
 // *******************************************************************
 
 $conn = null;
@@ -35,7 +35,78 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["sql_query"])) {
     } else {
         // Xử lý câu lệnh SQL
         $start_time = microtime(true);
-        $result = $conn->query($sql_query);
+//        $result = $conn->query($sql_query);
+
+
+$queries = array_filter(array_map('trim', explode(';', $sql_query)));
+
+$results_html .= "<div class='space-y-6'>";
+
+foreach ($queries as $index => $query) {
+
+    if(empty($query)) continue;
+
+    $start_time = microtime(true);
+    $result = $conn->query($query);
+    $end_time = microtime(true);
+
+    $execution_time = round(($end_time - $start_time) * 1000, 2);
+
+    $results_html .= "<div class='border rounded-lg p-4 shadow bg-white'>";
+    $results_html .= "<div class='mb-2 text-sm text-gray-500'>Query #".($index+1)."</div>";
+    $results_html .= "<pre class='bg-gray-100 p-2 rounded text-xs overflow-x-auto'>".htmlspecialchars($query)."</pre>";
+
+    if ($result === TRUE) {
+
+        $affected_rows = $conn->affected_rows;
+
+        $results_html .= "<div class='text-green-600 font-medium mt-2'>✅ OK - $affected_rows dòng | {$execution_time} ms</div>";
+
+    } elseif ($result === FALSE) {
+
+        $results_html .= "<div class='text-red-600 font-medium mt-2'>❌ ERROR: ".$conn->error."</div>";
+
+    } else {
+
+        if ($result->num_rows > 0) {
+
+            $results_html .= "<div class='mt-3 overflow-x-auto'>";
+            $results_html .= "<table class='min-w-full border text-sm'>";
+
+            // header
+            $results_html .= "<tr class='bg-gray-200'>";
+            $fields = [];
+            while ($field = $result->fetch_field()) {
+                $fields[] = $field->name;
+                $results_html .= "<th class='px-3 py-2 border'>".$field->name."</th>";
+            }
+            $results_html .= "</tr>";
+
+            // data
+            while ($row = $result->fetch_assoc()) {
+                $results_html .= "<tr>";
+                foreach ($fields as $f) {
+                    $results_html .= "<td class='px-3 py-2 border'>".htmlspecialchars($row[$f] ?? '')."</td>";
+                }
+                $results_html .= "</tr>";
+            }
+
+            $results_html .= "</table></div>";
+
+        } else {
+            $results_html .= "<div class='text-gray-500 mt-2'>No rows</div>";
+        }
+
+        $result->free();
+    }
+
+    $results_html .= "</div>";
+}
+
+$results_html .= "</div>";
+
+
+
         $end_time = microtime(true);
         $execution_time = round(($end_time - $start_time) * 1000, 2); // ms
 

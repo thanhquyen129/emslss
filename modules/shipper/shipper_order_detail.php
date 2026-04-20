@@ -1,205 +1,253 @@
 <?php
-ob_start();
-include '../config/auth.php';
-include '../config/db.php';
+session_start();
+include '../../config/db.php';
 
-if(!isset($_GET['id']) || !is_numeric($_GET['id'])){
-    die("Invalid order");
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit;
 }
 
-$id = intval($_GET['id']);
+date_default_timezone_set('Asia/Ho_Chi_Minh');
 
-$stmt = $conn->prepare("SELECT * FROM emslss_orders WHERE id=? LIMIT 1");
-$stmt->bind_param("i",$id);
-$stmt->execute();
+if (!isset($_GET['id'])) {
+    die("Thiếu ID đơn hàng");
+}
 
-$result = $stmt->get_result();
+$order_id = intval($_GET['id']);
+$user_id  = $_SESSION['user_id'];
+$role     = $_SESSION['role'];
 
-if($result->num_rows==0){
-    die("Order not found");
+/*
+|--------------------------------------------------------------------------
+| Query đơn hàng
+|--------------------------------------------------------------------------
+*/
+
+if ($role == 'shipper') {
+    $sql = "
+        SELECT *
+        FROM emslss_orders
+        WHERE id = $order_id
+        AND pickup_shipper_id = $user_id
+        LIMIT 1
+    ";
+} else {
+    $sql = "
+        SELECT *
+        FROM emslss_orders
+        WHERE id = $order_id
+        LIMIT 1
+    ";
+}
+
+$result = $conn->query($sql);
+
+if ($result->num_rows == 0) {
+    die("Không tìm thấy đơn hàng");
 }
 
 $order = $result->fetch_assoc();
 
-$shippers = $conn->query("
-SELECT id,full_name FROM emslss_users
-WHERE role='shipper'
-ORDER BY full_name
-");
+/*
+|--------------------------------------------------------------------------
+| Tracking gần nhất
+|--------------------------------------------------------------------------
+*/
 
-$history = $conn->query("
-SELECT * FROM emslss_tracking
-WHERE order_id=$id
-ORDER BY id DESC
-");
+$tracking_sql = "
+    SELECT *
+    FROM emslss_tracking
+    WHERE order_id = $order_id
+    ORDER BY created_at DESC
+    LIMIT 5
+";
 
-$images = $conn->query("
-SELECT * FROM emslss_images
-WHERE order_id=$id
-ORDER BY id DESC
-");
+$tracking_result = $conn->query($tracking_sql);
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
-<meta charset="utf-8">
-<title>Order Detail</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<meta charset="UTF-8">
+<title>Chi tiết Pickup</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-</head>
 
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body{
+    background:#f5f7fb;
+}
+
+.box{
+    background:white;
+    border-radius:16px;
+    padding:18px;
+    box-shadow:0 4px 14px rgba(0,0,0,.07);
+    margin-bottom:16px;
+}
+
+.label{
+    font-size:13px;
+    color:#777;
+}
+
+.value{
+    font-weight:600;
+    font-size:15px;
+}
+
+.section-title{
+    font-size:15px;
+    font-weight:700;
+    margin-bottom:12px;
+}
+
+.btn-action{
+    border-radius:12px;
+}
+
+.timeline-item{
+    border-left:3px solid #0d6efd;
+    padding-left:12px;
+    margin-bottom:12px;
+}
+
+.timeline-time{
+    font-size:12px;
+    color:#777;
+}
+
+.header-code{
+    font-size:20px;
+    font-weight:700;
+}
+
+.status-badge{
+    padding:6px 10px;
+    border-radius:20px;
+    font-size:13px;
+    background:#cfe2ff;
+    color:#084298;
+}
+</style>
+</head>
 <body>
 
-<div class="container mt-3">
-
-<div class="card p-3 mb-3">
-
-<h4><?= htmlspecialchars($order['ems_code']) ?></h4>
-
-<p><strong>Pickup:</strong> <?= htmlspecialchars($order['pickup_name']) ?></p>
-<p><strong>Phone:</strong> <?= htmlspecialchars($order['pickup_phone']) ?></p>
-<p><strong>Address:</strong> <?= htmlspecialchars($order['pickup_address']) ?></p>
-
-<p><strong>Receiver:</strong> <?= htmlspecialchars($order['receiver_name']) ?></p>
-<p><strong>Receiver Phone:</strong> <?= htmlspecialchars($order['receiver_phone']) ?></p>
-<p><strong>Receiver Address:</strong> <?= htmlspecialchars($order['receiver_address']) ?></p>
-
-<p><strong>Status:</strong> <?= htmlspecialchars($order['status']) ?></p>
-
-</div>
-
-<div class="card p-3 mb-3">
-
-<h5>Assign Shipper</h5>
-
-<form method="post" action="assign_shipper.php">
-
-<input type="hidden" name="id" value="<?= $id ?>">
-
-<select name="shipper_id" class="form-control mb-2" required>
-
-<option value="">Choose shipper</option>
-
-<?php while($s=$shippers->fetch_assoc()){ ?>
-
-<option value="<?= $s['id'] ?>"
-<?= ($order['shipper_id']==$s['id']) ? 'selected' : '' ?>>
-
-<?= htmlspecialchars($s['full_name']) ?>
-
-</option>
-
-<?php } ?>
-
-</select>
-
-<button class="btn btn-primary">Assign</button>
-
-</form>
-
-</div>
-
-<div class="card p-3 mb-3">
-
-<h5>Update Status</h5>
-
-<form method="post" action="tracking_update.php">
-
-<input type="hidden" name="order_id" value="<?= $id ?>">
-
-<select name="status" class="form-control mb-2">
-
-<option value="assigned">Assigned</option>
-<option value="picked_up">Picked Up</option>
-<option value="delivering">Delivering</option>
-<option value="delivered">Delivered</option>
-<option value="failed">Failed</option>
-
-</select>
-
-<button class="btn btn-success">Update Status</button>
-
-</form>
-
-</div>
-
-<div class="card p-3 mb-3">
-
-<h5>Upload Images</h5>
-
-<form method="post" action="upload_image.php" enctype="multipart/form-data">
-
-<input type="hidden" name="order_id" value="<?= $id ?>">
-
-<input type="file" name="image[]" multiple class="form-control mb-2">
-
-<button class="btn btn-warning">Upload</button>
-
-</form>
-
-</div>
-
-<div class="card p-3 mb-3">
-
-<h5>Callback EMS</h5>
-
-<form method="post" action="../api/callback_ems.php">
-
-<input type="hidden" name="order_id" value="<?= $id ?>">
-
-<button class="btn btn-danger">Send Callback</button>
-
-</form>
-
-</div>
-
-<div class="card p-3 mb-3">
-
-<h5>Tracking History</h5>
-
-<table class="table table-bordered">
-
-<tr>
-<th>Status</th>
-<th>Time</th>
-</tr>
-
-<?php while($h=$history->fetch_assoc()){ ?>
-
-<tr>
-<td><?= htmlspecialchars($h['status']) ?></td>
-<td><?= $h['created_at'] ?></td>
-</tr>
-
-<?php } ?>
-
-</table>
-
-</div>
-
-<div class="card p-3 mb-3">
-
-<h5>Uploaded Images</h5>
-
-<div class="row">
-
-<?php while($img=$images->fetch_assoc()){ ?>
-
-<div class="col-4 mb-2">
-
-<img src="../assets/uploads/<?= $img['image_path'] ?>"
-class="img-fluid rounded border">
-
-</div>
-
-<?php } ?>
-
-</div>
-
-</div>
-
-<a href="dashboard.php" class="btn btn-secondary mb-5">Back Dashboard</a>
+<div class="container py-3">
+
+    <div class="box">
+
+        <div class="d-flex justify-content-between align-items-start mb-3">
+            <div>
+                <div class="header-code">
+                    <a href="/modules/admin/admin_order_detail.php?id=<?= intval($order['id']) ?>">
+                        <?= htmlspecialchars($order['ems_code']) ?>
+                    </a>
+                </div>
+                <span class="status-badge"><?= htmlspecialchars($order['status']) ?></span>
+            </div>
+            <small class="text-muted">
+                <?= date('d/m/Y H:i', strtotime($order['created_at'])) ?>
+            </small>
+        </div>
+
+    </div>
+
+    <div class="box">
+        <div class="section-title">📍 Thông tin pickup</div>
+
+        <div class="mb-3">
+            <div class="label">Bưu cục</div>
+            <div class="value"><?= htmlspecialchars($order['post_office_name']) ?></div>
+        </div>
+
+        <div class="mb-3">
+            <div class="label">Địa chỉ bưu cục</div>
+            <div class="value"><?= htmlspecialchars($order['post_office_address']) ?></div>
+        </div>
+
+        <div class="mb-3">
+            <div class="label">Người giữ thư</div>
+            <div class="value"><?= htmlspecialchars($order['holder_name']) ?></div>
+        </div>
+
+        <div class="mb-3">
+            <div class="label">Số điện thoại</div>
+            <div class="value"><?= htmlspecialchars($order['holder_phone']) ?></div>
+        </div>
+
+        <div class="d-flex gap-2 mt-3">
+            <a href="tel:<?= htmlspecialchars($order['holder_phone']) ?>" class="btn btn-success btn-action w-50">
+                📞 Gọi ngay
+            </a>
+
+            <a href="https://www.google.com/maps/search/?api=1&query=<?= urlencode($order['post_office_address']) ?>" 
+               target="_blank"
+               class="btn btn-outline-primary btn-action w-50">
+                🧭 Mở map
+            </a>
+        </div>
+    </div>
+
+    <div class="box">
+        <div class="section-title">📦 Thông tin hàng</div>
+
+        <div class="mb-3">
+            <div class="label">Người gửi</div>
+            <div class="value"><?= htmlspecialchars($order['sender_name']) ?> | <?= htmlspecialchars($order['sender_phone']) ?></div>
+        </div>
+
+        <div class="mb-3">
+            <div class="label">Người nhận</div>
+            <div class="value"><?= htmlspecialchars($order['receiver_name']) ?> | <?= htmlspecialchars($order['receiver_phone']) ?></div>
+        </div>
+
+        <div class="mb-3">
+            <div class="label">Khối lượng</div>
+            <div class="value"><?= htmlspecialchars($order['weight']) ?> kg</div>
+        </div>
+
+        <div class="mb-3">
+            <div class="label">Loại hàng</div>
+            <div class="value"><?= htmlspecialchars($order['cargo_type']) ?></div>
+        </div>
+
+        <div class="mb-3">
+            <div class="label">Dịch vụ</div>
+            <div class="value"><?= htmlspecialchars($order['service_type']) ?></div>
+        </div>
+    </div>
+
+    <div class="box">
+        <div class="section-title">🕒 Tracking gần nhất</div>
+
+        <?php while($track = $tracking_result->fetch_assoc()): ?>
+            <div class="timeline-item">
+                <div><strong><?= htmlspecialchars($track['status']) ?></strong></div>
+                <div><?= htmlspecialchars($track['note']) ?></div>
+                <div class="timeline-time">
+                    <?= date('d/m H:i', strtotime($track['created_at'])) ?>
+                </div>
+            </div>
+        <?php endwhile; ?>
+    </div>
+
+    <div class="d-grid gap-2 pb-4">
+        <?php if ($order['status'] === 'assigned_pickup'): ?>
+            <a href="shipper_scan.php?id=<?= intval($order['id']) ?>" class="btn btn-primary btn-lg btn-action">
+                📷 Pickup ngay
+            </a>
+        <?php else: ?>
+            <button type="button" class="btn btn-secondary btn-lg btn-action" disabled>
+                Đã pickup
+            </button>
+        <?php endif; ?>
+
+        <a href="shipper_dashboard.php" class="btn btn-outline-secondary btn-action">
+            ← Quay lại dashboard
+        </a>
+    </div>
 
 </div>
 

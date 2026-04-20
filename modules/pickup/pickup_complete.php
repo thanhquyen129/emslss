@@ -115,7 +115,7 @@ body{
             🚚 Về dashboard pickup
         </a>
 
-        <a href="operation_receive.php?id=<?= $order_id ?>" class="btn btn-outline-success btn-action">
+        <a href="/modules/operation/receive.php?id=<?= $order_id ?>" class="btn btn-outline-success btn-action">
             📦 Bàn giao sang operation
         </a>
 

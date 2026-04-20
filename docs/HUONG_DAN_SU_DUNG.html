@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hướng dẫn sử dụng EMS-LSS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --ems-green: #006341;
+      --ems-green-dark: #004d32;
+      --ems-green-soft: #e8f2ec;
+      --ems-gold: #ffcc00;
+      --ems-gold-dark: #e6b800;
+      --bs-primary: var(--ems-green);
+      --bs-primary-rgb: 0, 99, 65;
+      --bs-link-color: #005530;
+      --bs-link-hover-color: #003d24;
+    }
+    body {
+      font-family: "Noto Sans", system-ui, -apple-system, sans-serif;
+      color: #1a2e24;
+      background: linear-gradient(180deg, #f4faf7 0%, #eef4f0 40%, #e8f0ec 100%);
+      padding-top: 76px;
+    }
+    .navbar-ems {
+      background: linear-gradient(90deg, var(--ems-green-dark) 0%, var(--ems-green) 55%, #0a7a52 100%);
+      box-shadow: 0 4px 24px rgba(0, 50, 35, 0.25);
+    }
+    .navbar-ems .navbar-brand {
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      color: #fff !important;
+    }
+    .navbar-ems .navbar-brand .badge-ems {
+      background: var(--ems-gold);
+      color: var(--ems-green-dark);
+      font-size: 0.65rem;
+      vertical-align: middle;
+      font-weight: 800;
+    }
+    .navbar-ems .nav-link {
+      color: rgba(255, 255, 255, 0.92) !important;
+      font-weight: 500;
+      padding: 0.5rem 0.85rem !important;
+      border-radius: 0.375rem;
+    }
+    .navbar-ems .nav-link:hover,
+    .navbar-ems .nav-link:focus {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff !important;
+    }
+    .hero-ems {
+      background: linear-gradient(135deg, var(--ems-green-dark) 0%, var(--ems-green) 48%, #0d8f5c 100%);
+      color: #fff;
+      border-radius: 1rem;
+      padding: 2.5rem 2rem;
+      margin-bottom: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-ems::after {
+      content: "";
+      position: absolute;
+      right: -80px;
+      top: -60px;
+      width: 280px;
+      height: 280px;
+      border: 3px solid rgba(255, 204, 0, 0.25);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .hero-ems h1 {
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+    .hero-ems .lead {
+      color: rgba(255, 255, 255, 0.92);
+      max-width: 42rem;
+    }
+    .strip-gold {
+      height: 4px;
+      background: linear-gradient(90deg, var(--ems-gold) 0%, #ffe066 50%, var(--ems-gold-dark) 100%);
+      border-radius: 2px;
+      max-width: 120px;
+    }
+    .card-ems {
+      border: none;
+      border-radius: 0.75rem;
+      box-shadow: 0 8px 32px rgba(0, 60, 40, 0.08);
+      overflow: hidden;
+    }
+    .card-ems .card-header {
+      background: var(--ems-green-soft);
+      border-bottom: 1px solid #c5ddd0;
+      font-weight: 700;
+      color: var(--ems-green-dark);
+    }
+    .screenshot-wrap {
+      border-radius: 0.75rem;
+      overflow: hidden;
+      border: 1px solid #d4e5dc;
+      box-shadow: 0 12px 40px rgba(0, 50, 35, 0.12);
+      background: #fff;
+    }
+    .screenshot-wrap img {
+      width: 100%;
+      height: auto;
+      display: block;
+      vertical-align: middle;
+    }
+    figure.figure-ems figcaption {
+      font-size: 0.875rem;
+      color: #4a6b5a;
+    }
+    .code-path {
+      font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+      font-size: 0.88rem;
+      word-break: break-all;
+    }
+    .table-ems thead th {
+      background: var(--ems-green);
+      color: #fff;
+      font-weight: 600;
+      border: none;
+    }
+    .table-ems tbody td {
+      vertical-align: middle;
+    }
+    .toc-card .list-group-item {
+      border: none;
+      padding: 0.4rem 0;
+      background: transparent;
+    }
+    .toc-card .list-group-item a {
+      text-decoration: none;
+      color: var(--ems-green-dark);
+      font-weight: 500;
+    }
+    .toc-card .list-group-item a:hover {
+      color: var(--ems-green);
+      text-decoration: underline;
+    }
+    .section-anchor {
+      scroll-margin-top: 96px;
+    }
+    footer.footer-ems {
+      background: var(--ems-green-dark);
+      color: rgba(255, 255, 255, 0.85);
+      margin-top: 3rem;
+      padding: 2rem 0;
+    }
+    .alert-ems-tip {
+      background: #fffbeb;
+      border: 1px solid #f5e0a8;
+      color: #6b5a1a;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top navbar-ems">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="#">
+        <i class="bi bi-postage-heart fs-4" aria-hidden="true"></i>
+        <span>EMS-LSS <span class="badge badge-ems rounded-pill ms-1">Hướng dẫn</span></span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain" aria-controls="navMain" aria-expanded="false" aria-label="Mở menu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMain">
+        <ul class="navbar-nav ms-auto flex-wrap">
+          <li class="nav-item"><a class="nav-link" href="#tong-quan">Tổng quan</a></li>
+          <li class="nav-item"><a class="nav-link" href="#dang-nhap">Đăng nhập</a></li>
+          <li class="nav-item"><a class="nav-link" href="#luong-nghiep-vu">Luồng nghiệp vụ</a></li>
+          <li class="nav-item"><a class="nav-link" href="#admin">Admin</a></li>
+          <li class="nav-item"><a class="nav-link" href="#operation">Operation</a></li>
+          <li class="nav-item"><a class="nav-link" href="#shipper">Shipper</a></li>
+          <li class="nav-item"><a class="nav-link" href="#api">API</a></li>
+          <li class="nav-item"><a class="nav-link" href="#trang-thai">Trạng thái</a></li>
+          <li class="nav-item"><a class="nav-link" href="#ghi-chu">Ghi chú</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container py-4">
+    <header class="hero-ems mb-4">
+      <div class="strip-gold mb-3"></div>
+      <h1 class="display-6 mb-3">Hướng dẫn sử dụng EMS-LSS</h1>
+      <p class="lead mb-0">
+        Tài liệu cho vận hành và kỹ thuật: tiếp nhận đơn từ EMS, điều phối pickup / delivery, tracking,
+        callback và các màn hình quản trị — đồng bộ với mã nguồn hiện tại.
+      </p>
+    </header>
+
+    <div class="row g-4">
+      <aside class="col-lg-3 order-lg-2">
+        <div class="card card-ems toc-card sticky-lg-top" style="top: 92px; z-index: 1;">
+          <div class="card-header"><i class="bi bi-list-nested me-2"></i>Mục lục</div>
+          <div class="card-body py-2">
+            <div class="list-group list-group-flush">
+              <div class="list-group-item"><a href="#tong-quan">1. Tổng quan</a></div>
+              <div class="list-group-item"><a href="#dang-nhap">2. Đăng nhập và vai trò</a></div>
+              <div class="list-group-item"><a href="#luong-nghiep-vu">3. Luồng nghiệp vụ</a></div>
+              <div class="list-group-item"><a href="#admin">4. Admin / Dispatcher</a></div>
+              <div class="list-group-item"><a href="#operation">5. Operation (Hub)</a></div>
+              <div class="list-group-item"><a href="#shipper">6. Shipper</a></div>
+              <div class="list-group-item"><a href="#api">7. API tích hợp EMS</a></div>
+              <div class="list-group-item"><a href="#trang-thai">8. Trạng thái đơn</a></div>
+              <div class="list-group-item"><a href="#ghi-chu">9. Ghi chú vận hành</a></div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <div class="col-lg-9 order-lg-1">
+
+        <div class="alert alert-ems-tip d-flex gap-3 align-items-start mb-4" role="status">
+          <i class="bi bi-image fs-4 flex-shrink-0 mt-1"></i>
+          <div>
+            <strong>Ảnh minh họa trong tài liệu</strong> là khung giao diện theo nhận diện EMS (xanh lá + vàng bưu chính).
+            Bạn có thể chụp màn hình thật từ hệ thống, lưu dạng PNG vào thư mục <span class="code-path">docs/images/</span>
+            và thay tên file tương ứng trong thẻ <code>&lt;img&gt;</code> (hoặc đổi thuộc tính <code>src</code>) để hiển thị ảnh thực tế.
+          </div>
+        </div>
+
+        <section id="tong-quan" class="section-anchor mb-5">
+          <h2 class="h4 text-success mb-3"><i class="bi bi-diagram-3 me-2"></i>1. Tổng quan</h2>
+          <p>
+            <strong>EMS-LSS</strong> là hệ thống trung gian: EMS gửi đơn vào LSS, đội vận hành phân công shipper
+            nhận thư (pickup) và phát thư (delivery), ghi nhận tracking và gửi trạng thái về EMS (callback).
+          </p>
+          <div class="card card-ems mb-3">
+            <div class="card-body">
+              <pre class="mb-0 small bg-light p-3 rounded border text-secondary">EMS → API nhận đơn → CSDL LSS
+→ Dispatcher / Admin phân công
+→ Shipper pickup (scan, ảnh)
+→ Operation / Hub (nhận hàng, giao cho delivery)
+→ Shipper delivery (scan, ảnh)
+→ Callback trạng thái → EMS</pre>
+            </div>
+          </div>
+          <p class="mb-0">
+            Điểm vào web: <code class="code-path">index.php</code> chuyển hướng tới <code class="code-path">modules/login.php</code>.
+          </p>
+        </section>
+
+        <section id="dang-nhap" class="section-anchor mb-5">
+          <h2 class="h4 text-success mb-3"><i class="bi bi-shield-lock me-2"></i>2. Đăng nhập và vai trò</h2>
+          <div class="row g-4 align-items-start">
+            <div class="col-md-6">
+              <p>
+                Đăng nhập tại <code class="code-path">/modules/login.php</code>. Sau khi đăng nhập thành công:
+              </p>
+              <ul>
+                <li><strong>shipper</strong> → <code class="code-path">modules/shipper/shipper_dashboard.php</code></li>
+                <li><strong>Các vai trò khác</strong> → <code class="code-path">modules/admin/dashboard.php</code> (tự redirect theo <code>role</code>):
+                  <ul class="mt-2">
+                    <li><code>admin</code>, <code>dispatcher</code> → dashboard realtime</li>
+                    <li><code>operation</code> → dashboard hub</li>
+                    <li><code>shipper</code> (nếu vào qua admin entry) → <code class="code-path">pickup_dashboard.php</code> (legacy)</li>
+                  </ul>
+                </li>
+              </ul>
+              <p class="mb-0">Đăng xuất: <code class="code-path">/logout.php</code></p>
+            </div>
+            <div class="col-md-6">
+              <figure class="figure figure-ems mb-0">
+                <div class="screenshot-wrap mb-2">
+                  <img src="images/screenshot-login.svg" width="960" height="540" alt="Minh họa màn hình đăng nhập EMS-LSS">
+                </div>
+                <figcaption class="figure-caption text-center">Màn hình đăng nhập — thay file trong <code>docs/images/</code> bằng ảnh chụp thật nếu cần</figcaption>
+              </figure>
+            </div>
+          </div>
+        </section>
+
+        <section id="luong-nghiep-vu" class="section-anchor mb-5">
+          <h2 class="h4 text-success mb-3"><i class="bi bi-arrow-left-right me-2"></i>3. Luồng nghiệp vụ</h2>
+          <ol class="mb-0">
+            <li>EMS đẩy đơn → API nhận đơn (mục API).</li>
+            <li>Đơn mới → dispatcher/admin gán shipper pickup (sau đó gán delivery khi tới bước đó).</li>
+            <li>Shipper pickup: xem đơn, scan mã EMS, hoàn tất pickup (ảnh chứng từ nếu có).</li>
+            <li>Operation: nhận hàng từ pickup, gán giao hàng.</li>
+            <li>Shipper delivery: scan và hoàn tất giao.</li>
+            <li>Callback về EMS; cron / màn hình theo dõi callback.</li>
+          </ol>
+        </section>
+
+        <section id="admin" class="section-anchor mb-5">
+          <h2 class="h4 text-success mb-3"><i class="bi bi-speedometer2 me-2"></i>4. Admin / Dispatcher</h2>
+          <p>URL giả định gốc site là <code>/</code>; nếu cài trong thư mục con, thêm prefix tương ứng.</p>
+
+          <div class="row g-4 mb-4">
+            <div class="col-md-6">
+              <figure class="figure figure-ems mb-md-0">
+                <div class="screenshot-wrap">
+                  <img src="images/screenshot-admin-dashboard.svg" width="960" height="540" alt="Minh họa dashboard realtime admin">
+                </div>
+                <figcaption class="figure-caption text-center mt-2">Dashboard realtime — theo dõi tổng quan đơn</figcaption>
+              </figure>
+            </div>
+            <div class="col-md-6">
+              <figure class="figure figure-ems mb-0">
+                <div class="screenshot-wrap">
+                  <img src="images/screenshot-order-detail.svg" width="960" height="540" alt="Minh họa chi tiết đơn admin">
+                </div>
+                <figcaption class="figure-caption text-center mt-2">Chi tiết đơn — timeline, thông tin vận hành</figcaption>
+              </figure>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-striped table-hover table-bordered table-ems mb-4">
+              <thead>
+                <tr>
+                  <th scope="col">Chức năng</th>
+                  <th scope="col">Đường dẫn (canonical)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Dashboard realtime</td><td><code class="code-path">/modules/admin/admin_dashboard_realtime.php</code></td></tr>
+                <tr><td>Điểm vào (redirect theo role)</td><td><code class="code-path">/modules/admin/dashboard.php</code></td></tr>
+                <tr><td>Chi tiết đơn</td><td><code class="code-path">/modules/admin/admin_order_detail.php?id={order_id}</code></td></tr>
+                <tr><td>Quản lý người dùng</td><td><code class="code-path">/modules/admin/admin_users.php</code></td></tr>
+                <tr><td>Sửa / tạo user</td><td><code class="code-path">/modules/admin/admin_user_edit.php</code></td></tr>
+                <tr><td>Vô hiệu hóa user</td><td><code class="code-path">/modules/admin/admin_user_disable.php</code></td></tr>
+                <tr><td>Quản lý roles</td><td><code class="code-path">/modules/admin/admin_roles.php</code></td></tr>
+                <tr><td>Báo cáo</td><td><code class="code-path">/modules/admin/admin_reports.php</code></td></tr>
+                <tr><td>Callback monitor</td><td><code class="code-path">/modules/admin/callback_monitor.php</code></td></tr>
+                <tr><td>Nhật ký API</td><td><code class="code-path">/modules/admin/api_logs.php</code></td></tr>
+                <tr><td>Gán đơn</td><td><code class="code-path">/modules/admin/assign_order_user.php</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card card-ems">
+            <div class="card-header">Cách dùng nhanh</div>
+            <div class="card-body">
+              <ul class="mb-0">
+                <li><strong>Realtime dashboard</strong> — danh sách đơn và trạng thái.</li>
+                <li><strong>Chi tiết đơn</strong> — timeline, shipper, ảnh, log (theo dữ liệu đã ghi).</li>
+                <li><strong>Callback monitor</strong> &amp; <strong>API logs</strong> — xử lý lỗi tích hợp.</li>
+                <li><strong>Users / Roles</strong> — tài khoản và phân quyền.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section id="operation" class="section-anchor mb-5">
+          <h2 class="h4 text-success mb-3"><i class="bi bi-building me-2"></i>5. Operation (Hub)</h2>
+          <div class="row g-4 align-items-start mb-4">
+            <div class="col-lg-7">
+              <div class="table-responsive">
+                <table class="table table-striped table-hover table-bordered table-ems mb-0">
+                  <thead>
+                    <tr><th>Chức năng</th><th>Đường dẫn</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>Dashboard vận hành</td><td><code class="code-path">/modules/operation/dashboard.php</code></td></tr>
+                    <tr><td>Nhận hàng từ pickup</td><td><code class="code-path">/modules/operation/receive.php?id={order_id}</code></td></tr>
+                    <tr><td>Gán delivery (POST)</td><td><code class="code-path">/modules/operation/assign_delivery.php</code></td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="alert alert-warning mt-3 mb-0 small">
+                <i class="bi bi-info-circle me-1"></i>
+                Có file legacy <code class="code-path">operation_dashboard.php</code>, <code class="code-path">operation_receive.php</code> — ưu tiên đường dẫn trong bảng khi tích hợp mới.
+              </div>
+            </div>
+            <div class="col-lg-5">
+              <figure class="figure figure-ems mb-0">
+                <div class="screenshot-wrap">
+                  <img src="images/screenshot-operation.svg" width="960" height="540" alt="Minh họa dashboard operation hub">
+                </div>
+                <figcaption class="figure-caption text-center mt-2">Hub — nhận hàng &amp; danh sách đơn</figcaption>
+              </figure>
+            </div>
+          </div>
+        </section>
+
+        <section id="shipper" class="section-anchor mb-5">
+          <h2 class="h4 text-success mb-3"><i class="bi bi-truck me-2"></i>6. Shipper</h2>
+          <p>Pickup và delivery tập trung tại <code class="code-path">modules/shipper/</code>.</p>
+          <div class="row g-4 mb-4">
+            <div class="col-md-6">
+              <figure class="figure figure-ems">
+                <div class="screenshot-wrap">
+                  <img src="images/screenshot-shipper.svg" width="960" height="540" alt="Minh họa giao diện shipper mobile">
+                </div>
+                <figcaption class="figure-caption text-center">Giao diện thao tác ngoài hiện trường (minh họa mobile)</figcaption>
+              </figure>
+            </div>
+            <div class="col-md-6">
+              <div class="table-responsive">
+                <table class="table table-striped table-hover table-bordered table-ems mb-0">
+                  <thead>
+                    <tr><th>Chức năng</th><th>Đường dẫn</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>Dashboard shipper</td><td><code class="code-path">/modules/shipper/shipper_dashboard.php</code></td></tr>
+                    <tr><td>Chi tiết pickup</td><td><code class="code-path">/modules/shipper/shipper_order_detail.php?id={order_id}</code></td></tr>
+                    <tr><td>Scan pickup</td><td><code class="code-path">/modules/shipper/shipper_scan.php?id={order_id}</code></td></tr>
+                    <tr><td>Hoàn tất pickup</td><td><code class="code-path">/modules/shipper/shipper_complete.php?id={order_id}</code></td></tr>
+                    <tr><td>Dashboard delivery</td><td><code class="code-path">/modules/shipper/delivery_dashboard.php</code></td></tr>
+                    <tr><td>Chi tiết delivery</td><td><code class="code-path">/modules/shipper/delivery_detail.php?id={order_id}</code></td></tr>
+                    <tr><td>Scan giao</td><td><code class="code-path">/modules/shipper/delivery_scan.php?id={order_id}</code></td></tr>
+                    <tr><td>Hoàn tất giao</td><td><code class="code-path">/modules/shipper/delivery_complete.php?id={order_id}</code></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <p class="small text-secondary mb-0">
+            Module cũ (<code class="code-path">pickup_dashboard.php</code>, <code class="code-path">modules/pickup/</code>, <code class="code-path">modules/delivery/</code>) có thể song song — nên thống nhất một bộ URL khi vận hành.
+          </p>
+        </section>
+
+        <section id="api" class="section-anchor mb-5">
+          <h2 class="h4 text-success mb-3"><i class="bi bi-plugin me-2"></i>7. API tích hợp EMS</h2>
+          <div class="row g-4 align-items-start">
+            <div class="col-lg-7">
+              <p>Chi tiết request/response: <code class="code-path">API.md</code>. Xác thực thường qua header <code>X-API-KEY</code> (xem <code class="code-path">config/</code>).</p>
+              <div class="table-responsive">
+                <table class="table table-striped table-hover table-bordered table-ems mb-0">
+                  <thead>
+                    <tr><th>Mục đích</th><th>Endpoint</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>EMS đẩy đơn</td><td><code>POST /api/ems_push_order.php</code></td></tr>
+                    <tr><td>Tra cứu tracking</td><td><code>GET /api/ems_tracking.php?ems_code=...</code></td></tr>
+                    <tr><td>Hủy đơn</td><td><code>/api/ems_cancel_order.php</code></td></tr>
+                    <tr><td>Callback</td><td><code>/api/callback_ems.php</code>, <code>/api/callback_pickup.php</code>, <code>/api/callback_delivery.php</code></td></tr>
+                    <tr><td>Retry callback</td><td><code>/api/callback_retry.php</code></td></tr>
+                    <tr><td>Health</td><td><code>/api/health.php</code></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="col-lg-5">
+              <figure class="figure figure-ems mb-0">
+                <div class="screenshot-wrap">
+                  <img src="images/screenshot-api-callback.svg" width="960" height="540" alt="Minh họa callback monitor và API">
+                </div>
+                <figcaption class="figure-caption text-center mt-2">Callback monitor &amp; nhật ký API (minh họa)</figcaption>
+              </figure>
+            </div>
+          </div>
+        </section>
+
+        <section id="trang-thai" class="section-anchor mb-5">
+          <h2 class="h4 text-success mb-3"><i class="bi bi-signpost-split me-2"></i>8. Trạng thái đơn (tham khảo)</h2>
+          <p>
+            Theo <code class="code-path">readme.md</code>, chuỗi có thể gồm:
+            <em>new_order → assigned_pickup → picked_up → arrived_hub / in_transit → assigned_delivery → delivered</em>
+            (và <em>failed</em> khi lỗi).
+          </p>
+          <p class="mb-0">
+            Đối chiếu thực tế với bảng <code>emslss_orders</code> và <code>emslss_tracking</code> trong <code class="code-path">DB_SCHEMA.md</code> hoặc <code class="code-path">install.sql</code>.
+          </p>
+        </section>
+
+        <section id="ghi-chu" class="section-anchor mb-4">
+          <h2 class="h4 text-success mb-3"><i class="bi bi-wrench-adjustable me-2"></i>9. Ghi chú vận hành</h2>
+          <ul class="mb-0">
+            <li><strong>Cron / retry:</strong> <code class="code-path">cron/</code> — cấu hình scheduler trên server production.</li>
+            <li><strong>Test đẩy đơn:</strong> <code class="code-path">test_ems_push.php</code></li>
+            <li><strong>Linux:</strong> đường dẫn file phân biệt hoa thường (<code>api_logs.php</code> vs <code>API_logs.php</code>).</li>
+            <li><strong>Roadmap:</strong> <code class="code-path">hoan_thien.md</code></li>
+          </ul>
+        </section>
+
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer-ems">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-8">
+          <strong class="text-white">EMS-LSS</strong>
+          <span class="text-white-50"> — Tài liệu hướng dẫn sử dụng. Cập nhật khi thêm route hoặc thay đổi luồng nghiệp vụ.</span>
+        </div>
+        <div class="col-md-4 text-md-end mt-2 mt-md-0">
+          <span class="badge text-bg-warning text-dark">Bưu chính · Logistics</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>

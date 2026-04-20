@@ -1,6 +1,7 @@
 <?php
 
-require_once '../config/db.php';
+require_once __DIR__ . '/../config/db.php';
+$_system = require __DIR__ . '/../config/system.php';
 
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
@@ -10,7 +11,9 @@ mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 |--------------------------------------------------------------------------
 */
 
-header('Content-Type: application/json; charset=utf-8');
+if (!defined('EMSLSS_SKIP_JSON_HEADER')) {
+    header('Content-Type: application/json; charset=utf-8');
+}
 
 /*
 |--------------------------------------------------------------------------
@@ -20,9 +23,11 @@ header('Content-Type: application/json; charset=utf-8');
 
 function requireApiKey()
 {
+    global $_system;
     $apiKey = $_SERVER['HTTP_X_API_KEY'] ?? '';
+    $expectedApiKey = $_system['security']['api_key'] ?? '';
 
-    if ($apiKey !== 'EMS123456') {
+    if ($expectedApiKey === '' || $apiKey !== $expectedApiKey) {
         responseError('Unauthorized', 401);
     }
 }
@@ -189,11 +194,11 @@ function responseSuccess($data = [])
     exit;
 }
 
-function responseDuplicate($order)
+function responseDuplicate($order,$ems_code)
 {
     echo json_encode([
         'status' => 'duplicate',
-        'order_id' => $order['id'],
+        'ems_code' => $ems_code,
         'current_status' => $order['status']
     ], JSON_UNESCAPED_UNICODE);
 

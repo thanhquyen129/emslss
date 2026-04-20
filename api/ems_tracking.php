@@ -8,7 +8,7 @@ safeExecute(function(){
     requireApiKey();
     requireMethod('GET');
 
-    $ems_code = $_GET['ems_code'] ?? '';
+    $ems_code = strtoupper(trim($_GET['ems_code'] ?? ''));
 
     if(!$ems_code){
         responseError('Missing ems_code');
@@ -20,23 +20,30 @@ safeExecute(function(){
         responseError('Order not found',404);
     }
 
-    $tracking = [];
+    $timeline = [];
 
-    $res = $conn->query("
-        SELECT status,note,created_at
+    $stmt = $conn->prepare("
+        SELECT status, note, created_at
         FROM emslss_tracking
-        WHERE order_id=".$order['id']."
+        WHERE order_id = ?
         ORDER BY created_at ASC
     ");
+    $stmt->bind_param("i", $order['id']);
+    $stmt->execute();
+    $res = $stmt->get_result();
 
     while($row = $res->fetch_assoc()){
-        $tracking[] = $row;
+        $timeline[] = [
+            'status' => $row['status'],
+            'note' => $row['note'],
+            'created_at' => $row['created_at']
+        ];
     }
 
     responseSuccess([
-        'order_id'=>$order['id'],
+        'ems_code'=>$ems_code,
         'current_status'=>$order['status'],
-        'timeline'=>$tracking
+        'timeline'=>$timeline
     ]);
 });
 ?>

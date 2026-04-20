@@ -42,11 +42,11 @@ if(session_status() == PHP_SESSION_NONE){
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="api_logs.php">API Logs</a>
+                    <a class="nav-link" href="API_logs.php">API Logs</a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="operation_dashboard.php">Operation</a>
+                    <a class="nav-link" href="/modules/operation/dashboard.php">Operation</a>
                 </li>
 
             </ul>
@@ -55,7 +55,7 @@ if(session_status() == PHP_SESSION_NONE){
                 Xin chào <?= $_SESSION['full_name'] ?? 'Admin' ?>
             </span>
 
-            <a href="logout.php" class="btn btn-sm btn-danger">Logout</a>
+            <a href="/logout.php" class="btn btn-sm btn-danger">Logout</a>
         </div>
     </div>
 </nav>

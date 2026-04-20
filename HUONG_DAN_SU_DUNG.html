@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hướng dẫn sử dụng EMS-LSS</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --surface: #1a2332;
+      --border: #2d3a4d;
+      --text: #e7edf4;
+      --muted: #8b9cb3;
+      --accent: #3d9cf0;
+      --success: #3ecf8e;
+      --warning: #e8b339;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      font-size: 16px;
+    }
+    .wrap { max-width: 880px; margin: 0 auto; padding: 2.5rem 1.25rem 4rem; }
+    header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    h1 { font-size: 1.75rem; font-weight: 700; margin: 0 0 0.5rem; letter-spacing: -0.02em; }
+    .lead { color: var(--muted); margin: 0; font-size: 1.05rem; }
+    h2 {
+      font-size: 1.2rem;
+      margin: 2rem 0 0.75rem;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    h3 { font-size: 1rem; margin: 1.25rem 0 0.5rem; color: var(--text); }
+    p { margin: 0.5rem 0 1rem; }
+    ul, ol { margin: 0.5rem 0 1rem; padding-left: 1.35rem; }
+    li { margin: 0.35rem 0; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code, .path {
+      font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+      font-size: 0.88em;
+      background: var(--surface);
+      padding: 0.15em 0.45em;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+    .path { display: inline-block; word-break: break-all; }
+    .note {
+      background: var(--surface);
+      border-left: 3px solid var(--warning);
+      padding: 0.75rem 1rem;
+      margin: 1rem 0;
+      border-radius: 0 6px 6px 0;
+      font-size: 0.95rem;
+    }
+    .flow {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      font-family: ui-monospace, monospace;
+      font-size: 0.85rem;
+      white-space: pre-wrap;
+      overflow-x: auto;
+      margin: 0.75rem 0 1.25rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.75rem 0 1.25rem;
+      font-size: 0.95rem;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.55rem 0.75rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    th { background: var(--surface); color: var(--muted); font-weight: 600; }
+    .toc { margin: 1.5rem 0; }
+    .toc a { display: block; padding: 0.25rem 0; }
+    footer {
+      margin-top: 3rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Hướng dẫn sử dụng EMS-LSS</h1>
+      <p class="lead">
+        Tài liệu mô tả chức năng đã triển khai: tiếp nhận đơn từ EMS, điều phối pickup / delivery,
+        tracking, callback và các màn hình quản trị — cập nhật theo mã nguồn hiện tại của dự án.
+      </p>
+    </header>
+
+    <nav class="toc" aria-label="Mục lục">
+      <strong>Mục lục</strong>
+      <a href="#tong-quan">1. Tổng quan</a>
+      <a href="#dang-nhap">2. Đăng nhập và vai trò</a>
+      <a href="#luong-nghiep-vu">3. Luồng nghiệp vụ</a>
+      <a href="#admin">4. Admin / Dispatcher</a>
+      <a href="#operation">5. Operation (Hub)</a>
+      <a href="#shipper">6. Shipper</a>
+      <a href="#api">7. API tích hợp EMS</a>
+      <a href="#trang-thai">8. Trạng thái đơn (tham khảo)</a>
+      <a href="#ghi-chu">9. Ghi chú vận hành</a>
+    </nav>
+
+    <section id="tong-quan">
+      <h2>1. Tổng quan</h2>
+      <p>
+        <strong>EMS-LSS</strong> là hệ thống trung gian: EMS gửi đơn vào LSS, đội vận hành phân công shipper
+        nhận thư (pickup) và phát thư (delivery), ghi nhận tracking và gửi trạng thái về EMS (callback).
+      </p>
+      <div class="flow">EMS → API nhận đơn → CSDL LSS
+→ Dispatcher / Admin phân công
+→ Shipper pickup (scan, ảnh)
+→ Operation / Hub (nhận hàng, giao cho delivery)
+→ Shipper delivery (scan, ảnh)
+→ Callback trạng thái → EMS</div>
+      <p>
+        Điểm vào ứng dụng web: <span class="path">index.php</span> chuyển hướng tới
+        <span class="path">modules/login.php</span>.
+      </p>
+    </section>
+
+    <section id="dang-nhap">
+      <h2>2. Đăng nhập và vai trò</h2>
+      <p>
+        Đăng nhập tại <span class="path">/modules/login.php</span>. Sau khi đăng nhập thành công:
+      </p>
+      <ul>
+        <li><strong>shipper</strong>: chuyển tới dashboard shipper (<span class="path">modules/shipper/shipper_dashboard.php</span>).</li>
+        <li><strong>Các vai trò khác</strong> (admin, dispatcher, operation…): chuyển tới <span class="path">modules/admin/dashboard.php</span>, file này tự điều hướng theo <code>role</code> trong session:
+          <ul>
+            <li><code>admin</code>, <code>dispatcher</code> → realtime dashboard admin.</li>
+            <li><code>operation</code> → dashboard vận hành (hub).</li>
+            <li><code>shipper</code> (nếu vào qua đường này) → <span class="path">pickup_dashboard.php</span> (legacy).</li>
+          </ul>
+        </li>
+      </ul>
+      <p>Đăng xuất: <span class="path">/logout.php</span>.</p>
+    </section>
+
+    <section id="luong-nghiep-vu">
+      <h2>3. Luồng nghiệp vụ đã có trong hệ thống</h2>
+      <p>Luồng lõi đã được mã hóa qua các endpoint và module sau (thứ tự logic):</p>
+      <ol>
+        <li>EMS đẩy đơn → API nhận đơn (xem mục API).</li>
+        <li>Đơn ở trạng thái mới → dispatcher/admin gán shipper pickup (và sau đó gán delivery khi tới bước đó).</li>
+        <li>Shipper pickup: xem đơn, scan mã EMS, hoàn tất pickup (ảnh chứng từ nếu có).</li>
+        <li>Operation: nhận hàng từ pickup, có thể gán giao hàng (delivery).</li>
+        <li>Shipper delivery: scan và hoàn tất giao.</li>
+        <li>Callback: hệ thống gửi trạng thái về EMS; có cron / màn hình theo dõi callback.</li>
+      </ol>
+    </section>
+
+    <section id="admin">
+      <h2>4. Admin / Dispatcher</h2>
+      <p>Các URL dưới đây giả định gốc site là <code>/</code>; nếu cài trong thư mục con, thêm prefix tương ứng.</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Chức năng</th>
+            <th>Đường dẫn (canonical)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Dashboard realtime (tổng quan đơn)</td>
+            <td><span class="path">/modules/admin/admin_dashboard_realtime.php</span></td>
+          </tr>
+          <tr>
+            <td>Điểm vào dashboard (redirect theo role)</td>
+            <td><span class="path">/modules/admin/dashboard.php</span></td>
+          </tr>
+          <tr>
+            <td>Chi tiết đơn (admin)</td>
+            <td><span class="path">/modules/admin/admin_order_detail.php?id={order_id}</span></td>
+          </tr>
+          <tr>
+            <td>Quản lý người dùng</td>
+            <td><span class="path">/modules/admin/admin_users.php</span></td>
+          </tr>
+          <tr>
+            <td>Sửa / tạo user (nếu có)</td>
+            <td><span class="path">/modules/admin/admin_user_edit.php</span></td>
+          </tr>
+          <tr>
+            <td>Vô hiệu hóa user</td>
+            <td><span class="path">/modules/admin/admin_user_disable.php</span></td>
+          </tr>
+          <tr>
+            <td>Quản lý vai trò (roles)</td>
+            <td><span class="path">/modules/admin/admin_roles.php</span></td>
+          </tr>
+          <tr>
+            <td>Báo cáo</td>
+            <td><span class="path">/modules/admin/admin_reports.php</span></td>
+          </tr>
+          <tr>
+            <td>Theo dõi callback / retry</td>
+            <td><span class="path">/modules/admin/callback_monitor.php</span></td>
+          </tr>
+          <tr>
+            <td>Nhật ký API</td>
+            <td><span class="path">/modules/admin/api_logs.php</span></td>
+          </tr>
+          <tr>
+            <td>Gán đơn cho user / shipper (module hỗ trợ)</td>
+            <td><span class="path">/modules/admin/assign_order_user.php</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <h3>Cách dùng ngắn gọn</h3>
+      <ul>
+        <li>Vào <strong>realtime dashboard</strong> để xem danh sách đơn và trạng thái cập nhật.</li>
+        <li>Mở <strong>chi tiết đơn</strong> để xem timeline, thông tin gán shipper, ảnh và log liên quan (tùy dữ liệu đã ghi).</li>
+        <li><strong>Callback monitor</strong> và <strong>API logs</strong> dùng khi cần xử lý lỗi tích hợp hoặc tra cứu request/response.</li>
+        <li><strong>Users / Roles</strong> để tạo tài khoản, phân quyền phù hợp vận hành.</li>
+      </ul>
+    </section>
+
+    <section id="operation">
+      <h2>5. Operation (Hub)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Chức năng</th>
+            <th>Đường dẫn</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Dashboard vận hành</td>
+            <td><span class="path">/modules/operation/dashboard.php</span></td>
+          </tr>
+          <tr>
+            <td>Nhận hàng từ pickup (theo đơn)</td>
+            <td><span class="path">/modules/operation/receive.php?id={order_id}</span></td>
+          </tr>
+          <tr>
+            <td>Gán delivery (POST API nội bộ)</td>
+            <td><span class="path">/modules/operation/assign_delivery.php</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="note">
+        Có thêm các file bọc legacy như <span class="path">operation_dashboard.php</span>,
+        <span class="path">operation_receive.php</span> tại thư mục <code>modules/</code> — ưu tiên dùng đường dẫn trong bảng trên khi tích hợp mới.
+      </p>
+    </section>
+
+    <section id="shipper">
+      <h2>6. Shipper</h2>
+      <p>Hai nhóm: pickup và delivery. Giao diện shipper tập trung dưới <span class="path">modules/shipper/</span>.</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Chức năng</th>
+            <th>Đường dẫn</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Dashboard shipper (tổng)</td>
+            <td><span class="path">/modules/shipper/shipper_dashboard.php</span></td>
+          </tr>
+          <tr>
+            <td>Chi tiết đơn (pickup)</td>
+            <td><span class="path">/modules/shipper/shipper_order_detail.php?id={order_id}</span></td>
+          </tr>
+          <tr>
+            <td>Scan pickup</td>
+            <td><span class="path">/modules/shipper/shipper_scan.php?id={order_id}</span></td>
+          </tr>
+          <tr>
+            <td>Hoàn tất pickup</td>
+            <td><span class="path">/modules/shipper/shipper_complete.php?id={order_id}</span></td>
+          </tr>
+          <tr>
+            <td>Dashboard delivery</td>
+            <td><span class="path">/modules/shipper/delivery_dashboard.php</span></td>
+          </tr>
+          <tr>
+            <td>Chi tiết delivery</td>
+            <td><span class="path">/modules/shipper/delivery_detail.php?id={order_id}</span></td>
+          </tr>
+          <tr>
+            <td>Scan giao hàng</td>
+            <td><span class="path">/modules/shipper/delivery_scan.php?id={order_id}</span></td>
+          </tr>
+          <tr>
+            <td>Hoàn tất giao hàng</td>
+            <td><span class="path">/modules/shipper/delivery_complete.php?id={order_id}</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <h3>Module pickup / delivery cũ (vẫn có trong repo)</h3>
+      <p>
+        Các file như <span class="path">pickup_dashboard.php</span>, <span class="path">pickup_scan.php</span>,
+        <span class="path">modules/pickup/</span>, <span class="path">modules/delivery/</span> có thể song song với luồng shipper —
+        khi vận hành nên thống nhất một bộ URL để tránh nhầm lẫn.
+      </p>
+    </section>
+
+    <section id="api">
+      <h2>7. API tích hợp EMS</h2>
+      <p>
+        Chi tiết request/response xem <span class="path">API.md</span> trong repo.
+        Các endpoint chính đã có trong mã nguồn:
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Mục đích</th>
+            <th>Endpoint</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>EMS đẩy đơn vào LSS</td>
+            <td><code>POST /api/ems_push_order.php</code></td>
+          </tr>
+          <tr>
+            <td>EMS tra cứu tracking</td>
+            <td><code>GET /api/ems_tracking.php?ems_code=...</code></td>
+          </tr>
+          <tr>
+            <td>Hủy đơn (nếu được bật cấu hình)</td>
+            <td><code>/api/ems_cancel_order.php</code></td>
+          </tr>
+          <tr>
+            <td>Callback nội bộ / pickup / delivery</td>
+            <td><code>/api/callback_ems.php</code>, <code>/api/callback_pickup.php</code>, <code>/api/callback_delivery.php</code></td>
+          </tr>
+          <tr>
+            <td>Retry callback (hỗ trợ vận hành)</td>
+            <td><code>/api/callback_retry.php</code></td>
+          </tr>
+          <tr>
+            <td>Health check</td>
+            <td><code>/api/health.php</code></td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        Xác thực API thường qua header <code>X-API-KEY</code> (xem <span class="path">API.md</span> và <span class="path">config/</span>).
+      </p>
+    </section>
+
+    <section id="trang-thai">
+      <h2>8. Trạng thái đơn (tham khảo)</h2>
+      <p>
+        Theo tài liệu nghiệp vụ (<span class="path">readme.md</span>), chuỗi tracking có thể gồm các bước như:
+        <em>new_order → assigned_pickup → picked_up → arrived_hub / in_transit → assigned_delivery → delivered</em>
+        (và <em>failed</em> khi lỗi).
+      </p>
+      <p>
+        Tên trạng thái cụ thể trong CSDL có thể khác một phần theo phiên bản code — khi báo cáo hoặc tích hợp,
+        nên đối chiếu bảng <code>emslss_orders</code> và <code>emslss_tracking</code> trong <span class="path">DB_SCHEMA.md</span> hoặc <span class="path">install.sql</span>.
+      </p>
+    </section>
+
+    <section id="ghi-chu">
+      <h2>9. Ghi chú vận hành</h2>
+      <ul>
+        <li><strong>Cron / retry</strong>: thư mục <span class="path">cron/</span> chứa script retry callback — cần cấu hình scheduler trên server production.</li>
+        <li><strong>Test đẩy đơn</strong>: <span class="path">test_ems_push.php</span> dùng kiểm tra tích hợp nhận đơn.</li>
+        <li><strong>Phân biệt chữ hoa/thường</strong>: trên Linux, đường dẫn file phân biệt hoa thường (ví dụ <code>api_logs.php</code> vs <code>API_logs.php</code>).</li>
+        <li><strong>Roadmap / hạn chế</strong>: đánh giá chi tiết tính năng còn thiếu và đề xuất nâng cấp nằm trong <span class="path">hoan_thien.md</span>.</li>
+      </ul>
+    </section>
+
+    <footer>
+      <p>Tài liệu này mô tả các thành phần đã có trong repository EMS-LSS. Cập nhật file HTML này khi thêm route hoặc thay đổi luồng nghiệp vụ.</p>
+    </footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" role="img" aria-labelledby="t6">
+  <title id="t6">Callback monitor &amp; API (minh hÍa)</title>
+  <rect width="960" height="540" fill="#f2f7f4"/>
+  <rect x="40" y="40" width="880" height="460" rx="12" fill="#fff" stroke="#d4e5dc"/>
+  <rect x="40" y="40" width="880" height="48" fill="#1e4633"/>
+  <text x="64" y="72" fill="#ffcc00" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="800">Callback Monitor</text>
+  <text x="240" y="72" fill="#a8d4c0" font-family="Segoe UI, Arial, sans-serif" font-size="13">Theo dõi gíi tr¡ng thái vÁ EMS</text>
+  <rect x="64" y="112" width="400" height="160" rx="8" fill="#fff8e6" stroke="#f0d78c"/>
+  <text x="84" y="144" fill="#8a6d1d" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700">Retry chÝ xí lý</text>
+  <rect x="84" y="160" width="340" height="28" rx="4" fill="#fff"/>
+  <rect x="84" y="198" width="340" height="28" rx="4" fill="#fff"/>
+  <rect x="488" y="112" width="408" height="360" rx="8" fill="#0d1117"/>
+  <text x="508" y="148" fill="#7ee787" font-family="Consolas, monospace" font-size="11">POST /api/callback_retry.php</text>
+  <text x="508" y="176" fill="#79c0ff" font-family="Consolas, monospace" font-size="11">{ "order_id": 1024, "status": "ok" }</text>
+  <text x="508" y="210" fill="#8b949e" font-family="Consolas, monospace" font-size="11">// API logs  request/response</text>
+  <text x="480" y="510" text-anchor="middle" fill="#5a7a6a" font-family="Segoe UI, Arial, sans-serif" font-size="13">callback_monitor.php · api_logs.php  minh hÍa</text>
+</svg>

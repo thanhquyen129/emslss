@@ -4,7 +4,8 @@ error_reporting(E_ALL); // Report all errors
 ini_set('display_errors', '1'); // Display errors on the screen
 ini_set('display_startup_errors', '1'); // Display startup errors
 include '../../config/db.php';
-require_once 'ems_callback_delivery.php';
+require_once '../../api/callback_delivery.php';
+require_once '../../api/callback_pickup.php';
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../login.php");
@@ -21,16 +22,27 @@ resend thủ công
 if (isset($_GET['resend'])) {
 
     $order_id = intval($_GET['resend']);
+    $orderStmt = $conn->prepare("SELECT status FROM emslss_orders WHERE id=? LIMIT 1");
+    $orderStmt->bind_param("i", $order_id);
+    $orderStmt->execute();
+    $order = $orderStmt->get_result()->fetch_assoc();
 
-    $result = sendDeliveryCallback($order_id, $conn);
+    if (!$order) {
+        header("Location: callback_monitor.php");
+        exit;
+    }
+
+    if ($order['status'] === 'picked_up') {
+        $result = sendPickupCallback($order_id);
+    } else {
+        $result = sendDeliveryCallback($order_id);
+    }
 
     $note = $result['success']
         ? 'Manual resend success'
-        : 'Manual resend fail';
+        : 'Manual resend fail: HTTP ' . ($result['http_code'] ?? 0);
 
-    $status = $result['success']
-        ? 'callback_success'
-        : 'callback_retry';
+    $status = 'callback_retry';
 
     $tr = $conn->prepare("
         INSERT INTO emslss_tracking(order_id,status,note,created_by)
@@ -51,55 +63,52 @@ lấy callback fail / retry / dead
 */
 
 $sql = "
-SELECT 
-o.id,
-o.ems_code,
-o.status as order_status,
-
-MAX(CASE WHEN t.status='callback_fail' THEN t.created_at END) as callback_fail_time,
-
-SUM(CASE WHEN t.status='callback_retry' THEN 1 ELSE 0 END) as retry_count,
-
-MAX(CASE WHEN t.status='callback_dead' THEN 1 ELSE 0 END) as is_dead
-
-FROM emslss_orders o
-
-LEFT JOIN emslss_tracking t ON o.id=t.order_id
-
-GROUP BY o.id
-
-HAVING callback_fail_time IS NOT NULL
-OR retry_count > 0
-OR is_dead=1
-
-ORDER BY callback_fail_time DESC
+SELECT *
+FROM (
+    SELECT 
+        o.id,
+        o.ems_code,
+        o.status AS order_status,
+        MAX(CASE WHEN t.status='callback_fail' THEN t.created_at END) AS callback_fail_time,
+        SUM(CASE WHEN t.status='callback_retry' THEN 1 ELSE 0 END) AS retry_count,
+        MAX(CASE WHEN t.status='callback_dead' THEN 1 ELSE 0 END) AS is_dead,
+        MAX(t.created_at) AS last_tracking_time
+    FROM emslss_orders o
+    LEFT JOIN emslss_tracking t ON o.id = t.order_id
+    GROUP BY o.id, o.ems_code, o.status
+) x
+WHERE x.callback_fail_time IS NOT NULL
+   OR x.retry_count > 0
+   OR x.is_dead = 1
+ORDER BY COALESCE(x.callback_fail_time, x.last_tracking_time) DESC
 ";
 
 $res = $conn->query($sql);
+$hasRows = ($res && $res->num_rows > 0);
 
 ?>
 
 <!DOCTYPE html>
 <html lang="vi">
-<head>
-<meta charset="UTF-8">
-<title>Callback Monitor</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+	<head>
+		<meta charset="UTF-8">
+		<title>Callback Monitor</title>
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-<style>
-body{
-    background:#f5f7fa;
-}
-.card-box{
-    border-radius:14px;
-    box-shadow:0 4px 12px rgba(0,0,0,0.08);
-}
-.badge-status{
-    font-size:13px;
-    padding:6px 10px;
-}
-</style>
-</head>
+		<style>
+			body{
+				background:#f5f7fa;
+			}
+			.card-box{
+				border-radius:14px;
+				box-shadow:0 4px 12px rgba(0,0,0,0.08);
+			}
+			.badge-status{
+				font-size:13px;
+				padding:6px 10px;
+			}
+		</style>
+	</head>
 <body>
 
 <div class="container py-4">
@@ -128,6 +137,13 @@ body{
 
 <tbody>
 
+<?php if (!$hasRows): ?>
+<tr>
+<td colspan="6" class="text-center text-muted py-4">
+Chưa có callback fail/retry/dead.
+</td>
+</tr>
+<?php else: ?>
 <?php while($row = $res->fetch_assoc()): ?>
 
 <tr>
@@ -184,6 +200,7 @@ if($row['is_dead']) {
 </tr>
 
 <?php endwhile; ?>
+<?php endif; ?>
 
 </tbody>
 
