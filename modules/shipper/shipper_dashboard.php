@@ -56,6 +56,7 @@ body{background:#0f172a;color:#fff;font-family:system-ui}
 
 <div class="topbar">
     <div>👋 <?= htmlspecialchars($user_name) ?></div>
+    <a href="../change_password.php" class="btn btn-sm btn-outline-light">Đổi MK</a>
     <a href="../../logout.php" class="btn btn-sm btn-danger">Logout</a>
 </div>
 

@@ -146,7 +146,7 @@ Lưu ảnh chứng từ.
 | ----------- | ------------ | ------------- |
 | id          | int          | khóa          |
 | order_id    | int          | liên kết đơn  |
-| image_path  | varchar(255) | đường dẫn ảnh |
+| image_path  | varchar(255) | web path ảnh, VD `/uploads/pickup/...` (xem `config/upload.php`) |
 | uploaded_by | int          | user upload   |
 | created_at  | datetime     | thời gian     |
 
@@ -250,6 +250,7 @@ admin
 dispatcher
 shipper
 operation
+ems
 ```
 
 ---

@@ -1,6 +1,7 @@
 <?php
 session_start();
 include '../config/db.php';
+require_once __DIR__ . '/../config/upload.php';
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
@@ -101,28 +102,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         */
 
         if (!empty($_FILES['images']['name'][0])) {
-
-            $upload_dir = 'uploads/';
-
-            if (!is_dir($upload_dir)) {
-                mkdir($upload_dir, 0777, true);
-            }
-
-            foreach ($_FILES['images']['tmp_name'] as $key => $tmp_name) {
-
-                $file_name = time() . '_' . basename($_FILES['images']['name'][$key]);
-                $target = $upload_dir . $file_name;
-
-                if (move_uploaded_file($tmp_name, $target)) {
-
-                    $img_sql = "
-                        INSERT INTO emslss_images(order_id,image_path,uploaded_by,created_at)
-                        VALUES($order_id,'$target',$user_id,NOW())
-                    ";
-
-                    $conn->query($img_sql);
-                }
-            }
+            $paths = emslss_upload_save_multipart_field('pickup', $_FILES['images']);
+            emslss_upload_insert_images($conn, $order_id, $paths, $user_id);
         }
 
         /*

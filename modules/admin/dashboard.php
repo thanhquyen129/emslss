@@ -23,6 +23,10 @@ else
 		case 'shipper':
 		header("Location: pickup_dashboard.php");
 		break;
+
+		case 'ems':
+		header("Location: /modules/ems/dashboard.php");
+		break;
 	}
 }
 exit;

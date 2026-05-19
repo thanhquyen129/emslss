@@ -1,23 +1,21 @@
 <?php
 session_start();
-include '../../config/db.php';
+require_once __DIR__ . '/../../config/db.php';
+require_once __DIR__ . '/../../config/upload.php';
 
-if (!isset($_SESSION['user_id'])) exit;
+if (!isset($_SESSION['user_id'])) {
+    exit;
+}
 
-$order_id = intval($_POST['order_id']);
+$order_id = (int) ($_POST['order_id'] ?? 0);
+if ($order_id <= 0 || empty($_FILES['image']['name'])) {
+    die('No file');
+}
 
-if (!isset($_FILES['image'])) die("No file");
+$paths = emslss_upload_save_multipart_field('misc', $_FILES['image']);
+if ($paths === []) {
+    die('Upload failed');
+}
 
-$target_dir = "../../uploads/";
-$filename = time() . "_" . basename($_FILES["image"]["name"]);
-$target_file = $target_dir . $filename;
-
-move_uploaded_file($_FILES["image"]["tmp_name"], $target_file);
-
-// Save DB
-$conn->query("
-    INSERT INTO emslss_images (order_id, image_path, uploaded_by)
-    VALUES ($order_id, '$filename', ".$_SESSION['user_id'].")
-");
-
-echo "OK";
+emslss_upload_insert_image($conn, $order_id, $paths[0], (int) $_SESSION['user_id']);
+echo 'OK';

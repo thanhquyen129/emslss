@@ -1,6 +1,7 @@
 <?php
 session_start();
 include '../../config/db.php';
+require_once __DIR__ . '/../../config/upload.php';
 include '../../templates/admin_topbar.php';
 
 if (!isset($_SESSION['user_id'])) {
@@ -183,7 +184,7 @@ pre{
 <h5>🖼 Ảnh pickup / delivery</h5>
 
 <?php while($img = $images->fetch_assoc()): ?>
-    <img src="<?= $img['image_path'] ?>" class="img-thumb">
+    <img src="<?= htmlspecialchars(emslss_upload_url($img['image_path'])) ?>" class="img-thumb">
 <?php endwhile; ?>
 
 </div>
@@ -192,7 +193,7 @@ pre{
 <h5>✍️ Chữ ký khách hàng</h5>
 
 <?php if(isset($meta['customer_signature'][0])): ?>
-    <img src="<?= $meta['customer_signature'][0] ?>" class="img-fluid rounded">
+    <img src="<?= htmlspecialchars(emslss_upload_url($meta['customer_signature'][0])) ?>" class="img-fluid rounded">
 <?php else: ?>
     <p>Chưa có chữ ký</p>
 <?php endif; ?>

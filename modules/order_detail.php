@@ -2,6 +2,7 @@
 ob_start();
 include '../config/auth.php';
 include '../config/db.php';
+require_once __DIR__ . '/../config/upload.php';
 
 if(!isset($_GET['id']) || !is_numeric($_GET['id'])){
     die("Invalid order");
@@ -188,7 +189,7 @@ ORDER BY id DESC
 
 <div class="col-4 mb-2">
 
-<img src="../assets/uploads/<?= $img['image_path'] ?>"
+<img src="<?= htmlspecialchars(emslss_upload_url($img['image_path'])) ?>"
 class="img-fluid rounded border">
 
 </div>

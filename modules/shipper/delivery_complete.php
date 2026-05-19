@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once '../../config/db.php';
+require_once '../../config/upload.php';
 require_once '../../api/callback_delivery.php';
 
 if (!isset($_SESSION['user_id'])) {
@@ -62,72 +63,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new RuntimeException("Đơn đã được submit trước đó.");
             }
 
-            // lưu signature
             if ($signature) {
-                $sig_dir_fs = __DIR__ . '/../../uploads/signatures/';
-                $sig_dir_db = '/uploads/signatures/';
-                if (!is_dir($sig_dir_fs)) mkdir($sig_dir_fs, 0777, true);
-
-                $sigParts = explode(',', $signature, 2);
-                if (count($sigParts) < 2) {
-                    throw new RuntimeException("Chữ ký không hợp lệ.");
+                $sigPath = emslss_upload_save_base64_image('signatures', $signature);
+                if ($sigPath === null) {
+                    throw new RuntimeException('Chữ ký không hợp lệ.');
                 }
-
-                $sig_file_name = time() . "_sig.png";
-                $sig_file_fs = $sig_dir_fs . $sig_file_name;
-                $sig_file_db = $sig_dir_db . $sig_file_name;
-                file_put_contents($sig_file_fs, base64_decode($sigParts[1]));
-
-                $img_stmt = $conn->prepare("
-                    INSERT INTO emslss_images(order_id,image_path,uploaded_by)
-                    VALUES(?,?,?)
-                ");
-                $img_stmt->bind_param("isi", $order_id, $sig_file_db, $user_id);
-                $img_stmt->execute();
+                emslss_upload_insert_image($conn, $order_id, $sigPath, $user_id);
             }
 
-            // upload ảnh chữ ký nếu có (tùy chọn thay cho ký tay)
             if (!empty($_FILES['signature_image']['name'])) {
-                $sig_dir_fs = __DIR__ . '/../../uploads/signatures/';
-                $sig_dir_db = '/uploads/signatures/';
-                if (!is_dir($sig_dir_fs)) mkdir($sig_dir_fs, 0777, true);
-
-                $sigImgName = time() . '_sig_upload_' . basename($_FILES['signature_image']['name']);
-                $sigImgFs = $sig_dir_fs . $sigImgName;
-                $sigImgDb = $sig_dir_db . $sigImgName;
-
-                if (move_uploaded_file($_FILES['signature_image']['tmp_name'], $sigImgFs)) {
-                    $img_stmt = $conn->prepare("
-                        INSERT INTO emslss_images(order_id,image_path,uploaded_by)
-                        VALUES(?,?,?)
-                    ");
-                    $img_stmt->bind_param("isi", $order_id, $sigImgDb, $user_id);
-                    $img_stmt->execute();
-                }
+                $sigPaths = emslss_upload_save_multipart_field('signatures', $_FILES['signature_image'], 'sig');
+                emslss_upload_insert_images($conn, $order_id, $sigPaths, $user_id);
             }
 
-            // upload nhiều ảnh
             if (!empty($_FILES['proof_images']['name'][0])) {
-
-                $upload_dir_fs = __DIR__ . '/../../uploads/delivery/';
-                $upload_dir_db = '/uploads/delivery/';
-                if (!is_dir($upload_dir_fs)) mkdir($upload_dir_fs, 0777, true);
-
-                foreach ($_FILES['proof_images']['tmp_name'] as $k => $tmp) {
-
-                    $filename = time().'_'.$k.'_'.basename($_FILES['proof_images']['name'][$k]);
-                    $target_fs = $upload_dir_fs . $filename;
-                    $target_db = $upload_dir_db . $filename;
-
-                    if (move_uploaded_file($tmp, $target_fs)) {
-                        $img_stmt = $conn->prepare("
-                            INSERT INTO emslss_images(order_id,image_path,uploaded_by)
-                            VALUES(?,?,?)
-                        ");
-                        $img_stmt->bind_param("isi", $order_id, $target_db, $user_id);
-                        $img_stmt->execute();
-                    }
-                }
+                $proofPaths = emslss_upload_save_multipart_field('delivery', $_FILES['proof_images']);
+                emslss_upload_insert_images($conn, $order_id, $proofPaths, $user_id);
             }
 
             // update order

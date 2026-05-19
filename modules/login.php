@@ -1,37 +1,39 @@
 <?php
 session_start();
 include '../config/db.php';
+require_once __DIR__ . '/../config/auth.php';
 
 $error='';
 
 if($_SERVER['REQUEST_METHOD']=='POST')
 {
     $u = trim($_POST['username']);
-    $p = md5(trim($_POST['password']));
+    $p = trim($_POST['password']);
 
-    $stmt = $conn->prepare("SELECT * FROM emslss_users WHERE username=? AND password=? LIMIT 1");
-    $stmt->bind_param("ss",$u,$p);
+    $stmt = $conn->prepare("SELECT * FROM emslss_users WHERE username=? AND is_active=1 LIMIT 1");
+    $stmt->bind_param("s", $u);
     $stmt->execute();
 
     $result = $stmt->get_result();
+    $user = $result->fetch_assoc();
 
-    if($result->num_rows > 0)
+    if ($user && emslss_verify_password($p, $user['password']))
 	{
-        $user = $result->fetch_assoc();
+        $role = emslss_resolve_user_role($user, $conn);
 
         $_SESSION['user_id'] = $user['id'];
-        $_SESSION['role'] = $user['role'];
+        $_SESSION['role'] = $role;
         $_SESSION['full_name'] = $user['full_name'];
-		if($user['role']=='shipper')
-		{
+		if ($role === 'shipper') {
 			header("Location: shipper/shipper_dashboard.php");
 			exit;
 		}
-		else
-		{
-			header("Location: admin/dashboard.php");
+		if ($role === 'ems') {
+			header("Location: ems/dashboard.php");
 			exit;
 		}
+		header("Location: admin/dashboard.php");
+		exit;
 
     } 
 	else 

@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once '../../config/db.php';
+require_once '../../config/upload.php';
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../login.php");
@@ -44,9 +45,10 @@ $imageRows = [];
 while ($img = $images->fetch_assoc()) {
     $path = $img['image_path'] ?? '';
     $type = 'proof';
-    if (stripos($path, '/signatures/') !== false) {
+    if (stripos($path, '/signatures/') !== false || stripos($path, 'signatures/') !== false) {
         $type = 'signature';
     }
+    $img['image_path'] = emslss_upload_url($path);
     $img['image_type'] = $type;
     $imageRows[] = $img;
 }

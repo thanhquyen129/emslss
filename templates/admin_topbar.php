@@ -10,7 +10,15 @@ if(session_status() == PHP_SESSION_NONE){
             EMS-LSS Admin
         </a>
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNavbar">
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#adminNavbar"
+            aria-controls="adminNavbar"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+        >
             <span class="navbar-toggler-icon"></span>
         </button>
 
@@ -42,7 +50,7 @@ if(session_status() == PHP_SESSION_NONE){
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="API_logs.php">API Logs</a>
+                    <a class="nav-link" href="api_logs.php">API Logs</a>
                 </li>
 
                 <li class="nav-item">
@@ -55,9 +63,16 @@ if(session_status() == PHP_SESSION_NONE){
                 Xin chào <?= $_SESSION['full_name'] ?? 'Admin' ?>
             </span>
 
+            <a href="/modules/change_password.php" class="btn btn-sm btn-outline-light me-2">Đổi MK</a>
             <a href="/logout.php" class="btn btn-sm btn-danger">Logout</a>
         </div>
     </div>
 </nav>
 
 <div style="height:70px;"></div>
+
+<script>
+if (!window.bootstrap) {
+    document.write('<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"><\/script>');
+}
+</script>

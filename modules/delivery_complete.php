@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once '../config/db.php';
+require_once '../config/upload.php';
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
@@ -54,43 +55,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         die("Đơn đã được submit trước đó.");
     }
 
-    // lưu signature
     if ($signature) {
-        $sig_dir = 'uploads/signatures/';
-        if (!is_dir($sig_dir)) mkdir($sig_dir, 0777, true);
-
-        $sig_file = $sig_dir . time() . "_sig.png";
-        $sig_data = explode(',', $signature)[1];
-        file_put_contents($sig_file, base64_decode($sig_data));
-
-        $img_stmt = $conn->prepare("
-            INSERT INTO emslss_images(order_id,image_path,uploaded_by)
-            VALUES(?,?,?)
-        ");
-        $img_stmt->bind_param("isi", $order_id, $sig_file, $user_id);
-        $img_stmt->execute();
+        $sigPath = emslss_upload_save_base64_image('signatures', $signature);
+        if ($sigPath !== null) {
+            emslss_upload_insert_image($conn, $order_id, $sigPath, $user_id);
+        }
     }
 
-    // upload nhiều ảnh
     if (!empty($_FILES['proof_images']['name'][0])) {
-
-        $upload_dir = 'uploads/delivery/';
-        if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
-
-        foreach ($_FILES['proof_images']['tmp_name'] as $k => $tmp) {
-
-            $filename = time().'_'.$k.'_'.basename($_FILES['proof_images']['name'][$k]);
-            $target = $upload_dir.$filename;
-
-            if (move_uploaded_file($tmp, $target)) {
-                $img_stmt = $conn->prepare("
-                    INSERT INTO emslss_images(order_id,image_path,uploaded_by)
-                    VALUES(?,?,?)
-                ");
-                $img_stmt->bind_param("isi", $order_id, $target, $user_id);
-                $img_stmt->execute();
-            }
-        }
+        $proofPaths = emslss_upload_save_multipart_field('delivery', $_FILES['proof_images']);
+        emslss_upload_insert_images($conn, $order_id, $proofPaths, $user_id);
     }
 
     // update order

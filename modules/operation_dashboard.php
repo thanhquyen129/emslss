@@ -98,7 +98,8 @@ font-size:12px;
 
 Xin chào <b><?php echo $full_name ?></b>
 
-<a href="../logout.php" class="btn btn-sm btn-danger ms-3">Logout</a>
+<a href="../change_password.php" class="btn btn-sm btn-outline-secondary ms-2">Đổi MK</a>
+<a href="../logout.php" class="btn btn-sm btn-danger ms-2">Logout</a>
 
 </div>
 
