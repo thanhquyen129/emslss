@@ -258,6 +258,11 @@ function emslss_resend_order_callback(int $order_id): array
         return sendDeliveryCallback($order_id, 'failed');
     }
 
+    if ($orderStatus === 'cancelled') {
+        require_once __DIR__ . '/callback_cancel.php';
+        return sendCancelCallback($order_id);
+    }
+
     return [
         'success' => false,
         'http_code' => 0,

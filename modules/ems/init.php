@@ -5,6 +5,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 require_once __DIR__ . '/../../config/db.php';
+require_once __DIR__ . '/../../config/order_helpers.php';
 
 function ems_require_login(): void
 {
@@ -24,8 +25,11 @@ function ems_require_role(): void
     }
 }
 
-function ems_status_badge(string $status): string
+function ems_status_badge(string $status, array $meta = []): string
 {
+    if ($status === 'cancelled' && emslss_order_is_lss_rejected($meta)) {
+        return '<span class="badge bg-danger">Từ chối (LSS)</span>';
+    }
     $map = [
         'new_order' => ['secondary', 'Mới (EMS push)'],
         'assigned_pickup' => ['primary', 'Đã gán pickup'],
@@ -54,6 +58,17 @@ function ems_allowed_statuses(): array
     ];
 }
 
+function ems_lss_rejected_count(mysqli $conn): int
+{
+    $row = $conn->query("
+        SELECT COUNT(DISTINCT o.id) AS total
+        FROM emslss_orders o
+        INNER JOIN emslss_order_meta m ON m.order_id = o.id AND m.meta_key = 'lss_reject_reason'
+        WHERE o.status = 'cancelled'
+    ")->fetch_assoc();
+    return (int) ($row['total'] ?? 0);
+}
+
 function ems_ems_api_sources(): array
 {
     return [
@@ -62,6 +77,7 @@ function ems_ems_api_sources(): array
         'EMS_CANCEL',
         'CALLBACK_PICKUP',
         'CALLBACK_DELIVERY',
+        'CALLBACK_CANCEL',
         'CALLBACK_FAIL',
         'CALLBACK_DEAD',
     ];

@@ -284,7 +284,7 @@ function minutesSince(?string $ts): int
                 <table class="table table-bordered align-middle">
                     <thead class="table-light">
                         <tr>
-                            <th>EMS Code</th><th>Người nhận</th><th>Địa chỉ</th><th>Chờ (kể từ pickup)</th><th></th>
+                            <th>EMS Code</th><th>Người nhận</th><th>Hàng hóa</th><th>Địa chỉ</th><th>Chờ (kể từ pickup)</th><th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -293,6 +293,7 @@ function minutesSince(?string $ts): int
                         <tr>
                             <td><b><a href="/modules/admin/admin_order_detail.php?id=<?= (int)$o['id'] ?>"><?= htmlspecialchars($o['ems_code']) ?></a></b></td>
                             <td><?= htmlspecialchars($o['receiver_name']) ?><br><small class="text-muted"><?= htmlspecialchars($o['receiver_phone']) ?></small></td>
+                            <td><small><?= htmlspecialchars($o['cargo_type'] ?? '-') ?><?php if (!empty($o['weight'])): ?><br><?= htmlspecialchars($o['weight']) ?> kg<?php endif; ?></small></td>
                             <td><small><?= htmlspecialchars($o['receiver_address']) ?></small></td>
                             <td>
                                 <?php if ($mins > $slaPickupMinutes): ?>
@@ -305,7 +306,7 @@ function minutesSince(?string $ts): int
                         </tr>
                     <?php endforeach; ?>
                     <?php if (count($new_orders) === 0): ?>
-                        <tr><td colspan="5" class="text-center text-muted">Không có đơn chờ nhận kho</td></tr>
+                        <tr><td colspan="6" class="text-center text-muted">Không có đơn chờ nhận kho</td></tr>
                     <?php endif; ?>
                     </tbody>
                 </table>
@@ -317,13 +318,14 @@ function minutesSince(?string $ts): int
             <div class="card"><div class="card-body table-responsive">
                 <table class="table table-bordered align-middle">
                     <thead class="table-light">
-                        <tr><th>EMS Code</th><th>Người nhận</th><th>Địa chỉ</th><th>Assign delivery</th></tr>
+                        <tr><th>EMS Code</th><th>Người nhận</th><th>Hàng hóa</th><th>Địa chỉ</th><th>Assign delivery</th></tr>
                     </thead>
                     <tbody>
                     <?php foreach ($transit_orders as $o): ?>
                         <tr>
                             <td><b><a href="/modules/admin/admin_order_detail.php?id=<?= (int)$o['id'] ?>"><?= htmlspecialchars($o['ems_code']) ?></a></b></td>
                             <td><?= htmlspecialchars($o['receiver_name']) ?><br><small class="text-muted"><?= htmlspecialchars($o['receiver_phone']) ?></small></td>
+                            <td><small><?= htmlspecialchars($o['cargo_type'] ?? '-') ?><?php if (!empty($o['weight'])): ?><br><?= htmlspecialchars($o['weight']) ?> kg<?php endif; ?></small></td>
                             <td><small><?= htmlspecialchars($o['receiver_address']) ?></small></td>
                             <td>
                                 <select class="form-select shipper_select" data-id="<?= (int)$o['id'] ?>">
@@ -336,7 +338,7 @@ function minutesSince(?string $ts): int
                         </tr>
                     <?php endforeach; ?>
                     <?php if (count($transit_orders) === 0): ?>
-                        <tr><td colspan="4" class="text-center text-muted">Không có đơn tại kho chờ giao</td></tr>
+                        <tr><td colspan="5" class="text-center text-muted">Không có đơn tại kho chờ giao</td></tr>
                     <?php endif; ?>
                     </tbody>
                 </table>

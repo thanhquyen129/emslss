@@ -3,6 +3,7 @@ require_once __DIR__ . '/init.php';
 ems_require_role();
 
 $statusFilter = trim($_GET['status'] ?? '');
+$rejectFilter = ($_GET['filter'] ?? '') === 'lss_rejected';
 $keyword = trim($_GET['q'] ?? '');
 $dateFrom = trim($_GET['from'] ?? '');
 $dateTo = trim($_GET['to'] ?? '');
@@ -31,11 +32,16 @@ $callbackFail = (int) ($conn->query("
     WHERE status IN ('callback_fail', 'callback_dead')
 ")->fetch_assoc()['total'] ?? 0);
 
+$lssRejectedCount = ems_lss_rejected_count($conn);
+
 $where = ['1=1'];
 $types = '';
 $params = [];
 
-if ($statusFilter !== '' && in_array($statusFilter, $allowedStatuses, true)) {
+if ($rejectFilter) {
+    $where[] = "o.status = 'cancelled'";
+    $where[] = "EXISTS (SELECT 1 FROM emslss_order_meta m WHERE m.order_id = o.id AND m.meta_key = 'lss_reject_reason')";
+} elseif ($statusFilter !== '' && in_array($statusFilter, $allowedStatuses, true)) {
     $where[] = 'o.status = ?';
     $types .= 's';
     $params[] = $statusFilter;
@@ -72,12 +78,13 @@ $total = (int) ($countStmt->get_result()->fetch_assoc()['total'] ?? 0);
 $totalPages = max(1, (int) ceil($total / $perPage));
 
 $listSql = "
-    SELECT o.id, o.ems_code, o.status, o.service_type, o.created_at, o.updated_at,
+    SELECT o.id, o.ems_code, o.status, o.service_type, o.cargo_type, o.weight,
+           o.created_at, o.updated_at,
            o.post_office_name, o.holder_name, o.holder_phone,
            o.sender_address, o.receiver_address, o.receiver_name
     FROM emslss_orders o
     WHERE $whereSql
-    ORDER BY o.created_at DESC
+    ORDER BY o.created_at DESC, o.id DESC
     LIMIT ? OFFSET ?
 ";
 $listStmt = $conn->prepare($listSql);
@@ -87,8 +94,22 @@ $listStmt->bind_param($listTypes, ...$listParams);
 $listStmt->execute();
 $orders = $listStmt->get_result();
 
-function ems_active_kpi(string $key, string $current): string
+$orderIds = [];
+$orderRows = [];
+while ($row = $orders->fetch_assoc()) {
+    $orderRows[] = $row;
+    $orderIds[] = (int) $row['id'];
+}
+$orderMeta = emslss_order_meta_bulk($conn, $orderIds, ['lss_reject_reason', 'cargo_description']);
+
+function ems_active_kpi(string $key, string $current, bool $rejectFilter = false): string
 {
+    if ($key === 'lss_rejected' && $rejectFilter) {
+        return 'active-kpi';
+    }
+    if ($rejectFilter) {
+        return '';
+    }
     return $key === $current ? 'active-kpi' : '';
 }
 ?>
@@ -146,12 +167,22 @@ body { background: #f0f4f8; }
             </a>
         </div>
         <?php endforeach; ?>
+        <div class="col-6 col-md-4 col-lg">
+            <a href="?filter=lss_rejected" class="kpi-card card bg-danger text-white <?= ems_active_kpi('lss_rejected', $statusFilter, $rejectFilter) ?>">
+                <div class="card-body py-2 px-3">
+                    <small>Từ chối (LSS)</small>
+                    <div class="fs-4 fw-bold"><?= (int) $lssRejectedCount ?></div>
+                </div>
+            </a>
+        </div>
     </div>
 
     <div class="card shadow-sm mb-3">
         <div class="card-body">
             <form method="GET" class="row g-2 align-items-end">
-                <?php if ($statusFilter): ?>
+                <?php if ($rejectFilter): ?>
+                    <input type="hidden" name="filter" value="lss_rejected">
+                <?php elseif ($statusFilter): ?>
                     <input type="hidden" name="status" value="<?= htmlspecialchars($statusFilter) ?>">
                 <?php endif; ?>
                 <div class="col-md-3">
@@ -178,7 +209,7 @@ body { background: #f0f4f8; }
     <div class="card shadow-sm">
         <div class="card-header d-flex justify-content-between align-items-center">
             <span>Danh sách (<?= $total ?> đơn)</span>
-            <?php if ($statusFilter): ?>
+            <?php if ($statusFilter || $rejectFilter): ?>
                 <a href="dashboard.php" class="btn btn-sm btn-link">Bỏ lọc trạng thái</a>
             <?php endif; ?>
         </div>
@@ -188,6 +219,7 @@ body { background: #f0f4f8; }
                     <tr>
                         <th>Mã EMS</th>
                         <th>Dịch vụ</th>
+                        <th>Hàng hóa</th>
                         <th>Bưu cục / Người giữ</th>
                         <th>Người nhận</th>
                         <th>Trạng thái</th>
@@ -196,13 +228,16 @@ body { background: #f0f4f8; }
                     </tr>
                 </thead>
                 <tbody>
-                <?php if ($orders->num_rows === 0): ?>
-                    <tr><td colspan="7" class="text-center text-muted py-4">Không có đơn phù hợp</td></tr>
+                <?php if ($orderRows === []): ?>
+                    <tr><td colspan="8" class="text-center text-muted py-4">Không có đơn phù hợp</td></tr>
                 <?php endif; ?>
-                <?php while ($row = $orders->fetch_assoc()): ?>
+                <?php foreach ($orderRows as $row):
+                    $meta = $orderMeta[(int) $row['id']] ?? [];
+                ?>
                     <tr class="order-row">
                         <td><strong><?= htmlspecialchars($row['ems_code']) ?></strong></td>
                         <td><small><?= htmlspecialchars($row['service_type'] ?? '-') ?></small></td>
+                        <td><small><?= emslss_order_cargo_html($row, $meta) ?></small></td>
                         <td>
                             <small><?= htmlspecialchars($row['post_office_name'] ?? '') ?></small><br>
                             <?= htmlspecialchars($row['holder_name'] ?? '') ?>
@@ -211,13 +246,13 @@ body { background: #f0f4f8; }
                             <?php endif; ?>
                         </td>
                         <td><?= htmlspecialchars($row['receiver_name'] ?? '') ?></td>
-                        <td><?= ems_status_badge($row['status']) ?></td>
+                        <td><?= ems_status_badge($row['status'], $meta) ?></td>
                         <td><small><?= htmlspecialchars($row['created_at']) ?></small></td>
                         <td>
                             <a href="order_detail.php?id=<?= (int) $row['id'] ?>" class="btn btn-sm btn-outline-primary">Chi tiết</a>
                         </td>
                     </tr>
-                <?php endwhile; ?>
+                <?php endforeach; ?>
                 </tbody>
             </table>
         </div>

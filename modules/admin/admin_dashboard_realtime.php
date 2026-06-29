@@ -112,6 +112,7 @@
 	}
 
 	$orderMeta = admin_load_order_ack_meta($conn, array_column($orders, 'id'));
+	$orderCargoMeta = emslss_order_meta_bulk($conn, array_column($orders, 'id'), ['cargo_description']);
 
 	// URL phân trang giữ nguyên filter status
 	function pageUrl($p, $statusFilter)
@@ -516,7 +517,7 @@
 		<table class="table table-bordered table-hover bg-white order-list-table table-sm">
 			<thead class="table-light">
 				<tr>
-					<th>Mã EMS</th><th>TT</th><th>Bưu cục</th><th>Địa chỉ</th><th>Người giữ</th><th>Người nhận</th><th>Pickup</th><th>Delivery</th><th>Nhận tin</th><th></th>
+					<th>Mã EMS</th><th>TT</th><th>Bưu cục</th><th>Địa chỉ</th><th>Hàng hóa</th><th>Người giữ</th><th>Người nhận</th><th>Pickup</th><th>Delivery</th><th>Nhận tin</th><th></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -526,12 +527,16 @@
 					<td><?= statusBadge($row['status']) ?></td>
 					<td><?= admin_render_trim_span($row['post_office_name']) ?></td>
 					<td><?= admin_render_trim_span($row['post_office_address']) ?></td>
+					<td class="small"><?= emslss_order_cargo_html($row, $orderCargoMeta[(int)$row['id']] ?? []) ?></td>
 					<td><?= admin_render_trim_span($row['holder_name'] . ' (' . $row['holder_phone'] . ')') ?></td>
 					<td><?= admin_render_trim_span($row['receiver_name'] . ' — ' . $row['receiver_address']) ?></td>
 					<td style="min-width:140px"><?= admin_render_pickup_select($row, $pickupUsers) ?></td>
 					<td style="min-width:140px"><?= admin_render_delivery_select($row, $deliveryUsers) ?></td>
 					<td class="small"><?= admin_render_ack_html((int)$row['id'], $orderMeta) ?></td>
-					<td><a class="btn btn-sm btn-outline-primary" href="admin_order_detail.php?id=<?= (int)$row['id'] ?>">Chi tiết</a></td>
+					<td>
+						<a class="btn btn-sm btn-outline-primary" href="admin_order_detail.php?id=<?= (int)$row['id'] ?>">Chi tiết</a>
+						<?= admin_render_reject_button($row) ?>
+					</td>
 				</tr>
 			<?php endforeach; ?>
 			</tbody>
@@ -576,6 +581,8 @@
 						➜ <?= admin_render_trim_span($row['receiver_address']) ?>
 					</div>
 
+					<?= admin_render_cargo_line($row, $orderCargoMeta) ?>
+
 					<div class="mb-2 assign-block">
 						<label class="form-label small">Pickup</label>
 						<?= admin_render_pickup_select($row, $pickupUsers) ?>
@@ -585,6 +592,8 @@
 						<label class="form-label small">Delivery</label>
 						<?= admin_render_delivery_select($row, $deliveryUsers) ?>
 					</div>
+
+					<?= admin_render_reject_button($row) ?>
 
 				</div>
 			</div>
@@ -641,6 +650,39 @@
 	<?php endif; ?>
 </div>
 
+<div class="modal fade" id="rejectOrderModal" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Từ chối nhận đơn</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+			</div>
+			<div class="modal-body">
+				<p class="mb-2">Mã EMS: <strong id="rejectEmsCode">-</strong></p>
+				<p class="small text-muted">Dùng cho đơn vùng sâu vùng xa hoặc ngoài phạm vi giao siêu tốc. Đơn sẽ chuyển sang <code>cancelled</code> và callback về EMS.</p>
+				<div class="mb-3">
+					<label class="form-label">Lý do <span class="text-danger">*</span></label>
+					<select class="form-select" id="rejectReason">
+						<option value="">-- chọn lý do --</option>
+						<?php foreach (emslss_order_reject_reasons() as $r): ?>
+						<option value="<?= htmlspecialchars($r) ?>"><?= htmlspecialchars($r) ?></option>
+						<?php endforeach; ?>
+					</select>
+				</div>
+				<div class="mb-0">
+					<label class="form-label">Chi tiết thêm (bắt buộc nếu chọn Lý do khác)</label>
+					<textarea class="form-control" id="rejectReasonDetail" rows="2" placeholder="Mô tả ngắn..."></textarea>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+				<button type="button" class="btn btn-danger" id="btnConfirmReject">Xác nhận từ chối</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
 <script>
@@ -657,6 +699,39 @@
 			}
 		}, 'json').fail(function(){ alert('Lỗi kết nối khi gán shipper'); });
 	});
+
+	let rejectOrderId = 0;
+	const rejectModalEl = document.getElementById('rejectOrderModal');
+	if (rejectModalEl) {
+		const rejectModal = new bootstrap.Modal(rejectModalEl);
+		document.querySelectorAll('.btn-reject-order').forEach(btn => {
+			btn.addEventListener('click', () => {
+				rejectOrderId = parseInt(btn.dataset.orderId, 10);
+				document.getElementById('rejectEmsCode').textContent = btn.dataset.emsCode || '';
+				document.getElementById('rejectReason').value = '';
+				document.getElementById('rejectReasonDetail').value = '';
+				rejectModal.show();
+			});
+		});
+		document.getElementById('btnConfirmReject').addEventListener('click', () => {
+			const reason = document.getElementById('rejectReason').value;
+			const reason_detail = document.getElementById('rejectReasonDetail').value.trim();
+			if (!reason) { alert('Vui lòng chọn lý do từ chối'); return; }
+			if (reason === 'Lý do khác' && !reason_detail) { alert('Vui lòng nhập chi tiết lý do'); return; }
+			if (!confirm('Xác nhận từ chối nhận đơn này?')) return;
+			const fd = new FormData();
+			fd.append('order_id', rejectOrderId);
+			fd.append('reason', reason);
+			fd.append('reason_detail', reason_detail);
+			fetch('reject_order.php', { method: 'POST', body: fd })
+				.then(r => r.json())
+				.then(res => {
+					alert(res.message || (res.success ? 'OK' : 'Lỗi'));
+					if (res.success) location.reload();
+				})
+				.catch(() => alert('Lỗi kết nối'));
+		});
+	}
 
 	const tipPopup = document.getElementById('trimTipPopup');
 	function showTrimTip(el, x, y) {

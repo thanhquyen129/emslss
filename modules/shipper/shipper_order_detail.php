@@ -75,6 +75,14 @@ while ($img = $imgRes->fetch_assoc()) {
     $img['image_path'] = emslss_upload_url($img['image_path'] ?? '');
     $imageRows[] = $img;
 }
+$cargoDesc = '';
+$cargoStmt = $conn->prepare("SELECT meta_value FROM emslss_order_meta WHERE order_id=? AND meta_key='cargo_description' ORDER BY id DESC LIMIT 1");
+$cargoStmt->bind_param('i', $order_id);
+$cargoStmt->execute();
+$cargoRow = $cargoStmt->get_result()->fetch_assoc();
+if ($cargoRow) {
+    $cargoDesc = (string) $cargoRow['meta_value'];
+}
 $canDeleteImages = ($order['status'] === 'assigned_pickup');
 ?>
 
@@ -219,6 +227,10 @@ body{
         <div class="mb-3">
             <div class="label">Loại hàng</div>
             <div class="value"><?= htmlspecialchars($order['cargo_type']) ?></div>
+            <?php if ($cargoDesc !== ''): ?>
+            <div class="label mt-2">Nội dung hàng</div>
+            <div class="value"><?= htmlspecialchars($cargoDesc) ?></div>
+            <?php endif; ?>
         </div>
 
         <div class="mb-3">

@@ -102,6 +102,12 @@ body { background: #f4f6f9; }
         <div class="mb-3">
             <strong>Loại hàng:</strong><br>
             <?= htmlspecialchars($order['cargo_type']) ?>
+            <?php if (!empty($meta['cargo_description'][0])): ?>
+                <br><small class="text-muted">Nội dung: <?= htmlspecialchars($meta['cargo_description'][0]) ?></small>
+            <?php endif; ?>
+            <?php if (!empty($order['weight'])): ?>
+                <br><small class="text-muted">KL: <?= htmlspecialchars($order['weight']) ?> kg</small>
+            <?php endif; ?>
         </div>
     </div>
 

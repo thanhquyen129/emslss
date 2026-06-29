@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../config/order_helpers.php';
 
 function admin_trim_text(string $text, int $len = 50): string
 {
@@ -106,4 +107,26 @@ function admin_render_delivery_select(array $row, array $deliveryUsers): string
         $html .= '<div class="form-text text-warning" style="font-size:11px">Chờ nhập kho</div>';
     }
     return $html;
+}
+
+function admin_render_cargo_line(array $row, array $orderCargoMeta): string
+{
+    $meta = $orderCargoMeta[(int) $row['id']] ?? [];
+    $text = emslss_order_cargo_summary($row, $meta);
+    if ($text === '-') {
+        return '';
+    }
+    return '<div class="small-line mb-2">📦 ' . admin_render_trim_span($text, 60) . '</div>';
+}
+
+function admin_render_reject_button(array $row): string
+{
+    if (!emslss_admin_can_reject_order((string) $row['status'])) {
+        return '';
+    }
+    $id = (int) $row['id'];
+    $code = htmlspecialchars($row['ems_code'], ENT_QUOTES, 'UTF-8');
+    return '<button type="button" class="btn btn-sm btn-outline-danger btn-reject-order mt-2"'
+        . ' data-order-id="' . $id . '" data-ems-code="' . $code . '">'
+        . 'Từ chối nhận</button>';
 }

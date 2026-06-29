@@ -81,7 +81,9 @@ pre { font-size: 11px; white-space: pre-wrap; max-height: 200px; overflow: auto;
 
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-        <h4>📦 <?= htmlspecialchars($order['ems_code']) ?> <?= ems_status_badge($order['status']) ?></h4>
+        <h4>📦 <?= htmlspecialchars($order['ems_code']) ?> <?= ems_status_badge($order['status'], [
+            'lss_reject_reason' => $meta['lss_reject_reason'][0] ?? '',
+        ]) ?></h4>
         <a href="dashboard.php" class="btn btn-secondary btn-sm">← Danh sách</a>
     </div>
 
@@ -92,7 +94,10 @@ pre { font-size: 11px; white-space: pre-wrap; max-height: 200px; overflow: auto;
                 <table class="table table-sm mb-0">
                     <tr><td width="140">Dịch vụ</td><td><?= htmlspecialchars($order['service_type'] ?? '-') ?></td></tr>
                     <tr><td>Loại hàng</td><td><?= htmlspecialchars($order['cargo_type'] ?? '-') ?></td></tr>
-                    <tr><td>Khối lượng</td><td><?= htmlspecialchars($order['weight'] ?? '-') ?> g</td></tr>
+                    <?php if (!empty($meta['cargo_description'][0])): ?>
+                    <tr><td>Nội dung hàng</td><td><?= htmlspecialchars($meta['cargo_description'][0]) ?></td></tr>
+                    <?php endif; ?>
+                    <tr><td>Khối lượng</td><td><?= htmlspecialchars($order['weight'] ?? '-') ?> kg</td></tr>
                     <tr><td>Bưu cục</td><td><?= htmlspecialchars($order['post_office_name'] ?? '') ?><br><small class="text-muted"><?= htmlspecialchars($order['post_office_address'] ?? '') ?></small></td></tr>
                     <tr><td>Người giữ</td><td><?= htmlspecialchars($order['holder_name'] ?? '') ?> · <?= htmlspecialchars($order['holder_phone'] ?? '') ?></td></tr>
                     <tr><td>Người gửi</td><td><?= htmlspecialchars($order['sender_name'] ?? '') ?><br><?= htmlspecialchars($order['sender_address'] ?? '') ?></td></tr>
@@ -108,7 +113,14 @@ pre { font-size: 11px; white-space: pre-wrap; max-height: 200px; overflow: auto;
                 <h6>Ghi chú / Meta</h6>
                 <p class="mb-1"><b>Người nhận (đã ký nhận):</b> <?= htmlspecialchars($meta['delivery_recipient_name'][0] ?? '-') ?></p>
                 <p class="mb-1"><b>Fail note:</b> <?= htmlspecialchars($meta['fail_note'][0] ?? '-') ?></p>
-                <p class="mb-0"><b>Delivery note:</b> <?= htmlspecialchars($meta['delivery_note'][0] ?? '-') ?></p>
+                <p class="mb-1"><b>Delivery note:</b> <?= htmlspecialchars($meta['delivery_note'][0] ?? '-') ?></p>
+                <?php if (!empty($meta['lss_reject_reason'][0])): ?>
+                <p class="mb-0 text-danger"><b>LSS từ chối nhận:</b> <?= htmlspecialchars($meta['lss_reject_reason'][0]) ?>
+                <?php if (!empty($meta['lss_reject_at'][0])): ?>
+                    <br><small class="text-muted"><?= htmlspecialchars($meta['lss_reject_at'][0]) ?></small>
+                <?php endif; ?>
+                </p>
+                <?php endif; ?>
             </div>
         </div>
 

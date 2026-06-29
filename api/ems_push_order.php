@@ -1,5 +1,6 @@
 <?php
 require_once 'bootstrap.php';
+require_once __DIR__ . '/../config/order_helpers.php';
 
 safeExecute(function() {
 
@@ -92,6 +93,8 @@ safeExecute(function() {
     $stmt->execute();
 
     $order_id = $stmt->insert_id;
+
+    emslss_order_save_cargo_meta($conn, $order_id, $data);
 
     $track = $conn->prepare("
         INSERT INTO emslss_tracking(order_id,status,note)

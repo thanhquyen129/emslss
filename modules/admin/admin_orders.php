@@ -42,6 +42,7 @@ while ($row = $orderQuery->fetch_assoc()) {
     $orders[] = $row;
 }
 $orderMeta = admin_load_order_ack_meta($conn, array_column($orders, 'id'));
+$orderCargoMeta = emslss_order_meta_bulk($conn, array_column($orders, 'id'), ['cargo_description']);
 
 function statusBadge($status)
 {
@@ -107,7 +108,7 @@ body { background: #f5f7fb; }
         <table class="table table-bordered table-hover bg-white table-sm">
             <thead class="table-light">
                 <tr>
-                    <th>Mã EMS</th><th>TT</th><th>Bưu cục</th><th>Địa chỉ</th><th>Người nhận</th>
+                    <th>Mã EMS</th><th>TT</th><th>Bưu cục</th><th>Hàng hóa</th><th>Địa chỉ</th><th>Người nhận</th>
                     <th>Pickup</th><th>Delivery</th><th>Nhận tin</th><th>Ngày tạo</th><th></th>
                 </tr>
             </thead>
@@ -117,13 +118,17 @@ body { background: #f5f7fb; }
                     <td><a href="admin_order_detail.php?id=<?= (int)$row['id'] ?>"><?= htmlspecialchars($row['ems_code']) ?></a></td>
                     <td><?= statusBadge($row['status']) ?></td>
                     <td><?= admin_render_trim_span($row['post_office_name']) ?></td>
+                    <td class="small"><?= emslss_order_cargo_html($row, $orderCargoMeta[(int)$row['id']] ?? []) ?></td>
                     <td><?= admin_render_trim_span($row['post_office_address']) ?></td>
                     <td><?= admin_render_trim_span($row['receiver_name'] . ' — ' . $row['receiver_address']) ?></td>
                     <td style="min-width:130px"><?= admin_render_pickup_select($row, $pickupUsers) ?></td>
                     <td style="min-width:130px"><?= admin_render_delivery_select($row, $deliveryUsers) ?></td>
                     <td class="small"><?= admin_render_ack_html((int)$row['id'], $orderMeta) ?></td>
                     <td><small><?= htmlspecialchars($row['created_at']) ?></small></td>
-                    <td><a class="btn btn-sm btn-outline-primary" href="admin_order_detail.php?id=<?= (int)$row['id'] ?>">Chi tiết</a></td>
+                    <td>
+                        <a class="btn btn-sm btn-outline-primary" href="admin_order_detail.php?id=<?= (int)$row['id'] ?>">Chi tiết</a>
+                        <?= admin_render_reject_button($row) ?>
+                    </td>
                 </tr>
             <?php endforeach; ?>
             </tbody>
@@ -143,6 +148,35 @@ body { background: #f5f7fb; }
     <?php endif; ?>
 </div>
 
+<div class="modal fade" id="rejectOrderModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Từ chối nhận đơn</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Mã EMS: <strong id="rejectEmsCode">-</strong></p>
+                <div class="mb-3">
+                    <label class="form-label">Lý do <span class="text-danger">*</span></label>
+                    <select class="form-select" id="rejectReason">
+                        <option value="">-- chọn --</option>
+                        <?php foreach (emslss_order_reject_reasons() as $r): ?>
+                        <option value="<?= htmlspecialchars($r) ?>"><?= htmlspecialchars($r) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <textarea class="form-control" id="rejectReasonDetail" rows="2" placeholder="Chi tiết (bắt buộc nếu Lý do khác)"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger" id="btnConfirmReject">Xác nhận</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script>
 $('.assign-user').change(function(){
@@ -154,6 +188,33 @@ $('.assign-user').change(function(){
         if (!res || !res.success) { alert((res && res.message) || 'Gán thất bại'); location.reload(); }
     }, 'json');
 });
+let rejectOrderId = 0;
+const rejectModalEl = document.getElementById('rejectOrderModal');
+if (rejectModalEl) {
+    const rejectModal = new bootstrap.Modal(rejectModalEl);
+    document.querySelectorAll('.btn-reject-order').forEach(btn => {
+        btn.addEventListener('click', () => {
+            rejectOrderId = parseInt(btn.dataset.orderId, 10);
+            document.getElementById('rejectEmsCode').textContent = btn.dataset.emsCode || '';
+            document.getElementById('rejectReason').value = '';
+            document.getElementById('rejectReasonDetail').value = '';
+            rejectModal.show();
+        });
+    });
+    document.getElementById('btnConfirmReject').addEventListener('click', () => {
+        const reason = document.getElementById('rejectReason').value;
+        const reason_detail = document.getElementById('rejectReasonDetail').value.trim();
+        if (!reason) { alert('Chọn lý do'); return; }
+        if (reason === 'Lý do khác' && !reason_detail) { alert('Nhập chi tiết'); return; }
+        if (!confirm('Từ chối nhận đơn?')) return;
+        const fd = new FormData();
+        fd.append('order_id', rejectOrderId);
+        fd.append('reason', reason);
+        fd.append('reason_detail', reason_detail);
+        fetch('reject_order.php', { method: 'POST', body: fd })
+            .then(r => r.json()).then(res => { alert(res.message || 'OK'); if (res.success) location.reload(); });
+    });
+}
 const tipPopup = document.getElementById('trimTipPopup');
 function showTrimTip(el, x, y) {
     if (!el.dataset.full) return;

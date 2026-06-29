@@ -2,6 +2,7 @@
 session_start();
 include '../../config/db.php';
 require_once __DIR__ . '/../../config/upload.php';
+require_once __DIR__ . '/../../config/order_helpers.php';
 include '../../templates/admin_topbar.php';
 
 if (!isset($_SESSION['user_id'])) {
@@ -130,7 +131,12 @@ pre{
 
 <div class="d-flex justify-content-between mb-4">
     <h3>📦 Chi tiết đơn: <?= htmlspecialchars($order['ems_code']) ?></h3>
-    <a href="dashboard.php" class="btn btn-secondary">← Quay lại</a>
+    <div class="d-flex gap-2">
+        <?php if (emslss_admin_can_reject_order((string) $order['status'])): ?>
+        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#rejectOrderModal">Từ chối nhận</button>
+        <?php endif; ?>
+        <a href="admin_dashboard_realtime.php" class="btn btn-secondary">← Quay lại</a>
+    </div>
 </div>
 
 <div class="row">
@@ -140,8 +146,17 @@ pre{
 <h5>Thông tin đơn</h5>
 <p><b>Người gửi:</b> <?= $order['sender_name'] ?></p>
 <p><b>Người nhận:</b> <?= $order['receiver_name'] ?></p>
-<p><b>Địa chỉ nhận:</b> <?= $order['receiver_address'] ?></p>
-<p><b>Trạng thái:</b> <span class="badge bg-primary"><?= $order['status'] ?></span></p>
+<p><b>Địa chỉ nhận:</b> <?= htmlspecialchars($order['receiver_address']) ?></p>
+<p><b>Loại hàng:</b> <?= htmlspecialchars($order['cargo_type'] ?: '-') ?></p>
+<?php if (!empty($meta['cargo_description'][0])): ?>
+<p><b>Nội dung hàng hóa:</b> <?= htmlspecialchars($meta['cargo_description'][0]) ?></p>
+<?php endif; ?>
+<p><b>Khối lượng:</b> <?= htmlspecialchars($order['weight'] ?? '-') ?> kg</p>
+<p><b>Dịch vụ:</b> <?= htmlspecialchars($order['service_type'] ?? '-') ?></p>
+<p><b>Trạng thái:</b> <span class="badge bg-primary"><?= htmlspecialchars($order['status']) ?></span></p>
+<?php if (!empty($meta['lss_reject_reason'][0])): ?>
+<p><b>Lý do từ chối (LSS):</b> <span class="text-danger"><?= htmlspecialchars($meta['lss_reject_reason'][0]) ?></span></p>
+<?php endif; ?>
 <p><b>Pickup shipper:</b> <?= $order['pickup_shipper_name'] ?: '-' ?></p>
 <p><b>Delivery shipper:</b> <?= $order['delivery_shipper_name'] ?: '-' ?></p>
 </div>
@@ -235,6 +250,56 @@ if(isset($meta['callback_retry'])){
 </div>
 
 </div>
+
+<?php if (emslss_admin_can_reject_order((string) $order['status'])): ?>
+<div class="modal fade" id="rejectOrderModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Từ chối nhận đơn <?= htmlspecialchars($order['ems_code']) ?></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Lý do <span class="text-danger">*</span></label>
+                    <select class="form-select" id="rejectReason">
+                        <option value="">-- chọn --</option>
+                        <?php foreach (emslss_order_reject_reasons() as $r): ?>
+                        <option value="<?= htmlspecialchars($r) ?>"><?= htmlspecialchars($r) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="mb-0">
+                    <label class="form-label">Chi tiết thêm</label>
+                    <textarea class="form-control" id="rejectReasonDetail" rows="2"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger" id="btnConfirmReject">Xác nhận</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.getElementById('btnConfirmReject').addEventListener('click', function () {
+    const reason = document.getElementById('rejectReason').value;
+    const reason_detail = document.getElementById('rejectReasonDetail').value.trim();
+    if (!reason) { alert('Vui lòng chọn lý do'); return; }
+    if (reason === 'Lý do khác' && !reason_detail) { alert('Vui lòng nhập chi tiết'); return; }
+    if (!confirm('Xác nhận từ chối nhận đơn?')) return;
+    const fd = new FormData();
+    fd.append('order_id', <?= (int) $order_id ?>);
+    fd.append('reason', reason);
+    fd.append('reason_detail', reason_detail);
+    fetch('reject_order.php', { method: 'POST', body: fd })
+        .then(r => r.json())
+        .then(res => { alert(res.message || 'OK'); if (res.success) location.reload(); })
+        .catch(() => alert('Lỗi kết nối'));
+});
+</script>
+<?php endif; ?>
 
 </body>
 </html>
