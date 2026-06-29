@@ -3,48 +3,49 @@ session_start();
 include '../config/db.php';
 require_once __DIR__ . '/../config/auth.php';
 
-$error='';
+$error = '';
 
-if($_SERVER['REQUEST_METHOD']=='POST')
-{
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $u = trim($_POST['username']);
     $p = trim($_POST['password']);
 
-    $stmt = $conn->prepare("SELECT * FROM emslss_users WHERE username=? AND is_active=1 LIMIT 1");
-    $stmt->bind_param("s", $u);
+    $stmt = $conn->prepare('SELECT * FROM emslss_users WHERE username=? AND is_active=1 LIMIT 1');
+    $stmt->bind_param('s', $u);
     $stmt->execute();
 
-    $result = $stmt->get_result();
-    $user = $result->fetch_assoc();
+    $user = $stmt->get_result()->fetch_assoc();
 
-    if ($user && emslss_verify_password($p, $user['password']))
-	{
-        $role = emslss_resolve_user_role($user, $conn);
+    if ($user && emslss_verify_password($p, $user['password'])) {
+        $roleCodes = emslss_user_role_codes($conn, (int) $user['id']);
+        if ($roleCodes === []) {
+            $fallback = emslss_resolve_user_role($user, $conn);
+            if ($fallback !== '') {
+                $roleCodes = [$fallback];
+            }
+        }
 
         $_SESSION['user_id'] = $user['id'];
-        $_SESSION['role'] = $role;
         $_SESSION['full_name'] = $user['full_name'];
-		if ($role === 'shipper') {
-			header("Location: shipper/shipper_dashboard.php");
-			exit;
-		}
-		if ($role === 'ems') {
-			header("Location: ems/dashboard.php");
-			exit;
-		}
-		header("Location: admin/dashboard.php");
-		exit;
+        $_SESSION['user_roles'] = $roleCodes;
 
-    } 
-	else 
-	{
-        $error = "Sai tài khoản hoặc mật khẩu";
+        if (count($roleCodes) === 1) {
+            $_SESSION['role'] = $roleCodes[0];
+            header('Location: ' . emslss_role_login_redirect($roleCodes[0]));
+            exit;
+        }
+        if (count($roleCodes) > 1) {
+            header('Location: choose_role.php');
+            exit;
+        }
+        $error = 'Tài khoản chưa được gán role.';
+    } else {
+        $error = 'Sai tài khoản hoặc mật khẩu';
     }
 }
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
 <meta charset="utf-8">
 <title>EMS-LSS Login</title>
@@ -56,9 +57,9 @@ if($_SERVER['REQUEST_METHOD']=='POST')
 
 <h3>EMS-LSS Login</h3>
 
-<?php if($error!=''){ ?>
-<div class="alert alert-danger"><?= $error ?></div>
-<?php } ?>
+<?php if ($error !== ''): ?>
+<div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+<?php endif; ?>
 
 <form method="POST">
 

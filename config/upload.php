@@ -52,7 +52,7 @@ function emslss_upload_subdir_name(string $type): string
 
 function emslss_upload_fs_dir(string $type): string
 {
-    return emslss_upload_root_fs() . emslss_upload_subdir_name($type);
+    return emslss_upload_root_fs() . emslss_upload_subdir_name($type) . DIRECTORY_SEPARATOR;
 }
 
 function emslss_upload_ensure_dir(string $type): string
@@ -86,6 +86,11 @@ function emslss_upload_safe_basename(string $originalName): string
 {
     $base = basename($originalName);
     $base = preg_replace('/[^a-zA-Z0-9._-]/', '_', $base) ?: 'file.bin';
+    if (strlen($base) > 80) {
+        $ext = pathinfo($base, PATHINFO_EXTENSION);
+        $stem = substr(pathinfo($base, PATHINFO_FILENAME), 0, 64) ?: 'file';
+        $base = $ext !== '' ? ($stem . '.' . $ext) : $stem;
+    }
     return $base;
 }
 
@@ -123,9 +128,14 @@ function emslss_upload_save_file(string $type, string $tmpPath, string $original
         ? move_uploaded_file($tmpPath, $targetFs)
         : @rename($tmpPath, $targetFs);
 
-    if (!$ok) {
+    if (!$ok || !is_file($targetFs) || filesize($targetFs) <= 0) {
+        if (is_file($targetFs)) {
+            @unlink($targetFs);
+        }
         return null;
     }
+
+    @chmod($targetFs, 0644);
 
     return emslss_upload_web_path($type, $filename);
 }
@@ -203,12 +213,29 @@ function emslss_upload_save_multipart_field(string $type, array $fileField, ?str
 
 function emslss_upload_insert_image(mysqli $conn, int $orderId, string $webPath, int $userId): bool
 {
+    $fs = emslss_upload_fs_path($webPath);
+    if ($fs === null || !is_file($fs)) {
+        return false;
+    }
+
     $stmt = $conn->prepare('
         INSERT INTO emslss_images (order_id, image_path, uploaded_by, created_at)
         VALUES (?, ?, ?, NOW())
     ');
     $stmt->bind_param('isi', $orderId, $webPath, $userId);
     return $stmt->execute();
+}
+
+/**
+ * Xóa các file vật lý đã lưu (dùng khi rollback transaction).
+ */
+function emslss_upload_cleanup_paths(array $webPaths): void
+{
+    foreach ($webPaths as $path) {
+        if (is_string($path) && $path !== '') {
+            emslss_upload_delete_file($path);
+        }
+    }
 }
 
 function emslss_upload_insert_images(mysqli $conn, int $orderId, array $webPaths, int $userId): int
@@ -255,6 +282,11 @@ function emslss_upload_url(?string $storedPath): string
         return emslss_upload_web_path('misc', basename($name));
     }
 
+    // path cũ shipper module (file vẫn nằm modules/shipper/uploads/...)
+    if (str_starts_with($path, 'modules/shipper/uploads/')) {
+        return '/' . $path;
+    }
+
     // chỉ tên file
     if (strpos($path, '/') === false) {
         return emslss_upload_web_path('misc', $path);
@@ -286,4 +318,136 @@ function emslss_upload_absolute_url(?string $storedPath): string
     }
 
     return rtrim($base, '/') . $relative;
+}
+
+/**
+ * Path file bị lưu nhầm do thiếu dấu / giữa subdir và tên file.
+ * VD: uploads/pickup1780628543_xxx.jpg thay vì uploads/pickup/1780628543_xxx.jpg
+ */
+function emslss_upload_misplaced_fs_path(string $relativeWebPath): ?string
+{
+    if (!preg_match('#^(pickup|delivery|signatures|misc)/(.+)$#', $relativeWebPath, $m)) {
+        return null;
+    }
+
+    $misplaced = emslss_upload_root_fs() . $m[1] . $m[2];
+    return is_file($misplaced) ? $misplaced : null;
+}
+
+/**
+ * Quét và chuyển toàn bộ file dính liền subdir trong uploads/ về đúng thư mục.
+ */
+function emslss_upload_repair_all_misplaced_files(): int
+{
+    $count = 0;
+    foreach (glob(emslss_upload_root_fs() . '*') ?: [] as $fullPath) {
+        if (!is_file($fullPath)) {
+            continue;
+        }
+        $base = basename($fullPath);
+        if (!preg_match('/^(pickup|delivery|signatures|misc)(\d.+)$/', $base, $m)) {
+            continue;
+        }
+        $destDir = emslss_upload_ensure_dir($m[1]);
+        $dest = $destDir . $m[2];
+        if (!is_file($dest) && @rename($fullPath, $dest)) {
+            $count++;
+        }
+    }
+    return $count;
+}
+
+/**
+ * Chuyển file lưu nhầm về đúng thư mục con.
+ */
+function emslss_upload_repair_misplaced_file(string $relativeWebPath): ?string
+{
+    if (!preg_match('#^(pickup|delivery|signatures|misc)/(.+)$#', $relativeWebPath, $m)) {
+        return null;
+    }
+
+    $misplaced = emslss_upload_misplaced_fs_path($relativeWebPath);
+    if ($misplaced === null) {
+        return null;
+    }
+
+    $destDir = emslss_upload_ensure_dir($m[1]);
+    $dest = $destDir . $m[2];
+    if (!is_file($dest)) {
+        @rename($misplaced, $dest);
+    }
+
+    if (is_file($dest)) {
+        return $dest;
+    }
+
+    return $misplaced;
+}
+
+/**
+ * Đường dẫn tuyệt đối trên filesystem từ path lưu DB.
+ */
+function emslss_upload_fs_path(?string $storedPath): ?string
+{
+    if ($storedPath === null || $storedPath === '') {
+        return null;
+    }
+
+    $path = trim($storedPath);
+    if (str_starts_with($path, 'modules/shipper/uploads/')) {
+        $legacy = dirname(__DIR__) . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $path);
+        return is_file($legacy) ? $legacy : null;
+    }
+
+    $url = emslss_upload_url($storedPath);
+    $prefix = emslss_upload_web_prefix();
+    if (!str_starts_with($url, $prefix . '/')) {
+        return null;
+    }
+
+    $relative = ltrim(substr($url, strlen($prefix)), '/');
+    $normal = emslss_upload_root_fs() . str_replace('/', DIRECTORY_SEPARATOR, $relative);
+    if (is_file($normal)) {
+        return $normal;
+    }
+
+    return emslss_upload_repair_misplaced_file($relative);
+}
+
+/**
+ * Xóa file vật lý (nếu tồn tại). Trả về true nếu không còn file hoặc đã xóa.
+ */
+function emslss_upload_delete_file(?string $storedPath): bool
+{
+    $fs = emslss_upload_fs_path($storedPath);
+    if ($fs === null) {
+        return false;
+    }
+    if (!is_file($fs)) {
+        return true;
+    }
+    return @unlink($fs);
+}
+
+/**
+ * Xóa ảnh trong DB và file trên host.
+ */
+function emslss_upload_delete_image(mysqli $conn, int $imageId, int $orderId): bool
+{
+    $stmt = $conn->prepare('SELECT image_path FROM emslss_images WHERE id=? AND order_id=? LIMIT 1');
+    $stmt->bind_param('ii', $imageId, $orderId);
+    $stmt->execute();
+    $row = $stmt->get_result()->fetch_assoc();
+    if (!$row) {
+        return false;
+    }
+
+    $del = $conn->prepare('DELETE FROM emslss_images WHERE id=? AND order_id=?');
+    $del->bind_param('ii', $imageId, $orderId);
+    if (!$del->execute()) {
+        return false;
+    }
+
+    emslss_upload_delete_file($row['image_path']);
+    return true;
 }

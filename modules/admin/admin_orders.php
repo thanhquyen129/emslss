@@ -1,0 +1,173 @@
+<?php
+session_start();
+require '../../config/db.php';
+require_once __DIR__ . '/../../config/auth.php';
+require_once __DIR__ . '/dashboard_helpers.php';
+
+if (!isset($_SESSION['user_id'])) {
+    header('Location: ../login.php');
+    exit;
+}
+
+$pickupUsers = emslss_fetch_active_users_by_role($conn, 'shipper');
+$deliveryUsers = $pickupUsers;
+
+$statusFilter = $_GET['status'] ?? '';
+$allowedStatuses = [
+    'new_order', 'assigned_pickup', 'picked_up', 'assigned_delivery',
+    'in_transit', 'delivered', 'failed', 'cancelled',
+];
+
+$where = '';
+if ($statusFilter !== '' && in_array($statusFilter, $allowedStatuses, true)) {
+    $where = "WHERE status='" . $conn->real_escape_string($statusFilter) . "'";
+}
+
+$perPage = 50;
+$page = max(1, (int)($_GET['page'] ?? 1));
+$totalOrders = (int)$conn->query("SELECT COUNT(*) total FROM emslss_orders $where")->fetch_assoc()['total'];
+$totalPages = max(1, (int)ceil($totalOrders / $perPage));
+if ($page > $totalPages) {
+    $page = $totalPages;
+}
+$offset = ($page - 1) * $perPage;
+
+$orderQuery = $conn->query("
+    SELECT * FROM emslss_orders $where
+    ORDER BY created_at DESC, id DESC
+    LIMIT $perPage OFFSET $offset
+");
+$orders = [];
+while ($row = $orderQuery->fetch_assoc()) {
+    $orders[] = $row;
+}
+$orderMeta = admin_load_order_ack_meta($conn, array_column($orders, 'id'));
+
+function statusBadge($status)
+{
+    $map = [
+        'new_order' => 'secondary', 'assigned_pickup' => 'primary', 'picked_up' => 'info',
+        'in_transit' => 'warning', 'assigned_delivery' => 'dark', 'delivered' => 'success',
+        'failed' => 'danger', 'cancelled' => 'danger',
+    ];
+    $color = $map[$status] ?? 'secondary';
+    return "<span class='badge bg-$color'>$status</span>";
+}
+
+function pageUrlOrders($p, $statusFilter)
+{
+    $params = ['page' => $p];
+    if ($statusFilter !== '') {
+        $params['status'] = $statusFilter;
+    }
+    return '?' . http_build_query($params);
+}
+?>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tất cả đơn hàng</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body { background: #f5f7fb; }
+.trim-tip { border-bottom: 1px dotted #888; cursor: help; }
+.trim-tip-popup {
+    position: fixed; z-index: 9999; max-width: 90vw; padding: 8px 12px;
+    background: #212529; color: #fff; border-radius: 8px; font-size: 13px;
+    box-shadow: 0 4px 16px rgba(0,0,0,.25); display: none;
+}
+</style>
+</head>
+<body>
+<?php include '../../templates/admin_topbar.php'; ?>
+<div id="trimTipPopup" class="trim-tip-popup"></div>
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <div>
+            <h4 class="mb-0">Tất cả đơn hàng</h4>
+            <small class="text-muted"><?= $totalOrders ?> đơn · trang <?= $page ?>/<?= $totalPages ?></small>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="admin_dashboard_realtime.php" class="btn btn-sm btn-outline-primary">Dashboard realtime</a>
+            <a href="admin_orders_cleanup.php" class="btn btn-sm btn-outline-danger">Xóa đơn test</a>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <a href="admin_orders.php" class="btn btn-sm <?= $statusFilter === '' ? 'btn-primary' : 'btn-outline-secondary' ?>">Tất cả</a>
+        <?php foreach ($allowedStatuses as $st): ?>
+        <a href="?status=<?= urlencode($st) ?>" class="btn btn-sm <?= $statusFilter === $st ? 'btn-primary' : 'btn-outline-secondary' ?>"><?= $st ?></a>
+        <?php endforeach; ?>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover bg-white table-sm">
+            <thead class="table-light">
+                <tr>
+                    <th>Mã EMS</th><th>TT</th><th>Bưu cục</th><th>Địa chỉ</th><th>Người nhận</th>
+                    <th>Pickup</th><th>Delivery</th><th>Nhận tin</th><th>Ngày tạo</th><th></th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php foreach ($orders as $row): ?>
+                <tr>
+                    <td><a href="admin_order_detail.php?id=<?= (int)$row['id'] ?>"><?= htmlspecialchars($row['ems_code']) ?></a></td>
+                    <td><?= statusBadge($row['status']) ?></td>
+                    <td><?= admin_render_trim_span($row['post_office_name']) ?></td>
+                    <td><?= admin_render_trim_span($row['post_office_address']) ?></td>
+                    <td><?= admin_render_trim_span($row['receiver_name'] . ' — ' . $row['receiver_address']) ?></td>
+                    <td style="min-width:130px"><?= admin_render_pickup_select($row, $pickupUsers) ?></td>
+                    <td style="min-width:130px"><?= admin_render_delivery_select($row, $deliveryUsers) ?></td>
+                    <td class="small"><?= admin_render_ack_html((int)$row['id'], $orderMeta) ?></td>
+                    <td><small><?= htmlspecialchars($row['created_at']) ?></small></td>
+                    <td><a class="btn btn-sm btn-outline-primary" href="admin_order_detail.php?id=<?= (int)$row['id'] ?>">Chi tiết</a></td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+
+    <?php if ($totalPages > 1): ?>
+    <nav class="mt-3">
+        <ul class="pagination flex-wrap">
+            <?php for ($p = 1; $p <= $totalPages; $p++): ?>
+            <li class="page-item <?= $p === $page ? 'active' : '' ?>">
+                <a class="page-link" href="<?= htmlspecialchars(pageUrlOrders($p, $statusFilter)) ?>"><?= $p ?></a>
+            </li>
+            <?php endfor; ?>
+        </ul>
+    </nav>
+    <?php endif; ?>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+$('.assign-user').change(function(){
+    const $el = $(this);
+    if ($el.prop('disabled')) return;
+    $.post('assign_order_user.php', {
+        order_id: $el.data('order-id'), user_id: $el.val(), type: $el.data('type')
+    }, function(res){
+        if (!res || !res.success) { alert((res && res.message) || 'Gán thất bại'); location.reload(); }
+    }, 'json');
+});
+const tipPopup = document.getElementById('trimTipPopup');
+function showTrimTip(el, x, y) {
+    if (!el.dataset.full) return;
+    tipPopup.textContent = el.dataset.full;
+    tipPopup.style.display = 'block';
+    tipPopup.style.left = Math.min(x, innerWidth - 200) + 'px';
+    tipPopup.style.top = Math.min(y, innerHeight - 80) + 'px';
+}
+function hideTrimTip() { tipPopup.style.display = 'none'; }
+document.querySelectorAll('.trim-tip').forEach(el => {
+    el.addEventListener('mouseenter', e => showTrimTip(el, e.clientX + 12, e.clientY + 12));
+    el.addEventListener('mouseleave', hideTrimTip);
+    el.addEventListener('click', e => { e.preventDefault(); showTrimTip(el, e.clientX, e.clientY); });
+});
+</script>
+</body>
+</html>

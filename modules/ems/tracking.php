@@ -22,7 +22,7 @@ if ($ems_code !== '') {
             FROM emslss_tracking t
             LEFT JOIN emslss_users u ON t.created_by = u.id
             WHERE t.order_id = ?
-            ORDER BY t.created_at ASC
+            ORDER BY t.created_at DESC
         ");
         $tStmt->bind_param('i', $tid);
         $tStmt->execute();

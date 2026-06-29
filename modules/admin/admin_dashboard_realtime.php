@@ -1,7 +1,8 @@
 <?php
 	session_start();
 	include '../../config/db.php';
-	include '../../templates/admin_topbar.php';
+	require_once __DIR__ . '/../../config/auth.php';
+	require_once __DIR__ . '/dashboard_helpers.php';
 
 	if (!isset($_SESSION['user_id'])) {
 		header("Location: ../login.php");
@@ -49,17 +50,8 @@
 		$kpi[$st] = $q->fetch_assoc()['total'];
 	}
 
-	$userQuery = $conn->query("
-		SELECT id, full_name
-		FROM emslss_users
-		WHERE role='shipper' AND is_active=1
-		ORDER BY full_name
-	");
-
-	while ($u = $userQuery->fetch_assoc()) {
-		$pickupUsers[] = $u;
-		$deliveryUsers[] = $u;
-	}
+	$pickupUsers = emslss_fetch_active_users_by_role($conn, 'shipper');
+	$deliveryUsers = $pickupUsers;
 
 	$statusFilter = $_GET['status'] ?? '';
 
@@ -74,20 +66,63 @@
 		'cancelled'
 	];
 
-	$where = '';
-
+	$whereParts = ["status NOT IN ('delivered','cancelled')"];
 	if ($statusFilter != '' && in_array($statusFilter, $allowedStatuses)) {
 		$safeStatus = $conn->real_escape_string($statusFilter);
-		$where = "WHERE status='$safeStatus'";
+		$whereParts = ["status='$safeStatus'"];
+	}
+	$where = 'WHERE ' . implode(' AND ', $whereParts);
+
+	// Phân trang: hiển thị tất cả đơn; nếu vượt ngưỡng thì chia trang
+	$perPage = 50;
+	$paginateThreshold = 100;
+
+	$countRow = $conn->query("
+		SELECT COUNT(*) total
+		FROM emslss_orders
+		$where
+	")->fetch_assoc();
+	$totalOrders = (int)($countRow['total'] ?? 0);
+
+	$usePagination = $totalOrders > $paginateThreshold;
+	$page = 1;
+	$totalPages = 1;
+	$limitSql = '';
+
+	if ($usePagination) {
+		$totalPages = (int)ceil($totalOrders / $perPage);
+		$page = max(1, intval($_GET['page'] ?? 1));
+		if ($page > $totalPages) {
+			$page = $totalPages;
+		}
+		$offset = ($page - 1) * $perPage;
+		$limitSql = "LIMIT $perPage OFFSET $offset";
 	}
 
 	$orderQuery = $conn->query("
 		SELECT *
 		FROM emslss_orders
 		$where
-		ORDER BY created_at DESC
-		LIMIT 30
+		ORDER BY created_at DESC, id DESC
+		$limitSql
 	");
+	$orders = [];
+	while ($row = $orderQuery->fetch_assoc()) {
+		$orders[] = $row;
+	}
+
+	$orderMeta = admin_load_order_ack_meta($conn, array_column($orders, 'id'));
+
+	// URL phân trang giữ nguyên filter status
+	function pageUrl($p, $statusFilter)
+	{
+		$params = [];
+		if ($statusFilter !== '') {
+			$params['status'] = $statusFilter;
+		}
+		$params['page'] = $p;
+		return '?' . http_build_query($params);
+	}
 
 	function statusBadge($status)
 	{
@@ -125,18 +160,56 @@
 	.kpi-number{font-size:30px; font-weight:700; }
 	.section-title{ font-weight:600; font-size:18px; }
 	.table td{ vertical-align:middle; }
+	#ordersWrap.orders-view-list .order-col { flex: 0 0 100%; max-width: 100%; }
+	#ordersWrap.orders-view-list .order-card-body { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; }
+	#ordersWrap.orders-view-list .order-card-body > * { flex: 1 1 220px; }
+	#ordersWrap.orders-view-list .assign-block { flex: 1 1 180px; }
+	#ordersWrap.orders-view-thumb .order-col { flex: 0 0 50%; max-width: 50%; }
+	@media (min-width: 768px) {
+		#ordersWrap.orders-view-thumb .order-col { flex: 0 0 33.333%; max-width: 33.333%; }
+	}
+	@media (min-width: 1200px) {
+		#ordersWrap.orders-view-thumb .order-col { flex: 0 0 25%; max-width: 25%; }
+	}
+	#ordersWrap.orders-view-thumb .order-extra { display: none; }
+	#ordersWrap.orders-view-thumb .assign-block { margin-top: 6px; }
+	#ordersWrap.orders-view-thumb .assign-select { min-width: 0; font-size: 12px; }
+	#ordersWrap.orders-view-thumb .ems-code { font-size: 14px; }
+	.order-list-only { display: none; }
+	.orders-mode-list .order-list-only { display: block; }
+	.orders-mode-list #ordersWrap { display: none !important; }
+	.trim-tip { border-bottom: 1px dotted #888; cursor: help; }
+	.trim-tip-popup {
+		position: fixed; z-index: 9999; max-width: 90vw; padding: 8px 12px;
+		background: #212529; color: #fff; border-radius: 8px; font-size: 13px;
+		box-shadow: 0 4px 16px rgba(0,0,0,.25); display: none;
+	}
 </style>
 </head>
 <body>
+<?php include '../../templates/admin_topbar.php'; ?>
+<div id="trimTipPopup" class="trim-tip-popup" role="tooltip"></div>
 <div class="container-fluid py-4">
 	<div class="d-flex justify-content-between align-items-center mb-4">
 		 <div>
 			<h3>📊 Admin Dashboard Realtime</h3>
-			<small>EMS-LSS vận hành realtime - Auto refresh <span id="countdown">30</span>s</small>
+			<small>Đơn chưa xử lý — Auto refresh <span id="countdown">30</span>s · <a href="admin_orders.php">Xem tất cả đơn</a></small>
 		</div>
 		<a href="../logout.php" class="btn btn-danger">Đăng xuất</a>
 	</div>
 
+	<div class="d-flex justify-content-between align-items-center mb-2">
+		<button type="button" class="btn btn-sm btn-outline-primary" id="btnToggleKpi" aria-expanded="true">
+			<span id="kpiToggleIcon">▼</span> Thống kê
+		</button>
+		<div class="btn-group btn-group-sm" role="group" aria-label="Chế độ hiển thị">
+			<button type="button" class="btn btn-outline-secondary view-mode-btn active" data-view="tile">Tile</button>
+			<button type="button" class="btn btn-outline-secondary view-mode-btn" data-view="list">List</button>
+			<button type="button" class="btn btn-outline-secondary view-mode-btn" data-view="thumb">Thumb</button>
+		</div>
+	</div>
+
+	<div class="collapse show" id="kpiCollapse">
 	<!--Top card-->
 	<?php
 	function activeCard($key, $statusFilter)
@@ -304,7 +377,7 @@
 		</div>
 
 		<div class="col-md-3 col-6">
-		<a href="?status=delivered" class="text-decoration-none">
+		<a href="admin_orders.php?status=delivered" class="text-decoration-none">
 		<div class="card kpi-card kpi-gradient-green <?= activeCard('delivered',$statusFilter) ?>">
 		<div class="card-body d-flex justify-content-between align-items-center">
 		<div>
@@ -374,8 +447,9 @@
 
 		</div>
 	</div>
+	</div><!-- kpiCollapse -->
 	<div class="mb-3">
-		<a href="admin_dashboard_realtime.php"
+		<a href="admin_orders.php"
 		   class="btn btn-sm btn-outline-secondary">
 		   Tất cả đơn
 		</a>
@@ -438,13 +512,39 @@
 
 
 
-	<div class="row g-3">
+	<div class="order-list-only mb-3">
+		<table class="table table-bordered table-hover bg-white order-list-table table-sm">
+			<thead class="table-light">
+				<tr>
+					<th>Mã EMS</th><th>TT</th><th>Bưu cục</th><th>Địa chỉ</th><th>Người giữ</th><th>Người nhận</th><th>Pickup</th><th>Delivery</th><th>Nhận tin</th><th></th>
+				</tr>
+			</thead>
+			<tbody>
+			<?php foreach ($orders as $row): ?>
+				<tr>
+					<td><a href="admin_order_detail.php?id=<?= (int)$row['id'] ?>"><?= htmlspecialchars($row['ems_code']) ?></a></td>
+					<td><?= statusBadge($row['status']) ?></td>
+					<td><?= admin_render_trim_span($row['post_office_name']) ?></td>
+					<td><?= admin_render_trim_span($row['post_office_address']) ?></td>
+					<td><?= admin_render_trim_span($row['holder_name'] . ' (' . $row['holder_phone'] . ')') ?></td>
+					<td><?= admin_render_trim_span($row['receiver_name'] . ' — ' . $row['receiver_address']) ?></td>
+					<td style="min-width:140px"><?= admin_render_pickup_select($row, $pickupUsers) ?></td>
+					<td style="min-width:140px"><?= admin_render_delivery_select($row, $deliveryUsers) ?></td>
+					<td class="small"><?= admin_render_ack_html((int)$row['id'], $orderMeta) ?></td>
+					<td><a class="btn btn-sm btn-outline-primary" href="admin_order_detail.php?id=<?= (int)$row['id'] ?>">Chi tiết</a></td>
+				</tr>
+			<?php endforeach; ?>
+			</tbody>
+		</table>
+	</div>
 
-		<?php while($row = $orderQuery->fetch_assoc()): ?>
+	<div class="row g-3 orders-view-tile order-tile-only" id="ordersWrap">
 
-		<div class="col-md-6 col-lg-4">
+		<?php foreach ($orders as $row): ?>
+
+		<div class="col-md-6 col-lg-4 order-col">
 			<div class="card shadow-sm order-card h-100">
-				<div class="card-body">
+				<div class="card-body order-card-body">
 
 					<div class="d-flex justify-content-between align-items-center mb-2">
 						<a class="ems-code text-primary"
@@ -459,86 +559,126 @@
 						🕒 <?= $row['created_at'] ?>
 					</div>
 
-					<div class="mb-2">
-						<strong>🏤 <?= htmlspecialchars($row['post_office_name']) ?></strong><br>
-						<span class="small-line">
-							<?= htmlspecialchars($row['post_office_address']) ?>
-						</span>
-					</div>
+					<?= admin_render_ack_html((int)$row['id'], $orderMeta) ?>
 
 					<div class="mb-2">
-						👤 <?= htmlspecialchars($row['holder_name']) ?>
+						<strong>🏤 <?= admin_render_trim_span($row['post_office_name']) ?></strong><br>
+						<span class="small-line"><?= admin_render_trim_span($row['post_office_address']) ?></span>
+					</div>
+
+					<div class="mb-2 small-line">
+						👤 <?= admin_render_trim_span($row['holder_name']) ?>
 						| 📞 <?= htmlspecialchars($row['holder_phone']) ?>
 					</div>
 
-					<div class="mb-3">
-						📍 <?= htmlspecialchars($row['sender_address']) ?><br>
-						➜ <?= htmlspecialchars($row['receiver_address']) ?>
+					<div class="mb-3 order-extra">
+						📍 <?= admin_render_trim_span($row['sender_address']) ?><br>
+						➜ <?= admin_render_trim_span($row['receiver_address']) ?>
 					</div>
 
-					<div class="mb-2">
+					<div class="mb-2 assign-block">
 						<label class="form-label small">Pickup</label>
-						<select class="form-select form-select-sm assign-select assign-user"
-								data-order-id="<?= $row['id'] ?>"
-								data-type="pickup">
-
-							<option value="">-- Chọn pickup --</option>
-
-							<?php foreach($pickupUsers as $u): ?>
-							<option value="<?= $u['id'] ?>"
-								<?= $row['pickup_shipper_id']==$u['id'] ? 'selected' : '' ?>>
-								<?= htmlspecialchars($u['full_name']) ?>
-							</option>
-							<?php endforeach; ?>
-
-						</select>
+						<?= admin_render_pickup_select($row, $pickupUsers) ?>
 					</div>
 
-					<div>
+					<div class="assign-block">
 						<label class="form-label small">Delivery</label>
-						<select class="form-select form-select-sm assign-select assign-user"
-								data-order-id="<?= $row['id'] ?>"
-								data-type="delivery">
-
-							<option value="">-- Chọn delivery --</option>
-
-							<?php foreach($deliveryUsers as $u): ?>
-							<option value="<?= $u['id'] ?>"
-								<?= $row['delivery_shipper_id']==$u['id'] ? 'selected' : '' ?>>
-								<?= htmlspecialchars($u['full_name']) ?>
-							</option>
-							<?php endforeach; ?>
-
-						</select>
+						<?= admin_render_delivery_select($row, $deliveryUsers) ?>
 					</div>
 
 				</div>
 			</div>
 		</div>
 
-		<?php endwhile; ?>
+		<?php endforeach; ?>
 
 	</div>
+
+	<?php if ($usePagination): ?>
+	<?php
+		$rangeStart = ($page - 1) * $perPage + 1;
+		$rangeEnd = min($page * $perPage, $totalOrders);
+		$winStart = max(1, $page - 2);
+		$winEnd = min($totalPages, $page + 2);
+	?>
+	<div class="d-flex flex-column align-items-center mt-4">
+		<div class="text-muted small mb-2">
+			Hiển thị <?= $rangeStart ?>–<?= $rangeEnd ?> trên tổng <?= $totalOrders ?> đơn
+			(trang <?= $page ?>/<?= $totalPages ?>)
+		</div>
+		<nav aria-label="Phân trang đơn hàng">
+			<ul class="pagination flex-wrap mb-0">
+				<li class="page-item <?= $page <= 1 ? 'disabled' : '' ?>">
+					<a class="page-link" href="<?= htmlspecialchars(pageUrl(1, $statusFilter)) ?>">«</a>
+				</li>
+				<li class="page-item <?= $page <= 1 ? 'disabled' : '' ?>">
+					<a class="page-link" href="<?= htmlspecialchars(pageUrl(max(1, $page - 1), $statusFilter)) ?>">‹</a>
+				</li>
+				<?php if ($winStart > 1): ?>
+					<li class="page-item disabled"><span class="page-link">…</span></li>
+				<?php endif; ?>
+				<?php for ($p = $winStart; $p <= $winEnd; $p++): ?>
+					<li class="page-item <?= $p == $page ? 'active' : '' ?>">
+						<a class="page-link" href="<?= htmlspecialchars(pageUrl($p, $statusFilter)) ?>"><?= $p ?></a>
+					</li>
+				<?php endfor; ?>
+				<?php if ($winEnd < $totalPages): ?>
+					<li class="page-item disabled"><span class="page-link">…</span></li>
+				<?php endif; ?>
+				<li class="page-item <?= $page >= $totalPages ? 'disabled' : '' ?>">
+					<a class="page-link" href="<?= htmlspecialchars(pageUrl(min($totalPages, $page + 1), $statusFilter)) ?>">›</a>
+				</li>
+				<li class="page-item <?= $page >= $totalPages ? 'disabled' : '' ?>">
+					<a class="page-link" href="<?= htmlspecialchars(pageUrl($totalPages, $statusFilter)) ?>">»</a>
+				</li>
+			</ul>
+		</nav>
+	</div>
+	<?php else: ?>
+	<div class="text-muted small text-center mt-4">
+		Hiển thị tất cả <?= $totalOrders ?> đơn
+	</div>
+	<?php endif; ?>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
 <script>
 	$('.assign-user').change(function(){
-
-		let order_id = $(this).data('order-id');
-		let user_id = $(this).val();
-		let type = $(this).data('type');
-
-		$.post('assign_order_user.php',{
-			order_id:order_id,
-			user_id:user_id,
-			type:type
-		},function(res){
-			console.log(res);
-		});
-
+		const $el = $(this);
+		if ($el.prop('disabled')) return;
+		const order_id = $el.data('order-id');
+		const user_id = $el.val();
+		const type = $el.data('type');
+		$.post('assign_order_user.php', { order_id, user_id, type }, function(res){
+			if (!res || !res.success) {
+				alert((res && res.message) ? res.message : 'Gán shipper thất bại');
+				location.reload();
+			}
+		}, 'json').fail(function(){ alert('Lỗi kết nối khi gán shipper'); });
 	});
+
+	const tipPopup = document.getElementById('trimTipPopup');
+	function showTrimTip(el, x, y) {
+		if (!tipPopup || !el.dataset.full) return;
+		tipPopup.textContent = el.dataset.full;
+		tipPopup.style.display = 'block';
+		tipPopup.style.left = Math.min(x, window.innerWidth - tipPopup.offsetWidth - 8) + 'px';
+		tipPopup.style.top = Math.min(y, window.innerHeight - tipPopup.offsetHeight - 8) + 'px';
+	}
+	function hideTrimTip() { if (tipPopup) tipPopup.style.display = 'none'; }
+	document.querySelectorAll('.trim-tip').forEach(el => {
+		el.addEventListener('mouseenter', e => showTrimTip(el, e.clientX + 12, e.clientY + 12));
+		el.addEventListener('mousemove', e => showTrimTip(el, e.clientX + 12, e.clientY + 12));
+		el.addEventListener('mouseleave', hideTrimTip);
+		el.addEventListener('click', e => { e.preventDefault(); showTrimTip(el, e.clientX, e.clientY); });
+		el.addEventListener('blur', hideTrimTip);
+	});
+	document.addEventListener('touchstart', e => {
+		const t = e.target.closest('.trim-tip');
+		if (t) { e.preventDefault(); showTrimTip(t, e.touches[0].clientX, e.touches[0].clientY + 20); }
+		else if (!e.target.closest('#trimTipPopup')) hideTrimTip();
+	}, { passive: false });
 
 	//setTimeout(function(){location.reload();},30000);
 </script>
@@ -559,7 +699,50 @@
 	}
 
 	startCountdown();
+
+	const LS_VIEW = 'emslss_admin_order_view';
+	const LS_KPI = 'emslss_admin_kpi_collapsed';
+	const ordersWrap = document.getElementById('ordersWrap');
+	const kpiCollapse = document.getElementById('kpiCollapse');
+	const btnToggleKpi = document.getElementById('btnToggleKpi');
+	const kpiToggleIcon = document.getElementById('kpiToggleIcon');
+
+	function applyViewMode(mode) {
+		document.body.classList.remove('orders-mode-tile', 'orders-mode-list', 'orders-mode-thumb');
+		document.body.classList.add('orders-mode-' + mode);
+		if (ordersWrap) {
+			ordersWrap.classList.remove('orders-view-tile', 'orders-view-list', 'orders-view-thumb');
+			ordersWrap.classList.add('orders-view-' + mode);
+		}
+		document.querySelectorAll('.view-mode-btn').forEach(b => {
+			b.classList.toggle('active', b.dataset.view === mode);
+		});
+		localStorage.setItem(LS_VIEW, mode);
+	}
+
+	const savedView = localStorage.getItem(LS_VIEW) || 'tile';
+	applyViewMode(savedView);
+
+	document.querySelectorAll('.view-mode-btn').forEach(btn => {
+		btn.addEventListener('click', () => applyViewMode(btn.dataset.view));
+	});
+
+	if (kpiCollapse && btnToggleKpi) {
+		const kpiCollapsed = localStorage.getItem(LS_KPI) === '1';
+		if (kpiCollapsed) {
+			kpiCollapse.classList.remove('show');
+			btnToggleKpi.setAttribute('aria-expanded', 'false');
+			kpiToggleIcon.textContent = '▶';
+		}
+		btnToggleKpi.addEventListener('click', () => {
+			const shown = kpiCollapse.classList.toggle('show');
+			btnToggleKpi.setAttribute('aria-expanded', shown ? 'true' : 'false');
+			kpiToggleIcon.textContent = shown ? '▼' : '▶';
+			localStorage.setItem(LS_KPI, shown ? '0' : '1');
+		});
+	}
 </script>
 
 </body>
 </html>
+

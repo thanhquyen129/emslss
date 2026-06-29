@@ -10,33 +10,28 @@ if (!isset($_SESSION['user_id'])) {
 date_default_timezone_set('Asia/Ho_Chi_Minh');
 
 $order_id = intval($_GET['id']);
-$user_id = $_SESSION['user_id'];
+$user_id = (int) $_SESSION['user_id'];
 $role = $_SESSION['role'] ?? '';
 
-if (!in_array($role, ['shipper', 'operation', 'admin'], true)) {
+// Nhập kho là việc của bộ phận operation (hoặc admin), không phải shipper
+if (!in_array($role, ['operation', 'admin'], true)) {
     die("Access denied");
 }
 
-$sql = "
-    SELECT *
-    FROM emslss_orders
-    WHERE id = $order_id
-    LIMIT 1
-";
+$stmt = $conn->prepare("SELECT * FROM emslss_orders WHERE id = ? LIMIT 1");
+$stmt->bind_param("i", $order_id);
+$stmt->execute();
+$order = $stmt->get_result()->fetch_assoc();
 
-$result = $conn->query($sql);
-
-if ($result->num_rows == 0) {
+if (!$order) {
     die("Không tìm thấy đơn");
 }
-
-$order = $result->fetch_assoc();
 
 $message = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-    $scan_code = trim($_POST['scan_code']);
+    $scan_code = trim($_POST['scan_code'] ?? '');
 
     if ($scan_code != $order['ems_code']) {
 
@@ -44,40 +39,34 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     } else {
 
-        /*
-        |--------------------------------------------------------------------------
-        | Update status
-        |--------------------------------------------------------------------------
-        */
+        try {
+            $conn->begin_transaction();
 
-        $update = "
-            UPDATE emslss_orders
-            SET status='in_transit',
-                updated_at=NOW()
-            WHERE id=$order_id
-        ";
+            $update = $conn->prepare("
+                UPDATE emslss_orders
+                SET status='in_transit', updated_at=NOW()
+                WHERE id=?
+            ");
+            $update->bind_param("i", $order_id);
+            $update->execute();
 
-        $conn->query($update);
+            $tr = $conn->prepare("
+                INSERT INTO emslss_tracking(order_id,status,note,created_by,created_at)
+                VALUES(?, 'in_transit', 'Operation đã nhận hàng', ?, NOW())
+            ");
+            $tr->bind_param("ii", $order_id, $user_id);
+            $tr->execute();
 
-        /*
-        |--------------------------------------------------------------------------
-        | Tracking
-        |--------------------------------------------------------------------------
-        */
-
-        $tracking = "
-            INSERT INTO emslss_tracking(order_id,status,note,created_by,created_at)
-            VALUES($order_id,'in_transit','Operation đã nhận hàng',$user_id,NOW())
-        ";
-
-        $conn->query($tracking);
-
-        if (in_array($role, ['operation', 'admin'], true)) {
-            header("Location: /modules/operation/dashboard.php");
-        } else {
-            header("Location: /modules/shipper/shipper_dashboard.php");
+            $conn->commit();
+        } catch (Throwable $e) {
+            $conn->rollback();
+            $message = '<div class="alert alert-danger">Lỗi xử lý: ' . htmlspecialchars($e->getMessage()) . '</div>';
         }
-        exit;
+
+        if ($message === '') {
+            header("Location: /modules/operation/dashboard.php");
+            exit;
+        }
     }
 }
 ?>
@@ -125,8 +114,13 @@ body{
         <div class="box">
 
             <div class="mb-3">
-                <label class="form-label">Scan mã EMS</label>
-                <input type="text" name="scan_code" class="form-control" required>
+                <label class="form-label">📷 Camera scan barcode/QR</label>
+                <div id="reader"></div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Hoặc nhập mã EMS</label>
+                <input type="text" name="scan_code" id="scan_code" class="form-control" required>
             </div>
 
             <button type="submit" class="btn btn-success w-100 btn-action">
@@ -137,7 +131,25 @@ body{
 
     </form>
 
+    <a href="/modules/operation/dashboard.php" class="btn btn-outline-secondary w-100 btn-action">
+        ← Quay lại dashboard
+    </a>
+
 </div>
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+<script>
+function onScanSuccess(decodedText) {
+    document.getElementById('scan_code').value = decodedText;
+}
+
+let html5QrcodeScanner = new Html5QrcodeScanner(
+    "reader",
+    { fps: 10, qrbox: 250 }
+);
+
+html5QrcodeScanner.render(onScanSuccess);
+</script>
 
 </body>
 </html>

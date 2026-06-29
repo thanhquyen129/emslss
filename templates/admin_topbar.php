@@ -30,7 +30,7 @@ if(session_status() == PHP_SESSION_NONE){
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="dashboard.php">Orders</a>
+                    <a class="nav-link" href="admin_orders.php">Orders</a>
                 </li>
 
                 <li class="nav-item">

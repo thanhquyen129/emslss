@@ -29,7 +29,7 @@ $trackStmt = $conn->prepare("
     FROM emslss_tracking t
     LEFT JOIN emslss_users u ON t.created_by = u.id
     WHERE t.order_id = ?
-    ORDER BY t.created_at ASC
+    ORDER BY t.created_at DESC
 ");
 $trackStmt->bind_param('i', $order_id);
 $trackStmt->execute();
@@ -92,7 +92,7 @@ pre { font-size: 11px; white-space: pre-wrap; max-height: 200px; overflow: auto;
                 <table class="table table-sm mb-0">
                     <tr><td width="140">Dịch vụ</td><td><?= htmlspecialchars($order['service_type'] ?? '-') ?></td></tr>
                     <tr><td>Loại hàng</td><td><?= htmlspecialchars($order['cargo_type'] ?? '-') ?></td></tr>
-                    <tr><td>Khối lượng</td><td><?= htmlspecialchars($order['weight'] ?? '-') ?> kg</td></tr>
+                    <tr><td>Khối lượng</td><td><?= htmlspecialchars($order['weight'] ?? '-') ?> g</td></tr>
                     <tr><td>Bưu cục</td><td><?= htmlspecialchars($order['post_office_name'] ?? '') ?><br><small class="text-muted"><?= htmlspecialchars($order['post_office_address'] ?? '') ?></small></td></tr>
                     <tr><td>Người giữ</td><td><?= htmlspecialchars($order['holder_name'] ?? '') ?> · <?= htmlspecialchars($order['holder_phone'] ?? '') ?></td></tr>
                     <tr><td>Người gửi</td><td><?= htmlspecialchars($order['sender_name'] ?? '') ?><br><?= htmlspecialchars($order['sender_address'] ?? '') ?></td></tr>
@@ -106,6 +106,7 @@ pre { font-size: 11px; white-space: pre-wrap; max-height: 200px; overflow: auto;
 
             <div class="card p-3 mb-3">
                 <h6>Ghi chú / Meta</h6>
+                <p class="mb-1"><b>Người nhận (đã ký nhận):</b> <?= htmlspecialchars($meta['delivery_recipient_name'][0] ?? '-') ?></p>
                 <p class="mb-1"><b>Fail note:</b> <?= htmlspecialchars($meta['fail_note'][0] ?? '-') ?></p>
                 <p class="mb-0"><b>Delivery note:</b> <?= htmlspecialchars($meta['delivery_note'][0] ?? '-') ?></p>
             </div>
@@ -132,8 +133,9 @@ pre { font-size: 11px; white-space: pre-wrap; max-height: 200px; overflow: auto;
             <p class="text-muted mb-0">Chưa có ảnh</p>
         <?php endif; ?>
         <?php while ($img = $images->fetch_assoc()): ?>
-            <a href="../../<?= htmlspecialchars($img['image_path']) ?>" target="_blank">
-                <img src="../../<?= htmlspecialchars($img['image_path']) ?>" class="img-thumb" alt="proof">
+            <?php $imgUrl = emslss_upload_url($img['image_path']); ?>
+            <a href="<?= htmlspecialchars($imgUrl) ?>" target="_blank">
+                <img src="<?= htmlspecialchars($imgUrl) ?>" class="img-thumb" alt="proof">
             </a>
         <?php endwhile; ?>
     </div>

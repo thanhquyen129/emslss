@@ -4,8 +4,16 @@ if (!defined('EMSLSS_SKIP_JSON_HEADER')) {
 }
 require_once 'bootstrap.php';
 $callbackConfig = require __DIR__ . '/../config/callback.php';
+require_once __DIR__ . '/../config/upload.php';
 
-function sendPickupCallback($order_id)
+/**
+ * Gửi callback trạng thái thu gom về EMS.
+ *
+ * @param int    $order_id
+ * @param string $status  'picked_up' (mặc định) hoặc 'failed' (thu gom không thành công).
+ * @param array  $extra   Tùy chọn: reason (bắt buộc với failed theo tài liệu EMS).
+ */
+function sendPickupCallback($order_id, $status = 'picked_up', array $extra = [])
 {
     global $conn;
     global $callbackConfig;
@@ -26,12 +34,63 @@ function sendPickupCallback($order_id)
         ];
     }
 
+    $status = in_array($status, ['picked_up', 'failed'], true) ? $status : 'picked_up';
+
+    $images = [];
+    $imgStmt = $conn->prepare("
+        SELECT image_path
+        FROM emslss_images
+        WHERE order_id = ?
+        ORDER BY created_at ASC
+        LIMIT 10
+    ");
+    $imgStmt->bind_param("i", $order_id);
+    $imgStmt->execute();
+    $imgRes = $imgStmt->get_result();
+    $pickupSeg = '/' . emslss_upload_subdir_name('pickup') . '/';
+    while ($img = $imgRes->fetch_assoc()) {
+        $path = trim((string) ($img['image_path'] ?? ''));
+        if ($path === '') {
+            continue;
+        }
+        $isPickup = str_contains($path, $pickupSeg)
+            || str_contains($path, '/pickup/')
+            || str_contains($path, 'modules/shipper/uploads/');
+        if ($isPickup) {
+            $images[] = emslss_upload_absolute_url($path);
+        }
+    }
+
     $eventTime = date('Y-m-d\TH:i:s');
     $data = [
         'ems_code' => $order['ems_code'],
-        'status' => 'picked_up',
+        'status' => $status,
         'time' => $eventTime
     ];
+
+    if ($status === 'picked_up') {
+        // EMS bắt buộc images khi picked_up
+        $data['images'] = $images;
+    } elseif ($status === 'failed') {
+        $reason = trim((string) ($extra['reason'] ?? ''));
+        if ($reason === '') {
+            $metaStmt = $conn->prepare("
+                SELECT meta_value FROM emslss_order_meta
+                WHERE order_id = ? AND meta_key = 'fail_note'
+                ORDER BY id DESC LIMIT 1
+            ");
+            $metaStmt->bind_param('i', $order_id);
+            $metaStmt->execute();
+            $metaRow = $metaStmt->get_result()->fetch_assoc();
+            $reason = trim((string) ($metaRow['meta_value'] ?? ''));
+        }
+        if ($reason !== '') {
+            $data['reason'] = $reason;
+        }
+        if ($images !== []) {
+            $data['images'] = $images;
+        }
+    }
 
     $payload = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
@@ -115,8 +174,8 @@ function sendPickupCallback($order_id)
 
     $trackStatus = $success ? 'callback_success' : 'callback_fail';
     $trackNote = $success
-        ? 'EMS pickup callback success'
-        : 'EMS pickup callback fail: HTTP ' . $http_code;
+        ? 'EMS pickup callback (' . $status . ') success'
+        : 'EMS pickup callback (' . $status . ') fail: HTTP ' . $http_code;
     $tr = $conn->prepare("
         INSERT INTO emslss_tracking(order_id, status, note, created_by)
         VALUES(?,?,?,NULL)

@@ -6,7 +6,27 @@ require_once 'bootstrap.php';
 $callbackConfig = require __DIR__ . '/../config/callback.php';
 require_once __DIR__ . '/../config/upload.php';
 
-function sendDeliveryCallback($order_id)
+function emslss_order_meta_map(mysqli $conn, int $orderId): array
+{
+    $meta = [];
+    $stmt = $conn->prepare('SELECT meta_key, meta_value FROM emslss_order_meta WHERE order_id = ?');
+    $stmt->bind_param('i', $orderId);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    while ($row = $res->fetch_assoc()) {
+        $meta[$row['meta_key']][] = $row['meta_value'];
+    }
+    return $meta;
+}
+
+/**
+ * Gửi callback trạng thái phát về EMS.
+ *
+ * @param int    $order_id
+ * @param string $status  'delivered' (mặc định) hoặc 'failed'.
+ * @param array  $extra   Tùy chọn: note (delivered), reason (failed), signature_image.
+ */
+function sendDeliveryCallback($order_id, $status = 'delivered', array $extra = [])
 {
     global $conn;
     global $callbackConfig;
@@ -28,29 +48,77 @@ function sendDeliveryCallback($order_id)
     }
 
     $eventTime = date('Y-m-d\TH:i:s');
+    $meta = emslss_order_meta_map($conn, $order_id);
     $images = [];
     $imgStmt = $conn->prepare("
         SELECT image_path
         FROM emslss_images
         WHERE order_id = ?
-        ORDER BY created_at DESC
-        LIMIT 5
+        ORDER BY created_at ASC
+        LIMIT 10
     ");
     $imgStmt->bind_param("i", $order_id);
     $imgStmt->execute();
     $imgRes = $imgStmt->get_result();
+    $deliverySeg = '/' . emslss_upload_subdir_name('delivery') . '/';
     while ($img = $imgRes->fetch_assoc()) {
-        if (!empty($img['image_path'])) {
-            $images[] = emslss_upload_absolute_url((string) $img['image_path']);
+        $path = trim((string) ($img['image_path'] ?? ''));
+        if ($path === '') {
+            continue;
+        }
+        $isDelivery = str_contains($path, $deliverySeg)
+            || str_contains($path, '/delivery/');
+        if ($isDelivery) {
+            $images[] = emslss_upload_absolute_url($path);
         }
     }
 
+    $status = in_array($status, ['delivered', 'failed'], true) ? $status : 'delivered';
+
     $data = [
         'ems_code' => $order['ems_code'],
-        'status' => 'delivered',
+        'status' => $status,
         'time' => $eventTime,
-        'images' => $images
     ];
+
+    if ($status === 'delivered') {
+        // EMS bắt buộc: images, signature_image, note
+        $data['images'] = $images;
+
+        $signatureImage = trim((string) ($extra['signature_image'] ?? ''));
+        if ($signatureImage === '' && !empty($meta['customer_signature'][0])) {
+            $signatureImage = emslss_upload_absolute_url((string) $meta['customer_signature'][0]);
+        }
+        if ($signatureImage !== '') {
+            $data['signature_image'] = $signatureImage;
+        }
+
+        $note = trim((string) ($extra['note'] ?? ''));
+        if ($note === '') {
+            $recipient = trim((string) ($meta['delivery_recipient_name'][0] ?? ''));
+            $deliveryNote = trim((string) ($meta['delivery_note'][0] ?? ''));
+            if ($recipient !== '') {
+                $note = 'Người nhận: ' . $recipient . ($deliveryNote !== '' ? '. ' . $deliveryNote : '');
+            } elseif ($deliveryNote !== '') {
+                $note = $deliveryNote;
+            }
+        }
+        if ($note !== '') {
+            $data['note'] = $note;
+        }
+    } else {
+        // failed — EMS bắt buộc: reason
+        if ($images !== []) {
+            $data['images'] = $images;
+        }
+        $reason = trim((string) ($extra['reason'] ?? ''));
+        if ($reason === '' && !empty($meta['fail_note'][0])) {
+            $reason = trim((string) $meta['fail_note'][0]);
+        }
+        if ($reason !== '') {
+            $data['reason'] = $reason;
+        }
+    }
 
     $payload = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
@@ -134,8 +202,8 @@ function sendDeliveryCallback($order_id)
 
     $trackStatus = $success ? 'callback_success' : 'callback_fail';
     $trackNote = $success
-        ? 'EMS delivery callback success'
-        : 'EMS delivery callback fail: HTTP ' . $http_code;
+        ? 'EMS delivery callback (' . $status . ') success'
+        : 'EMS delivery callback (' . $status . ') fail: HTTP ' . $http_code;
     $tr = $conn->prepare("
         INSERT INTO emslss_tracking(order_id, status, note, created_by)
         VALUES(?,?,?,NULL)
@@ -147,6 +215,53 @@ function sendDeliveryCallback($order_id)
         'success' => $success,
         'http_code' => $http_code,
         'response' => $response
+    ];
+}
+
+function emslss_resend_order_callback(int $order_id): array
+{
+    global $conn;
+
+    $stmt = $conn->prepare('SELECT status FROM emslss_orders WHERE id=? LIMIT 1');
+    $stmt->bind_param('i', $order_id);
+    $stmt->execute();
+    $order = $stmt->get_result()->fetch_assoc();
+    if (!$order) {
+        return [
+            'success' => false,
+            'http_code' => 0,
+            'response' => 'Order not found',
+        ];
+    }
+
+    $orderStatus = (string) $order['status'];
+
+    if ($orderStatus === 'picked_up' || $orderStatus === 'assigned_pickup') {
+        return sendPickupCallback($order_id, 'picked_up');
+    }
+    if ($orderStatus === 'delivered') {
+        return sendDeliveryCallback($order_id, 'delivered');
+    }
+    if ($orderStatus === 'failed') {
+        $tr = $conn->prepare("
+            SELECT note FROM emslss_tracking
+            WHERE order_id=? AND status='failed'
+            ORDER BY id DESC LIMIT 1
+        ");
+        $tr->bind_param('i', $order_id);
+        $tr->execute();
+        $failRow = $tr->get_result()->fetch_assoc();
+        $failNote = (string) ($failRow['note'] ?? '');
+        if (stripos($failNote, 'Thu gom') !== false) {
+            return sendPickupCallback($order_id, 'failed');
+        }
+        return sendDeliveryCallback($order_id, 'failed');
+    }
+
+    return [
+        'success' => false,
+        'http_code' => 0,
+        'response' => 'Không thể resend callback với trạng thái đơn: ' . $orderStatus,
     ];
 }
 ?>

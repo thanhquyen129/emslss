@@ -40,11 +40,7 @@ if (isset($_GET['resend'])) {
         exit;
     }
 
-    if ($order['status'] === 'picked_up') {
-        $result = sendPickupCallback($order_id);
-    } else {
-        $result = sendDeliveryCallback($order_id);
-    }
+    $result = emslss_resend_order_callback($order_id);
 
     $errorBody = '';
     if (!empty($result['response'])) {

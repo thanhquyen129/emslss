@@ -47,7 +47,7 @@ $tracking = $conn->query("
     FROM emslss_tracking t
     LEFT JOIN emslss_users u ON t.created_by = u.id
     WHERE t.order_id = $order_id
-    ORDER BY t.created_at ASC
+    ORDER BY t.created_at DESC
 ");
 
 /*
@@ -151,12 +151,16 @@ pre{
 <div class="card p-3 mb-4">
 <h5>Meta lỗi / note</h5>
 
+<p><b>Người nhận (đã ký nhận):</b><br>
+<?= htmlspecialchars($meta['delivery_recipient_name'][0] ?? '-') ?>
+</p>
+
 <p><b>Fail note:</b><br>
-<?= $meta['fail_note'][0] ?? '-' ?>
+<?= htmlspecialchars($meta['fail_note'][0] ?? '-') ?>
 </p>
 
 <p><b>Delivery note:</b><br>
-<?= $meta['delivery_note'][0] ?? '-' ?>
+<?= htmlspecialchars($meta['delivery_note'][0] ?? '-') ?>
 </p>
 
 <p><b>Retry count:</b><br>
