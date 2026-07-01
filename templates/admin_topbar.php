@@ -46,6 +46,10 @@ if(session_status() == PHP_SESSION_NONE){
                 </li>
 
                 <li class="nav-item">
+                    <a class="nav-link" href="order_export.php">Kết xuất</a>
+                </li>
+
+                <li class="nav-item">
                     <a class="nav-link" href="callback_monitor.php">Callback</a>
                 </li>
 

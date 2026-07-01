@@ -2,6 +2,7 @@
 session_start();
 include '../../config/db.php';
 require_once __DIR__ . '/../../config/upload.php';
+require_once __DIR__ . '/../../config/order_helpers.php';
 require_once __DIR__ . '/helpers.php';
 
 if (!isset($_SESSION['user_id'])) {
@@ -221,7 +222,7 @@ body{
 
         <div class="mb-3">
             <div class="label">Khối lượng</div>
-            <div class="value"><?= htmlspecialchars($order['weight']) ?> kg</div>
+            <div class="value"><?= emslss_format_weight_html($order['weight'] ?? null) ?></div>
         </div>
 
         <div class="mb-3">

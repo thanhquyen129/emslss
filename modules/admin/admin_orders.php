@@ -12,35 +12,19 @@ if (!isset($_SESSION['user_id'])) {
 $pickupUsers = emslss_fetch_active_users_by_role($conn, 'shipper');
 $deliveryUsers = $pickupUsers;
 
-$statusFilter = $_GET['status'] ?? '';
-$allowedStatuses = [
-    'new_order', 'assigned_pickup', 'picked_up', 'assigned_delivery',
-    'in_transit', 'delivered', 'failed', 'cancelled',
-];
-
-$where = '';
-if ($statusFilter !== '' && in_array($statusFilter, $allowedStatuses, true)) {
-    $where = "WHERE status='" . $conn->real_escape_string($statusFilter) . "'";
-}
+$listFilter = admin_orders_list_filter($_GET);
+$statusFilter = $listFilter['statusFilter'];
+$emsKeyword = $listFilter['emsKeyword'];
 
 $perPage = 50;
 $page = max(1, (int)($_GET['page'] ?? 1));
-$totalOrders = (int)$conn->query("SELECT COUNT(*) total FROM emslss_orders $where")->fetch_assoc()['total'];
+$totalOrders = admin_orders_run_count($conn, $listFilter);
 $totalPages = max(1, (int)ceil($totalOrders / $perPage));
 if ($page > $totalPages) {
     $page = $totalPages;
 }
 $offset = ($page - 1) * $perPage;
-
-$orderQuery = $conn->query("
-    SELECT * FROM emslss_orders $where
-    ORDER BY created_at DESC, id DESC
-    LIMIT $perPage OFFSET $offset
-");
-$orders = [];
-while ($row = $orderQuery->fetch_assoc()) {
-    $orders[] = $row;
-}
+$orders = admin_orders_fetch_page($conn, $listFilter, $perPage, $offset);
 $orderMeta = admin_load_order_ack_meta($conn, array_column($orders, 'id'));
 $orderCargoMeta = emslss_order_meta_bulk($conn, array_column($orders, 'id'), ['cargo_description']);
 
@@ -55,13 +39,9 @@ function statusBadge($status)
     return "<span class='badge bg-$color'>$status</span>";
 }
 
-function pageUrlOrders($p, $statusFilter)
+function pageUrlOrders($p, $statusFilter, $emsKeyword)
 {
-    $params = ['page' => $p];
-    if ($statusFilter !== '') {
-        $params['status'] = $statusFilter;
-    }
-    return '?' . http_build_query($params);
+    return admin_orders_page_url((int) $p, $statusFilter, $emsKeyword);
 }
 ?>
 <!DOCTYPE html>
@@ -92,15 +72,18 @@ body { background: #f5f7fb; }
             <small class="text-muted"><?= $totalOrders ?> đơn · trang <?= $page ?>/<?= $totalPages ?></small>
         </div>
         <div class="d-flex gap-2">
+            <a href="order_export.php" class="btn btn-sm btn-success">📥 Kết xuất CSV</a>
             <a href="admin_dashboard_realtime.php" class="btn btn-sm btn-outline-primary">Dashboard realtime</a>
             <a href="admin_orders_cleanup.php" class="btn btn-sm btn-outline-danger">Xóa đơn test</a>
         </div>
     </div>
 
+    <?= admin_render_ems_search_form($statusFilter, $emsKeyword) ?>
+
     <div class="mb-3">
-        <a href="admin_orders.php" class="btn btn-sm <?= $statusFilter === '' ? 'btn-primary' : 'btn-outline-secondary' ?>">Tất cả</a>
-        <?php foreach ($allowedStatuses as $st): ?>
-        <a href="?status=<?= urlencode($st) ?>" class="btn btn-sm <?= $statusFilter === $st ? 'btn-primary' : 'btn-outline-secondary' ?>"><?= $st ?></a>
+        <a href="<?= htmlspecialchars(admin_orders_page_url(1, '', $emsKeyword)) ?>" class="btn btn-sm <?= $statusFilter === '' ? 'btn-primary' : 'btn-outline-secondary' ?>">Tất cả</a>
+        <?php foreach (admin_orders_allowed_statuses() as $st): ?>
+        <a href="<?= htmlspecialchars(admin_orders_page_url(1, $st, $emsKeyword)) ?>" class="btn btn-sm <?= $statusFilter === $st ? 'btn-primary' : 'btn-outline-secondary' ?>"><?= $st ?></a>
         <?php endforeach; ?>
     </div>
 
@@ -140,7 +123,7 @@ body { background: #f5f7fb; }
         <ul class="pagination flex-wrap">
             <?php for ($p = 1; $p <= $totalPages; $p++): ?>
             <li class="page-item <?= $p === $page ? 'active' : '' ?>">
-                <a class="page-link" href="<?= htmlspecialchars(pageUrlOrders($p, $statusFilter)) ?>"><?= $p ?></a>
+                <a class="page-link" href="<?= htmlspecialchars(pageUrlOrders($p, $statusFilter, $emsKeyword)) ?>"><?= $p ?></a>
             </li>
             <?php endfor; ?>
         </ul>

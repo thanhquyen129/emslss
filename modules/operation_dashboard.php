@@ -2,6 +2,7 @@
 session_start();
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../config/auth.php';
+require_once __DIR__ . '/../config/order_helpers.php';
 date_default_timezone_set('Asia/Ho_Chi_Minh');
 
 if (!isset($_SESSION['user_id'])) {
@@ -293,7 +294,7 @@ function minutesSince(?string $ts): int
                         <tr>
                             <td><b><a href="/modules/admin/admin_order_detail.php?id=<?= (int)$o['id'] ?>"><?= htmlspecialchars($o['ems_code']) ?></a></b></td>
                             <td><?= htmlspecialchars($o['receiver_name']) ?><br><small class="text-muted"><?= htmlspecialchars($o['receiver_phone']) ?></small></td>
-                            <td><small><?= htmlspecialchars($o['cargo_type'] ?? '-') ?><?php if (!empty($o['weight'])): ?><br><?= htmlspecialchars($o['weight']) ?> kg<?php endif; ?></small></td>
+                            <td><small><?= htmlspecialchars($o['cargo_type'] ?? '-') ?><?php if (!empty($o['weight'])): ?><br><?= emslss_format_weight_html($o['weight']) ?><?php endif; ?></small></td>
                             <td><small><?= htmlspecialchars($o['receiver_address']) ?></small></td>
                             <td>
                                 <?php if ($mins > $slaPickupMinutes): ?>
@@ -325,7 +326,7 @@ function minutesSince(?string $ts): int
                         <tr>
                             <td><b><a href="/modules/admin/admin_order_detail.php?id=<?= (int)$o['id'] ?>"><?= htmlspecialchars($o['ems_code']) ?></a></b></td>
                             <td><?= htmlspecialchars($o['receiver_name']) ?><br><small class="text-muted"><?= htmlspecialchars($o['receiver_phone']) ?></small></td>
-                            <td><small><?= htmlspecialchars($o['cargo_type'] ?? '-') ?><?php if (!empty($o['weight'])): ?><br><?= htmlspecialchars($o['weight']) ?> kg<?php endif; ?></small></td>
+                            <td><small><?= htmlspecialchars($o['cargo_type'] ?? '-') ?><?php if (!empty($o['weight'])): ?><br><?= emslss_format_weight_html($o['weight']) ?><?php endif; ?></small></td>
                             <td><small><?= htmlspecialchars($o['receiver_address']) ?></small></td>
                             <td>
                                 <select class="form-select shipper_select" data-id="<?= (int)$o['id'] ?>">

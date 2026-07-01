@@ -1,28 +1,32 @@
 <?php
 session_start();
-require_once '../../config/db.php';
-require_once '../../config/upload.php';
-require_once '../../api/callback_delivery.php';
+require_once __DIR__ . '/../../config/db.php';
+require_once __DIR__ . '/../../config/upload.php';
 
 if (!isset($_SESSION['user_id'])) {
-    header("Location: ../login.php");
+    header('Location: ../login.php');
     exit;
 }
 
-$user_id = $_SESSION['user_id'];
-$role    = $_SESSION['role'];
+$user_id = (int) $_SESSION['user_id'];
+$role    = $_SESSION['role'] ?? '';
 
-if (!in_array($role, ['shipper', 'admin', 'operation'])) {
-    die("Access denied");
+if (!in_array($role, ['shipper', 'admin', 'operation'], true)) {
+    die('Access denied');
 }
 
-$order_id = intval($_GET['id'] ?? 0);
+$order_id = (int) ($_GET['id'] ?? 0);
+if ($order_id <= 0) {
+    die('Thiếu ID đơn');
+}
 
-$stmt = $conn->prepare("
-SELECT * FROM emslss_orders
-WHERE id=? AND delivery_shipper_id=?
-");
-$stmt->bind_param("ii", $order_id, $user_id);
+if (in_array($role, ['admin', 'operation'], true)) {
+    $stmt = $conn->prepare('SELECT * FROM emslss_orders WHERE id=? LIMIT 1');
+    $stmt->bind_param('i', $order_id);
+} else {
+    $stmt = $conn->prepare('SELECT * FROM emslss_orders WHERE id=? AND delivery_shipper_id=? LIMIT 1');
+    $stmt->bind_param('ii', $order_id, $user_id);
+}
 $stmt->execute();
 $order = $stmt->get_result()->fetch_assoc();
 
@@ -182,6 +186,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($message === '') {
+        require_once __DIR__ . '/../../api/callback_delivery.php';
         if ($action === 'success') {
             $callbackNote = 'Người nhận: ' . $recipient_name . ($note !== '' ? '. ' . $note : '');
             $callbackExtra = ['note' => $callbackNote];
@@ -197,8 +202,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 }
-?>
 
+?>
 <!DOCTYPE html>
 <html lang="vi">
 <head>

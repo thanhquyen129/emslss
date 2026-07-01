@@ -151,7 +151,7 @@ pre{
 <?php if (!empty($meta['cargo_description'][0])): ?>
 <p><b>Nội dung hàng hóa:</b> <?= htmlspecialchars($meta['cargo_description'][0]) ?></p>
 <?php endif; ?>
-<p><b>Khối lượng:</b> <?= htmlspecialchars($order['weight'] ?? '-') ?> kg</p>
+<p><b>Khối lượng:</b> <?= emslss_format_weight_html($order['weight'] ?? null) ?></p>
 <p><b>Dịch vụ:</b> <?= htmlspecialchars($order['service_type'] ?? '-') ?></p>
 <p><b>Trạng thái:</b> <span class="badge bg-primary"><?= htmlspecialchars($order['status']) ?></span></p>
 <?php if (!empty($meta['lss_reject_reason'][0])): ?>

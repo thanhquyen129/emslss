@@ -53,41 +53,19 @@
 	$pickupUsers = emslss_fetch_active_users_by_role($conn, 'shipper');
 	$deliveryUsers = $pickupUsers;
 
-	$statusFilter = $_GET['status'] ?? '';
-
-	$allowedStatuses = [
-		'new_order',
-		'assigned_pickup',
-		'picked_up',
-		'assigned_delivery',
-		'in_transit',
-		'delivered',
-		'failed',
-		'cancelled'
-	];
-
-	$whereParts = ["status NOT IN ('delivered','cancelled')"];
-	if ($statusFilter != '' && in_array($statusFilter, $allowedStatuses)) {
-		$safeStatus = $conn->real_escape_string($statusFilter);
-		$whereParts = ["status='$safeStatus'"];
-	}
-	$where = 'WHERE ' . implode(' AND ', $whereParts);
+	$listFilter = admin_orders_list_filter($_GET, ['active_only' => true]);
+	$statusFilter = $listFilter['statusFilter'];
+	$emsKeyword = $listFilter['emsKeyword'];
 
 	// Phân trang: hiển thị tất cả đơn; nếu vượt ngưỡng thì chia trang
 	$perPage = 50;
 	$paginateThreshold = 100;
 
-	$countRow = $conn->query("
-		SELECT COUNT(*) total
-		FROM emslss_orders
-		$where
-	")->fetch_assoc();
-	$totalOrders = (int)($countRow['total'] ?? 0);
+	$totalOrders = admin_orders_run_count($conn, $listFilter);
 
 	$usePagination = $totalOrders > $paginateThreshold;
 	$page = 1;
 	$totalPages = 1;
-	$limitSql = '';
 
 	if ($usePagination) {
 		$totalPages = (int)ceil($totalOrders / $perPage);
@@ -96,33 +74,18 @@
 			$page = $totalPages;
 		}
 		$offset = ($page - 1) * $perPage;
-		$limitSql = "LIMIT $perPage OFFSET $offset";
-	}
-
-	$orderQuery = $conn->query("
-		SELECT *
-		FROM emslss_orders
-		$where
-		ORDER BY created_at DESC, id DESC
-		$limitSql
-	");
-	$orders = [];
-	while ($row = $orderQuery->fetch_assoc()) {
-		$orders[] = $row;
+		$orders = admin_orders_fetch_page($conn, $listFilter, $perPage, $offset);
+	} else {
+		$orders = admin_orders_fetch_page($conn, $listFilter, max(1, $totalOrders), 0);
 	}
 
 	$orderMeta = admin_load_order_ack_meta($conn, array_column($orders, 'id'));
 	$orderCargoMeta = emslss_order_meta_bulk($conn, array_column($orders, 'id'), ['cargo_description']);
 
 	// URL phân trang giữ nguyên filter status
-	function pageUrl($p, $statusFilter)
+	function pageUrl($p, $statusFilter, $emsKeyword)
 	{
-		$params = [];
-		if ($statusFilter !== '') {
-			$params['status'] = $statusFilter;
-		}
-		$params['page'] = $p;
-		return '?' . http_build_query($params);
+		return admin_orders_page_url((int) $p, $statusFilter, $emsKeyword);
 	}
 
 	function statusBadge($status)
@@ -336,7 +299,7 @@
 
 	<div class="row g-3 mb-4">
 		<div class="col-md-3 col-6">
-		<a href="?status=new_order" class="text-decoration-none">
+		<a href="<?= htmlspecialchars(admin_orders_page_url(1, 'new_order', $emsKeyword)) ?>" class="text-decoration-none">
 		<div class="card kpi-card kpi-gradient-blue <?= activeCard('new_order',$statusFilter) ?>">
 		<div class="card-body d-flex justify-content-between align-items-center">
 		<div>
@@ -350,7 +313,7 @@
 		</div>
 
 		<div class="col-md-3 col-6">
-		<a href="?status=assigned_pickup" class="text-decoration-none">
+		<a href="<?= htmlspecialchars(admin_orders_page_url(1, 'assigned_pickup', $emsKeyword)) ?>" class="text-decoration-none">
 		<div class="card kpi-card kpi-gradient-orange <?= activeCard('assigned_pickup',$statusFilter) ?>">
 		<div class="card-body d-flex justify-content-between align-items-center">
 		<div>
@@ -364,7 +327,7 @@
 		</div>
 
 		<div class="col-md-3 col-6">
-		<a href="?status=assigned_delivery" class="text-decoration-none">
+		<a href="<?= htmlspecialchars(admin_orders_page_url(1, 'assigned_delivery', $emsKeyword)) ?>" class="text-decoration-none">
 		<div class="card kpi-card kpi-gradient-cyan <?= activeCard('assigned_delivery',$statusFilter) ?>">
 		<div class="card-body d-flex justify-content-between align-items-center">
 		<div>
@@ -378,7 +341,7 @@
 		</div>
 
 		<div class="col-md-3 col-6">
-		<a href="admin_orders.php?status=delivered" class="text-decoration-none">
+		<a href="<?= htmlspecialchars(admin_orders_page_url(1, 'delivered', $emsKeyword, 'admin_orders.php')) ?>" class="text-decoration-none">
 		<div class="card kpi-card kpi-gradient-green <?= activeCard('delivered',$statusFilter) ?>">
 		<div class="card-body d-flex justify-content-between align-items-center">
 		<div>
@@ -392,7 +355,7 @@
 		</div>
 
 		<div class="col-md-3 col-6">
-		<a href="?status=failed" class="text-decoration-none">
+		<a href="<?= htmlspecialchars(admin_orders_page_url(1, 'failed', $emsKeyword)) ?>" class="text-decoration-none">
 		<div class="card kpi-card kpi-gradient-red <?= activeCard('failed',$statusFilter) ?>">
 		<div class="card-body d-flex justify-content-between align-items-center">
 		<div>
@@ -434,7 +397,7 @@
 		</div>
 
 		<div class="col-md-3 col-6">
-		<a href="?status=in_transit" class="text-decoration-none">
+		<a href="<?= htmlspecialchars(admin_orders_page_url(1, 'in_transit', $emsKeyword)) ?>" class="text-decoration-none">
 		<div class="card kpi-card kpi-gradient-gray <?= activeCard('in_transit',$statusFilter) ?>">
 		<div class="card-body d-flex justify-content-between align-items-center">
 		<div>
@@ -449,12 +412,18 @@
 		</div>
 	</div>
 	</div><!-- kpiCollapse -->
-	<div class="mb-3">
+	<div class="mb-3 d-flex flex-wrap gap-2">
 		<a href="admin_orders.php"
 		   class="btn btn-sm btn-outline-secondary">
 		   Tất cả đơn
 		</a>
+		<a href="order_export.php"
+		   class="btn btn-sm btn-outline-success">
+		   📥 Kết xuất CSV
+		</a>
 	</div>
+
+	<?= admin_render_ems_search_form($statusFilter, $emsKeyword) ?>
 
 
 
@@ -618,27 +587,27 @@
 		<nav aria-label="Phân trang đơn hàng">
 			<ul class="pagination flex-wrap mb-0">
 				<li class="page-item <?= $page <= 1 ? 'disabled' : '' ?>">
-					<a class="page-link" href="<?= htmlspecialchars(pageUrl(1, $statusFilter)) ?>">«</a>
+					<a class="page-link" href="<?= htmlspecialchars(pageUrl(1, $statusFilter, $emsKeyword)) ?>">«</a>
 				</li>
 				<li class="page-item <?= $page <= 1 ? 'disabled' : '' ?>">
-					<a class="page-link" href="<?= htmlspecialchars(pageUrl(max(1, $page - 1), $statusFilter)) ?>">‹</a>
+					<a class="page-link" href="<?= htmlspecialchars(pageUrl(max(1, $page - 1), $statusFilter, $emsKeyword)) ?>">‹</a>
 				</li>
 				<?php if ($winStart > 1): ?>
 					<li class="page-item disabled"><span class="page-link">…</span></li>
 				<?php endif; ?>
 				<?php for ($p = $winStart; $p <= $winEnd; $p++): ?>
 					<li class="page-item <?= $p == $page ? 'active' : '' ?>">
-						<a class="page-link" href="<?= htmlspecialchars(pageUrl($p, $statusFilter)) ?>"><?= $p ?></a>
+						<a class="page-link" href="<?= htmlspecialchars(pageUrl($p, $statusFilter, $emsKeyword)) ?>"><?= $p ?></a>
 					</li>
 				<?php endfor; ?>
 				<?php if ($winEnd < $totalPages): ?>
 					<li class="page-item disabled"><span class="page-link">…</span></li>
 				<?php endif; ?>
 				<li class="page-item <?= $page >= $totalPages ? 'disabled' : '' ?>">
-					<a class="page-link" href="<?= htmlspecialchars(pageUrl(min($totalPages, $page + 1), $statusFilter)) ?>">›</a>
+					<a class="page-link" href="<?= htmlspecialchars(pageUrl(min($totalPages, $page + 1), $statusFilter, $emsKeyword)) ?>">›</a>
 				</li>
 				<li class="page-item <?= $page >= $totalPages ? 'disabled' : '' ?>">
-					<a class="page-link" href="<?= htmlspecialchars(pageUrl($totalPages, $statusFilter)) ?>">»</a>
+					<a class="page-link" href="<?= htmlspecialchars(pageUrl($totalPages, $statusFilter, $emsKeyword)) ?>">»</a>
 				</li>
 			</ul>
 		</nav>

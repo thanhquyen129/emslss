@@ -2,6 +2,7 @@
 session_start();
 require_once '../../config/db.php';
 require_once '../../config/upload.php';
+require_once __DIR__ . '/../../config/order_helpers.php';
 require_once __DIR__ . '/helpers.php';
 
 if (!isset($_SESSION['user_id'])) {
@@ -17,12 +18,17 @@ if (!in_array($role, ['shipper', 'admin', 'operation'], true)) {
 }
 
 $order_id = (int) ($_GET['id'] ?? 0);
+if ($order_id <= 0) {
+    die('Thiếu ID đơn');
+}
 
-$stmt = $conn->prepare('
-    SELECT * FROM emslss_orders
-    WHERE id = ? AND delivery_shipper_id = ?
-');
-$stmt->bind_param('ii', $order_id, $user_id);
+if (in_array($role, ['admin', 'operation'], true)) {
+    $stmt = $conn->prepare('SELECT * FROM emslss_orders WHERE id = ? LIMIT 1');
+    $stmt->bind_param('i', $order_id);
+} else {
+    $stmt = $conn->prepare('SELECT * FROM emslss_orders WHERE id = ? AND delivery_shipper_id = ? LIMIT 1');
+    $stmt->bind_param('ii', $order_id, $user_id);
+}
 $stmt->execute();
 $order = $stmt->get_result()->fetch_assoc();
 
@@ -106,7 +112,7 @@ body { background: #f4f6f9; }
                 <br><small class="text-muted">Nội dung: <?= htmlspecialchars($meta['cargo_description'][0]) ?></small>
             <?php endif; ?>
             <?php if (!empty($order['weight'])): ?>
-                <br><small class="text-muted">KL: <?= htmlspecialchars($order['weight']) ?> kg</small>
+                <br><small class="text-muted">KL: <?= emslss_format_weight_html($order['weight'] ?? null) ?></small>
             <?php endif; ?>
         </div>
     </div>

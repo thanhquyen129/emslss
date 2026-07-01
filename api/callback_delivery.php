@@ -2,7 +2,7 @@
 if (!defined('EMSLSS_SKIP_JSON_HEADER')) {
     define('EMSLSS_SKIP_JSON_HEADER', true);
 }
-require_once 'bootstrap.php';
+require_once __DIR__ . '/bootstrap.php';
 $callbackConfig = require __DIR__ . '/../config/callback.php';
 require_once __DIR__ . '/../config/upload.php';
 
@@ -269,4 +269,3 @@ function emslss_resend_order_callback(int $order_id): array
         'response' => 'Không thể resend callback với trạng thái đơn: ' . $orderStatus,
     ];
 }
-?>

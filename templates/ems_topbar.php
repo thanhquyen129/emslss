@@ -27,6 +27,9 @@ $current = basename($_SERVER['PHP_SELF'] ?? '');
                 <li class="nav-item">
                     <a class="nav-link<?= $current === 'callbacks.php' ? ' active' : '' ?>" href="callbacks.php">Callback</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/modules/admin/order_export.php">Kết xuất</a>
+                </li>
             </ul>
 
             <span class="navbar-text text-white me-3">

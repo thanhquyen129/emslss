@@ -130,3 +130,109 @@ function admin_render_reject_button(array $row): string
         . ' data-order-id="' . $id . '" data-ems-code="' . $code . '">'
         . 'Từ chối nhận</button>';
 }
+
+function admin_orders_allowed_statuses(): array
+{
+    return [
+        'new_order', 'assigned_pickup', 'picked_up', 'assigned_delivery',
+        'in_transit', 'delivered', 'failed', 'cancelled',
+    ];
+}
+
+function admin_orders_list_filter(array $get, array $options = []): array
+{
+    $allowedStatuses = $options['allowed_statuses'] ?? admin_orders_allowed_statuses();
+    $activeOnly = !empty($options['active_only']);
+
+    $statusFilter = trim((string) ($get['status'] ?? ''));
+    $emsKeyword = trim((string) ($get['ems'] ?? ''));
+
+    $where = [];
+    $types = '';
+    $params = [];
+
+    if ($emsKeyword !== '') {
+        $where[] = 'ems_code LIKE ?';
+        $types .= 's';
+        $params[] = '%' . $emsKeyword . '%';
+    }
+
+    if ($statusFilter !== '' && in_array($statusFilter, $allowedStatuses, true)) {
+        $where[] = 'status = ?';
+        $types .= 's';
+        $params[] = $statusFilter;
+    } elseif ($activeOnly && $emsKeyword === '') {
+        $where[] = "status NOT IN ('delivered','cancelled')";
+    }
+
+    return [
+        'whereSql' => $where === [] ? '1=1' : implode(' AND ', $where),
+        'types' => $types,
+        'params' => $params,
+        'statusFilter' => $statusFilter,
+        'emsKeyword' => $emsKeyword,
+    ];
+}
+
+function admin_orders_page_url(int $page, string $statusFilter, string $emsKeyword, string $base = ''): string
+{
+    $params = [];
+    if ($statusFilter !== '') {
+        $params['status'] = $statusFilter;
+    }
+    if ($emsKeyword !== '') {
+        $params['ems'] = $emsKeyword;
+    }
+    if ($page > 1) {
+        $params['page'] = $page;
+    }
+    $query = $params === [] ? '' : '?' . http_build_query($params);
+    return $base . $query;
+}
+
+function admin_orders_run_count(mysqli $conn, array $filter): int
+{
+    $sql = 'SELECT COUNT(*) AS total FROM emslss_orders WHERE ' . $filter['whereSql'];
+    $stmt = $conn->prepare($sql);
+    if ($filter['types'] !== '') {
+        $stmt->bind_param($filter['types'], ...$filter['params']);
+    }
+    $stmt->execute();
+    return (int) ($stmt->get_result()->fetch_assoc()['total'] ?? 0);
+}
+
+function admin_orders_fetch_page(mysqli $conn, array $filter, int $limit, int $offset): array
+{
+    $sql = 'SELECT * FROM emslss_orders WHERE ' . $filter['whereSql']
+        . ' ORDER BY created_at DESC, id DESC LIMIT ? OFFSET ?';
+    $stmt = $conn->prepare($sql);
+    $types = $filter['types'] . 'ii';
+    $params = array_merge($filter['params'], [$limit, $offset]);
+    $stmt->bind_param($types, ...$params);
+    $stmt->execute();
+    $orders = [];
+    $res = $stmt->get_result();
+    while ($row = $res->fetch_assoc()) {
+        $orders[] = $row;
+    }
+    return $orders;
+}
+
+function admin_render_ems_search_form(string $statusFilter, string $emsKeyword, string $action = ''): string
+{
+    $statusEsc = htmlspecialchars($statusFilter, ENT_QUOTES, 'UTF-8');
+    $emsEsc = htmlspecialchars($emsKeyword, ENT_QUOTES, 'UTF-8');
+    $clearUrl = admin_orders_page_url(1, $statusFilter, '', $action);
+    $html = '<form method="get" action="' . htmlspecialchars($action, ENT_QUOTES, 'UTF-8') . '" class="d-flex flex-wrap gap-2 align-items-center mb-3">';
+    if ($statusFilter !== '') {
+        $html .= '<input type="hidden" name="status" value="' . $statusEsc . '">';
+    }
+    $html .= '<input type="text" name="ems" class="form-control form-control-sm" style="max-width:240px"'
+        . ' placeholder="Tìm nhanh mã EMS" value="' . $emsEsc . '">'
+        . '<button type="submit" class="btn btn-sm btn-primary">Tìm</button>';
+    if ($emsKeyword !== '') {
+        $html .= '<a href="' . htmlspecialchars($clearUrl, ENT_QUOTES, 'UTF-8') . '" class="btn btn-sm btn-outline-secondary">Xóa tìm</a>';
+    }
+    $html .= '</form>';
+    return $html;
+}

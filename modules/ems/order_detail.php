@@ -97,7 +97,7 @@ pre { font-size: 11px; white-space: pre-wrap; max-height: 200px; overflow: auto;
                     <?php if (!empty($meta['cargo_description'][0])): ?>
                     <tr><td>Nội dung hàng</td><td><?= htmlspecialchars($meta['cargo_description'][0]) ?></td></tr>
                     <?php endif; ?>
-                    <tr><td>Khối lượng</td><td><?= htmlspecialchars($order['weight'] ?? '-') ?> kg</td></tr>
+                    <tr><td>Khối lượng</td><td><?= emslss_format_weight_html($order['weight'] ?? null) ?></td></tr>
                     <tr><td>Bưu cục</td><td><?= htmlspecialchars($order['post_office_name'] ?? '') ?><br><small class="text-muted"><?= htmlspecialchars($order['post_office_address'] ?? '') ?></small></td></tr>
                     <tr><td>Người giữ</td><td><?= htmlspecialchars($order['holder_name'] ?? '') ?> · <?= htmlspecialchars($order['holder_phone'] ?? '') ?></td></tr>
                     <tr><td>Người gửi</td><td><?= htmlspecialchars($order['sender_name'] ?? '') ?><br><?= htmlspecialchars($order['sender_address'] ?? '') ?></td></tr>
