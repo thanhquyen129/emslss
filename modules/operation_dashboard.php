@@ -281,10 +281,18 @@ function minutesSince(?string $ts): int
 
         <!-- CHỜ NHẬN KHO (picked_up) -->
         <div class="tab-pane fade <?= $activeTab === 'new' ? 'show active' : '' ?>" id="new">
+            <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="btnSelectAllReceive">Chọn tất cả</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="btnClearReceive">Bỏ chọn</button>
+                <button type="button" class="btn btn-sm btn-success" id="btnBulkReceive" disabled>
+                    📥 Nhập kho hàng loạt (<span id="bulkReceiveCount">0</span>)
+                </button>
+            </div>
             <div class="card"><div class="card-body table-responsive">
                 <table class="table table-bordered align-middle">
                     <thead class="table-light">
                         <tr>
+                            <th style="width:40px"><input type="checkbox" class="form-check-input" id="chkReceiveAll" title="Chọn tất cả"></th>
                             <th>EMS Code</th><th>Người nhận</th><th>Hàng hóa</th><th>Địa chỉ</th><th>Chờ (kể từ pickup)</th><th></th>
                         </tr>
                     </thead>
@@ -292,6 +300,11 @@ function minutesSince(?string $ts): int
                     <?php foreach ($new_orders as $o):
                         $mins = minutesSince($o['updated_at']); ?>
                         <tr>
+                            <td>
+                                <input type="checkbox" class="form-check-input chk-receive-order"
+                                       value="<?= (int) $o['id'] ?>"
+                                       data-ems="<?= htmlspecialchars($o['ems_code'], ENT_QUOTES, 'UTF-8') ?>">
+                            </td>
                             <td><b><a href="/modules/admin/admin_order_detail.php?id=<?= (int)$o['id'] ?>"><?= htmlspecialchars($o['ems_code']) ?></a></b></td>
                             <td><?= htmlspecialchars($o['receiver_name']) ?><br><small class="text-muted"><?= htmlspecialchars($o['receiver_phone']) ?></small></td>
                             <td><small><?= htmlspecialchars($o['cargo_type'] ?? '-') ?><?php if (!empty($o['weight'])): ?><br><?= emslss_format_weight_html($o['weight']) ?><?php endif; ?></small></td>
@@ -307,7 +320,7 @@ function minutesSince(?string $ts): int
                         </tr>
                     <?php endforeach; ?>
                     <?php if (count($new_orders) === 0): ?>
-                        <tr><td colspan="6" class="text-center text-muted">Không có đơn chờ nhận kho</td></tr>
+                        <tr><td colspan="7" class="text-center text-muted">Không có đơn chờ nhận kho</td></tr>
                     <?php endif; ?>
                     </tbody>
                 </table>
@@ -476,6 +489,72 @@ document.querySelectorAll(".shipper_select").forEach(el => {
         .catch(() => alert("Assign failed"));
     });
 });
+
+(function () {
+    const chkAll = document.getElementById('chkReceiveAll');
+    const btnSelectAll = document.getElementById('btnSelectAllReceive');
+    const btnClear = document.getElementById('btnClearReceive');
+    const btnBulk = document.getElementById('btnBulkReceive');
+    const countEl = document.getElementById('bulkReceiveCount');
+    const rowChecks = () => Array.from(document.querySelectorAll('.chk-receive-order'));
+
+    function updateBulkUi() {
+        const selected = rowChecks().filter(c => c.checked);
+        const n = selected.length;
+        if (countEl) countEl.textContent = String(n);
+        if (btnBulk) btnBulk.disabled = n === 0;
+        if (chkAll) {
+            const all = rowChecks();
+            chkAll.checked = all.length > 0 && all.every(c => c.checked);
+            chkAll.indeterminate = n > 0 && n < all.length;
+        }
+    }
+
+    rowChecks().forEach(c => c.addEventListener('change', updateBulkUi));
+    chkAll?.addEventListener('change', () => {
+        rowChecks().forEach(c => { c.checked = chkAll.checked; });
+        updateBulkUi();
+    });
+    btnSelectAll?.addEventListener('click', () => {
+        rowChecks().forEach(c => { c.checked = true; });
+        updateBulkUi();
+    });
+    btnClear?.addEventListener('click', () => {
+        rowChecks().forEach(c => { c.checked = false; });
+        if (chkAll) chkAll.checked = false;
+        updateBulkUi();
+    });
+
+    btnBulk?.addEventListener('click', () => {
+        const selected = rowChecks().filter(c => c.checked);
+        if (selected.length === 0) return;
+        const codes = selected.slice(0, 5).map(c => c.dataset.ems).join(', ');
+        const more = selected.length > 5 ? '…' : '';
+        if (!confirm('Nhập kho ' + selected.length + ' đơn?\n' + codes + more)) return;
+
+        btnBulk.disabled = true;
+        const body = new URLSearchParams();
+        selected.forEach(c => body.append('order_ids[]', c.value));
+
+        fetch('/modules/operation/bulk_receive.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: body.toString()
+        })
+        .then(r => r.json())
+        .then(res => {
+            alert(res.message || (res.success ? 'OK' : 'Thất bại'));
+            if (res.success) location.reload();
+            else updateBulkUi();
+        })
+        .catch(() => {
+            alert('Lỗi kết nối');
+            updateBulkUi();
+        });
+    });
+
+    updateBulkUi();
+})();
 </script>
 
 </body>

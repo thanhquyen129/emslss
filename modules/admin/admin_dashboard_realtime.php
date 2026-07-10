@@ -157,7 +157,7 @@
 	<div class="d-flex justify-content-between align-items-center mb-4">
 		 <div>
 			<h3>📊 Admin Dashboard Realtime</h3>
-			<small>Đơn chưa xử lý — Auto refresh <span id="countdown">30</span>s · <a href="admin_orders.php">Xem tất cả đơn</a></small>
+			<small>Đơn chưa xử lý · <a href="admin_orders.php">Xem tất cả đơn</a></small>
 		</div>
 		<a href="../logout.php" class="btn btn-danger">Đăng xuất</a>
 	</div>
@@ -723,27 +723,8 @@
 		if (t) { e.preventDefault(); showTrimTip(t, e.touches[0].clientX, e.touches[0].clientY + 20); }
 		else if (!e.target.closest('#trimTipPopup')) hideTrimTip();
 	}, { passive: false });
-
-	//setTimeout(function(){location.reload();},30000);
 </script>
 <script>
-	let timeLeft = 30;
-	const countdownEl = document.getElementById("countdown");
-
-	function startCountdown() {
-		const timer = setInterval(() => {
-			timeLeft--;
-			countdownEl.innerText = timeLeft;
-
-			if (timeLeft <= 0) {
-				clearInterval(timer);
-				location.reload();
-			}
-		}, 1000);
-	}
-
-	startCountdown();
-
 	const LS_VIEW = 'emslss_admin_order_view';
 	const LS_KPI = 'emslss_admin_kpi_collapsed';
 	const ordersWrap = document.getElementById('ordersWrap');
