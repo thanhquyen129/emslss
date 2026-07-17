@@ -1,0 +1,14 @@
+Tạo 1 form riêng biệt hoàn toàn không liên quan gì đến codebase hiện tại. Mục đích nhập các thông tin sau
+-Ngày yêu cầu 	
+-Chặng	
+-Số hiệu chuyến bay	
+-AIRWAY BILL	 
+-SỐ VIN	 
+-SỐ SERIAL	 
+-Số kiện	 
+-Khối lượng
+Form nhập liệu nằm bên trên.
+Người dùng nhập xong bấm lưu sẽ hiển thị danh sách bên dưới. 
+Trước mỗi dòng có checkbox (có nút chọn tất cả). 
+trên Danh sách có các tab dữ liệu theo tháng giống kiểu excel sheet.
+Trên danh sách Có 2 nút chức năng In bill (file bill mẫu) và xuất bảng kê dạng excel theo mẫu (
