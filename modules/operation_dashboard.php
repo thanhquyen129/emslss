@@ -195,8 +195,8 @@ function minutesSince(?string $ts): int
             <?php if ($role === 'admin'): ?>
                 <a href="/modules/admin/admin_dashboard_realtime.php" class="btn btn-sm btn-outline-primary">← Admin Dashboard</a>
             <?php endif; ?>
-            <a href="../change_password.php" class="btn btn-sm btn-outline-secondary">Đổi MK</a>
-            <a href="../logout.php" class="btn btn-sm btn-danger">Logout</a>
+            <a href="/modules/change_password.php" class="btn btn-sm btn-outline-secondary">Đổi MK</a>
+            <a href="/logout.php" class="btn btn-sm btn-danger">Logout</a>
         </div>
     </div>
 
