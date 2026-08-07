@@ -109,10 +109,22 @@ safeExecute(function() {
 
     commitTx();
 
+    // Push OneSignal tới admin (không làm fail API nếu push lỗi)
+    $pushResult = null;
+    try {
+        require_once __DIR__ . '/../config/onesignal.php';
+        $pushResult = emslss_notify_admins_new_order($conn, $ems_code, (int)$order_id);
+    } catch (Throwable $e) {
+        $pushResult = ['ok' => false, 'error' => $e->getMessage()];
+    }
+
     apiLog(
         'EMS_PUSH',
         $payload,
-        json_encode(['ems_code'=>$ems_code])
+        json_encode([
+            'ems_code' => $ems_code,
+            'push' => $pushResult,
+        ], JSON_UNESCAPED_UNICODE)
     );
 
     responseSuccess([

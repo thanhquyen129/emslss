@@ -1,2 +1,11 @@
 /uploads/*
 !/uploads/.gitkeep
+
+# Mobile (Capacitor)
+mobile/node_modules/
+mobile/android/.gradle/
+mobile/android/**/build/
+mobile/android/local.properties
+mobile/android/app/google-services.json
+mobile/dist/
+mobile/onesignal.local.json

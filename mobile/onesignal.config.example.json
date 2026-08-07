@@ -1,0 +1,5 @@
+{
+  "app_id": "PASTE_ONESIGNAL_APP_ID_HERE",
+  "rest_api_key": "PASTE_ONESIGNAL_REST_API_KEY_HERE",
+  "note": "Copy to onesignal.local.json (gitignored) hoặc set env EMSLSS_ONESIGNAL_APP_ID / EMSLSS_ONESIGNAL_REST_API_KEY. Trên Android: sửa android/app/src/main/res/values/strings.xml → onesignal_app_id. Cần cấu hình Firebase (FCM) trong OneSignal dashboard."
+}

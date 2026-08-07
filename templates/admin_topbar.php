@@ -80,3 +80,14 @@ if (!window.bootstrap) {
     document.write('<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"><\/script>');
 }
 </script>
+<?php if (!empty($_SESSION['user_id']) && (($_SESSION['role'] ?? '') === 'admin')): ?>
+<script>
+window.EMSLSS_PUSH = {
+  userId: <?= (int)$_SESSION['user_id'] ?>,
+  role: <?= json_encode((string)($_SESSION['role'] ?? 'admin'), JSON_UNESCAPED_UNICODE) ?>,
+  registerUrl: '/modules/push_register.php',
+  platform: 'android'
+};
+</script>
+<script src="/assets/js/emslss_push_bridge.js"></script>
+<?php endif; ?>

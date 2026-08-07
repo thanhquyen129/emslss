@@ -40,6 +40,14 @@ return [
         ],
         'allowed_extensions' => ['jpg', 'jpeg', 'png', 'gif', 'webp'],
         'max_bytes' => (int)(getenv('EMSLSS_UPLOAD_MAX_BYTES') ?: 10485760),
-    ]
+    ],
+    // OneSignal — điền App ID + REST API Key (Settings → Keys & IDs). Không commit key thật nếu repo public.
+    'onesignal' => [
+        'enabled' => (int)(getenv('EMSLSS_ONESIGNAL_ENABLED') ?: 1) === 1,
+        'app_id' => getenv('EMSLSS_ONESIGNAL_APP_ID') ?: '',
+        'rest_api_key' => getenv('EMSLSS_ONESIGNAL_REST_API_KEY') ?: '',
+        'timeout' => (int)(getenv('EMSLSS_ONESIGNAL_TIMEOUT') ?: 8),
+        'open_url' => getenv('EMSLSS_PUBLIC_URL') ?: 'https://lsslogistics.vn',
+    ],
 ];
 ?>
