@@ -44,7 +44,8 @@ return [
     // OneSignal — điền App ID + REST API Key (Settings → Keys & IDs). Không commit key thật nếu repo public.
     'onesignal' => [
         'enabled' => (int)(getenv('EMSLSS_ONESIGNAL_ENABLED') ?: 1) === 1,
-        'app_id' => getenv('EMSLSS_ONESIGNAL_APP_ID') ?: '',
+        'app_id' => getenv('EMSLSS_ONESIGNAL_APP_ID') ?: 'debdeb86-0e7f-47f6-8bc7-2c5252fda208',
+        // App API Key bắt đầu bằng os_v2_app_ (KHÔNG phải Key ID). Set env hoặc điền sau khi create/rotate key.
         'rest_api_key' => getenv('EMSLSS_ONESIGNAL_REST_API_KEY') ?: '',
         'timeout' => (int)(getenv('EMSLSS_ONESIGNAL_TIMEOUT') ?: 8),
         'open_url' => getenv('EMSLSS_PUBLIC_URL') ?: 'https://lsslogistics.vn',
