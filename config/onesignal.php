@@ -12,6 +12,13 @@ function emslss_onesignal_cfg(): array
     }
     $system = require __DIR__ . '/system.php';
     $cfg = $system['onesignal'] ?? [];
+    $localFile = __DIR__ . '/onesignal.local.php';
+    if (is_file($localFile)) {
+        $local = require $localFile;
+        if (is_array($local)) {
+            $cfg = array_merge($cfg, $local);
+        }
+    }
     return $cfg;
 }
 
