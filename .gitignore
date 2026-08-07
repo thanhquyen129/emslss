@@ -9,3 +9,4 @@ mobile/android/local.properties
 mobile/android/app/google-services.json
 mobile/dist/
 mobile/onesignal.local.json
+config/onesignal.local.php
