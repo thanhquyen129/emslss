@@ -5,4 +5,5 @@
     <string name="package_name">vn.lsslogistics.app</string>
     <string name="custom_url_scheme">vn.lsslogistics.app</string>
     <string name="onesignal_app_id">debdeb86-0e7f-47f6-8bc7-2c5252fda208</string>
+    <string name="app_web_base_url">https://lsslogistics.vn</string>
 </resources>

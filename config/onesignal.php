@@ -141,6 +141,9 @@ function emslss_notify_admins_new_order(mysqli $conn, string $ems_code, int $ord
     $openUrl = rtrim((string)($c['open_url'] ?? 'https://lsslogistics.vn'), '/')
         . '/modules/admin/admin_orders.php';
 
+    // Không set 'url' (https) — OneSignal sẽ mở Chrome.
+    // App đọc open_url/open_path trong data và load trong WebView.
+    $openPath = '/modules/admin/admin_orders.php';
     $base = [
         'target_channel' => 'push',
         'headings' => ['en' => $heading, 'vi' => $heading],
@@ -149,8 +152,9 @@ function emslss_notify_admins_new_order(mysqli $conn, string $ems_code, int $ord
             'type' => 'new_order',
             'ems_code' => $ems_code,
             'order_id' => $order_id,
+            'open_path' => $openPath,
+            'open_url' => $openUrl,
         ],
-        'url' => $openUrl,
     ];
 
     $results = [];
