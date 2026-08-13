@@ -1,6 +1,7 @@
 <?php
 session_start();
 include '../../config/db.php';
+require_once __DIR__ . '/../../config/upload.php';
 require_once '../../api/callback_pickup.php';
 
 if (!isset($_SESSION['user_id'])) {
@@ -64,35 +65,34 @@ if (in_array($order['status'], $doneStatuses, true)) {
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-    $scanned_code = trim($_POST['scanned_code']);
-    $note         = trim($_POST['note']);
+    $action       = $_POST['action'] ?? 'success';
+    $scanned_code = trim($_POST['scanned_code'] ?? '');
+    $note         = trim($_POST['note'] ?? '');
+    $fail_reason  = trim($_POST['fail_reason'] ?? '');
 
-    if ($scanned_code != $order['ems_code']) {
-        $message = '<div class="alert alert-danger">❌ Mã EMS không khớp</div>';
+    if (!in_array($action, ['success', 'fail'], true)) {
+        $message = '<div class="alert alert-danger">Thao tác không hợp lệ</div>';
     } elseif (in_array($order['status'], $doneStatuses, true)) {
         $message = '<div class="alert alert-warning">Đơn đã pickup/xử lý trước đó.</div>';
-    } else {
+    } elseif ($action === 'success' && $scanned_code != $order['ems_code']) {
+        $message = '<div class="alert alert-danger">❌ Mã EMS không khớp</div>';
+    } elseif ($action === 'fail' && $fail_reason === '') {
+        $message = '<div class="alert alert-danger">Vui lòng chọn lý do thu gom không thành công.</div>';
+    } elseif ($action === 'success') {
 
         /*
         |--------------------------------------------------------------------------
-        | Update order
+        | Thu gom thành công
         |--------------------------------------------------------------------------
         */
 
-        $update = "
+        $update = $conn->prepare("
             UPDATE emslss_orders
-            SET status='picked_up',
-                updated_at=NOW()
-            WHERE id=$order_id
-        ";
-
-        $conn->query($update);
-
-        /*
-        |--------------------------------------------------------------------------
-        | Insert tracking
-        |--------------------------------------------------------------------------
-        */
+            SET status='picked_up', updated_at=NOW()
+            WHERE id=?
+        ");
+        $update->bind_param("i", $order_id);
+        $update->execute();
 
         $tr = $conn->prepare("
             INSERT INTO emslss_tracking(order_id,status,note,created_by,created_at)
@@ -101,39 +101,65 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $tr->bind_param("isi", $order_id, $note, $user_id);
         $tr->execute();
 
+        $pickupPaths = [];
+        foreach (['images_camera', 'images_gallery'] as $imgField) {
+            if (!empty($_FILES[$imgField]['name'][0])) {
+                $pickupPaths = array_merge($pickupPaths, emslss_upload_save_multipart_field('pickup', $_FILES[$imgField]));
+            }
+        }
+        if ($pickupPaths !== []) {
+            emslss_upload_insert_images($conn, $order_id, $pickupPaths, $user_id);
+        }
+
+        sendPickupCallback($order_id, 'picked_up');
+
+        header("Location: shipper_complete.php?id=".$order_id);
+        exit;
+    } else {
+
         /*
         |--------------------------------------------------------------------------
-        | Upload images
+        | Thu gom KHÔNG thành công — EMS chỉ có trạng thái chung 'failed' + reason
         |--------------------------------------------------------------------------
         */
 
-        if (!empty($_FILES['images']['name'][0])) {
+        $update = $conn->prepare("
+            UPDATE emslss_orders
+            SET status='failed', updated_at=NOW()
+            WHERE id=?
+        ");
+        $update->bind_param("i", $order_id);
+        $update->execute();
 
-            $upload_dir_fs = __DIR__ . '/../../uploads/pickup/';
-            $upload_dir_db = '/uploads/pickup/';
+        $track_note = 'Thu gom thất bại — Lý do: ' . $fail_reason . ($note !== '' ? '. Ghi chú: ' . $note : '');
+        $tr = $conn->prepare("
+            INSERT INTO emslss_tracking(order_id,status,note,created_by,created_at)
+            VALUES(?, 'failed', ?, ?, NOW())
+        ");
+        $tr->bind_param("isi", $order_id, $track_note, $user_id);
+        $tr->execute();
 
-            if (!is_dir($upload_dir_fs)) {
-                mkdir($upload_dir_fs, 0777, true);
-            }
+        $metaKey = 'fail_note';
+        $metaValue = 'Thu gom thất bại: ' . $fail_reason . ($note !== '' ? '. ' . $note : '');
+        $meta = $conn->prepare("
+            INSERT INTO emslss_order_meta(order_id, meta_key, meta_value)
+            VALUES(?,?,?)
+        ");
+        $meta->bind_param("iss", $order_id, $metaKey, $metaValue);
+        $meta->execute();
 
-            foreach ($_FILES['images']['tmp_name'] as $key => $tmp_name) {
-
-                $file_name = time() . '_' . $key . '_' . basename($_FILES['images']['name'][$key]);
-                $target_fs = $upload_dir_fs . $file_name;
-                $target_db = $upload_dir_db . $file_name;
-
-                if (move_uploaded_file($tmp_name, $target_fs)) {
-                    $img = $conn->prepare("
-                        INSERT INTO emslss_images(order_id,image_path,uploaded_by,created_at)
-                        VALUES(?,?,?,NOW())
-                    ");
-                    $img->bind_param("isi", $order_id, $target_db, $user_id);
-                    $img->execute();
-                }
+        $pickupPaths = [];
+        foreach (['images_camera', 'images_gallery'] as $imgField) {
+            if (!empty($_FILES[$imgField]['name'][0])) {
+                $pickupPaths = array_merge($pickupPaths, emslss_upload_save_multipart_field('pickup', $_FILES[$imgField]));
             }
         }
+        if ($pickupPaths !== []) {
+            emslss_upload_insert_images($conn, $order_id, $pickupPaths, $user_id);
+        }
 
-        sendPickupCallback($order_id);
+        $callbackReason = $fail_reason . ($note !== '' ? '. ' . $note : '');
+        sendPickupCallback($order_id, 'failed', ['reason' => $callbackReason]);
 
         header("Location: shipper_complete.php?id=".$order_id);
         exit;
@@ -210,19 +236,41 @@ body{
 
         <div class="box">
             <div class="mb-3">
-                <label class="form-label">📸 Ảnh bằng chứng</label>
-                <input type="file" name="images[]" class="form-control" multiple accept="image/*" capture="environment">
+                <label class="form-label">📸 Ảnh bằng chứng — chụp</label>
+                <input type="file" name="images_camera[]" class="form-control" multiple accept="image/*" capture="environment">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">🖼️ Ảnh bằng chứng — chọn từ thư viện (nhiều ảnh)</label>
+                <input type="file" name="images_gallery[]" class="form-control" multiple accept="image/*">
             </div>
 
             <div class="mb-3">
                 <label class="form-label">📝 Ghi chú</label>
                 <textarea name="note" class="form-control" rows="3" placeholder="Ví dụ: Nhận tại quầy số 2"></textarea>
             </div>
+
+            <div class="mb-3">
+                <label class="form-label">⚠️ Lý do thu gom không thành công</label>
+                <select name="fail_reason" id="fail_reason" class="form-select">
+                    <option value="">-- chọn --</option>
+                    <option>Không có hàng để thu gom</option>
+                    <option>Người gửi hẹn lại hôm sau</option>
+                    <option>Không liên lạc được người gửi</option>
+                    <option>Sai địa chỉ thu gom</option>
+                    <option>Hàng không đúng quy cách</option>
+                    <option>Lý do khác</option>
+                </select>
+                <div class="form-text">Bắt buộc khi báo thu gom không thành công.</div>
+            </div>
         </div>
 
         <div class="d-grid gap-2 pb-4">
-            <button type="submit" class="btn btn-primary btn-lg btn-action">
+            <button type="submit" name="action" value="success" class="btn btn-primary btn-lg btn-action">
                 ✅ Xác nhận đã pickup
+            </button>
+
+            <button type="submit" name="action" value="fail" id="btnFail" formnovalidate class="btn btn-danger btn-action">
+                ⚠️ Thu gom không thành công
             </button>
 
             <a href="shipper_order_detail.php?id=<?= $order_id ?>" class="btn btn-outline-secondary btn-action">
@@ -248,6 +296,13 @@ let html5QrcodeScanner = new Html5QrcodeScanner(
 );
 
 html5QrcodeScanner.render(onScanSuccess);
+
+document.getElementById('btnFail').addEventListener('click', function (e) {
+    if (!document.getElementById('fail_reason').value) {
+        e.preventDefault();
+        alert('Vui lòng chọn lý do thu gom không thành công.');
+    }
+});
 </script>
 
 </body>

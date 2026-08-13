@@ -44,6 +44,8 @@ $img_sql = "
 
 $img_result = $conn->query($img_sql);
 $img_count = $img_result->fetch_assoc()['total'];
+
+$is_failed = ($order['status'] === 'failed');
 ?>
 
 <!DOCTYPE html>
@@ -82,9 +84,13 @@ body{
 <div class="container py-4">
 
     <div class="box text-center">
-        <div class="success-icon">✅</div>
-        <h4 class="mt-3">Pickup thành công</h4>
-        <p class="text-muted">Đơn hàng đã được ghi nhận vào hệ thống</p>
+        <div class="success-icon"><?= $is_failed ? '⚠️' : '✅' ?></div>
+        <h4 class="mt-3"><?= $is_failed ? 'Thu gom không thành công' : 'Pickup thành công' ?></h4>
+        <p class="text-muted">
+            <?= $is_failed
+                ? 'Đã ghi nhận thu gom thất bại và gửi callback về EMS'
+                : 'Đơn hàng đã được ghi nhận vào hệ thống' ?>
+        </p>
     </div>
 
     <div class="box">
@@ -111,12 +117,14 @@ body{
 
     <div class="d-grid gap-2">
 
+        <?php if (!$is_failed): ?>
+        <div class="alert alert-info text-start mb-0">
+            📦 Đơn đã ở trạng thái <strong>picked_up</strong>. Bộ phận kho (operation) sẽ scan xác nhận nhập kho.
+        </div>
+        <?php endif; ?>
+
         <a href="shipper_dashboard.php" class="btn btn-primary btn-lg btn-action">
             🚚 Về dashboard pickup
-        </a>
-
-        <a href="/modules/operation/receive.php?id=<?= $order_id ?>" class="btn btn-outline-success btn-action">
-            📦 Bàn giao sang operation
         </a>
 
     </div>

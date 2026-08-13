@@ -1,0 +1,29 @@
+{
+  "appId": "vn.lsslogistics.app",
+  "appName": "EMS-LSS",
+  "webDir": "www",
+  "server": {
+    "url": "https://lsslogistics.vn",
+    "cleartext": false,
+    "allowNavigation": [
+      "lsslogistics.vn",
+      "*.lsslogistics.vn"
+    ]
+  },
+  "android": {
+    "allowMixedContent": false,
+    "backgroundColor": "#0f172a",
+    "webContentsDebuggingEnabled": false
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1200,
+      "backgroundColor": "#0f172a",
+      "showSpinner": false
+    },
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#0f172a"
+    }
+  }
+}
