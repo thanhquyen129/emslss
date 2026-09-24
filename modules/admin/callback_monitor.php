@@ -16,6 +16,14 @@ if ($_SESSION['role'] != 'admin') {
     die("Access denied");
 }
 
+$allowedFilters = ['all', 'fail', 'retry', 'dead', 'success'];
+$filter = $_GET['filter'] ?? 'all';
+if (!in_array($filter, $allowedFilters, true)) {
+    $filter = 'all';
+}
+
+$filterQuery = $filter === 'all' ? '' : ('&filter=' . urlencode($filter));
+
 /*
 resend thủ công
 */
@@ -28,21 +36,24 @@ if (isset($_GET['resend'])) {
     $order = $orderStmt->get_result()->fetch_assoc();
 
     if (!$order) {
-        header("Location: callback_monitor.php");
+        header("Location: callback_monitor.php" . ($filterQuery !== '' ? '?' . ltrim($filterQuery, '&') : ''));
         exit;
     }
 
-    if ($order['status'] === 'picked_up') {
-        $result = sendPickupCallback($order_id);
-    } else {
-        $result = sendDeliveryCallback($order_id);
-    }
+    $result = emslss_resend_order_callback($order_id);
 
+    $errorBody = '';
+    if (!empty($result['response'])) {
+        $errorBody = trim((string)$result['response']);
+        if (strlen($errorBody) > 180) {
+            $errorBody = substr($errorBody, 0, 180) . '...';
+        }
+    }
     $note = $result['success']
         ? 'Manual resend success'
-        : 'Manual resend fail: HTTP ' . ($result['http_code'] ?? 0);
+        : 'Manual resend fail: HTTP ' . ($result['http_code'] ?? 0) . ($errorBody !== '' ? ' | ' . $errorBody : '');
 
-    $status = 'callback_retry';
+    $status = $result['success'] ? 'callback_success' : 'callback_fail';
 
     $tr = $conn->prepare("
         INSERT INTO emslss_tracking(order_id,status,note,created_by)
@@ -54,33 +65,54 @@ if (isset($_GET['resend'])) {
     $tr->bind_param("issi", $order_id, $status, $note, $admin_id);
     $tr->execute();
 
-    header("Location: callback_monitor.php");
+    header("Location: callback_monitor.php" . ($filterQuery !== '' ? '?' . ltrim($filterQuery, '&') : ''));
     exit;
 }
 
 /*
-lấy callback fail / retry / dead
+lấy callback fail / retry / dead / success gần nhất
 */
 
+$statusFilterSql = " IN ('callback_fail', 'callback_retry', 'callback_dead', 'callback_success') ";
+if ($filter === 'fail') {
+    $statusFilterSql = " = 'callback_fail' ";
+} elseif ($filter === 'retry') {
+    $statusFilterSql = " = 'callback_retry' ";
+} elseif ($filter === 'dead') {
+    $statusFilterSql = " = 'callback_dead' ";
+} elseif ($filter === 'success') {
+    $statusFilterSql = " = 'callback_success' ";
+}
+
 $sql = "
-SELECT *
-FROM (
-    SELECT 
-        o.id,
-        o.ems_code,
-        o.status AS order_status,
+SELECT
+    o.id,
+    o.ems_code,
+    o.status AS order_status,
+    agg.callback_fail_time,
+    agg.retry_count,
+    COALESCE(last_cb.status, '') AS last_callback_status,
+    COALESCE(last_cb.note, '') AS last_callback_note,
+    last_cb.created_at AS last_callback_time
+FROM emslss_orders o
+LEFT JOIN (
+    SELECT
+        t.order_id,
         MAX(CASE WHEN t.status='callback_fail' THEN t.created_at END) AS callback_fail_time,
-        SUM(CASE WHEN t.status='callback_retry' THEN 1 ELSE 0 END) AS retry_count,
-        MAX(CASE WHEN t.status='callback_dead' THEN 1 ELSE 0 END) AS is_dead,
-        MAX(t.created_at) AS last_tracking_time
-    FROM emslss_orders o
-    LEFT JOIN emslss_tracking t ON o.id = t.order_id
-    GROUP BY o.id, o.ems_code, o.status
-) x
-WHERE x.callback_fail_time IS NOT NULL
-   OR x.retry_count > 0
-   OR x.is_dead = 1
-ORDER BY COALESCE(x.callback_fail_time, x.last_tracking_time) DESC
+        SUM(CASE WHEN t.status='callback_retry' THEN 1 ELSE 0 END) AS retry_count
+    FROM emslss_tracking t
+    GROUP BY t.order_id
+) agg ON agg.order_id = o.id
+LEFT JOIN emslss_tracking last_cb ON last_cb.id = (
+    SELECT t2.id
+    FROM emslss_tracking t2
+    WHERE t2.order_id = o.id
+      AND t2.status IN ('callback_fail', 'callback_retry', 'callback_dead', 'callback_success')
+    ORDER BY t2.created_at DESC, t2.id DESC
+    LIMIT 1
+)
+WHERE COALESCE(last_cb.status, '') $statusFilterSql
+ORDER BY COALESCE(last_cb.created_at, agg.callback_fail_time) DESC
 ";
 
 $res = $conn->query($sql);
@@ -111,12 +143,30 @@ $hasRows = ($res && $res->num_rows > 0);
 	</head>
 <body>
 
+<?php include __DIR__ . '/../../templates/admin_topbar.php'; ?>
+
 <div class="container py-4">
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h4>📡 Callback Monitor</h4>
-    <a href="dashboard.php" class="btn btn-secondary">← Dashboard</a>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h4 class="mb-0">📡 Callback Monitor</h4>
 </div>
+
+<ul class="nav nav-pills flex-wrap gap-1 mb-3">
+<?php
+$tabDefs = [
+    'all' => 'Tất cả',
+    'fail' => 'Fail',
+    'retry' => 'Retry',
+    'dead' => 'Dead',
+    'success' => 'Success',
+];
+foreach ($tabDefs as $key => $label) {
+    $active = $filter === $key ? 'active' : '';
+    $href = $key === 'all' ? 'callback_monitor.php' : 'callback_monitor.php?filter=' . urlencode($key);
+    echo '<li class="nav-item"><a class="nav-link ' . $active . '" href="' . htmlspecialchars($href) . '">' . htmlspecialchars($label) . '</a></li>';
+}
+?>
+</ul>
 
 <div class="card card-box">
 
@@ -128,9 +178,10 @@ $hasRows = ($res && $res->num_rows > 0);
 <tr>
 <th>Mã EMS</th>
 <th>Order Status</th>
-<th>Callback Fail</th>
+<th>Callback Time</th>
 <th>Retry Count</th>
 <th>Queue</th>
+<th>Lỗi gần nhất</th>
 <th>Action</th>
 </tr>
 </thead>
@@ -139,8 +190,8 @@ $hasRows = ($res && $res->num_rows > 0);
 
 <?php if (!$hasRows): ?>
 <tr>
-<td colspan="6" class="text-center text-muted py-4">
-Chưa có callback fail/retry/dead.
+<td colspan="7" class="text-center text-muted py-4">
+Chưa có callback status.
 </td>
 </tr>
 <?php else: ?>
@@ -157,7 +208,7 @@ Chưa có callback fail/retry/dead.
 </td>
 
 <td>
-<?= $row['callback_fail_time'] ?>
+<?= htmlspecialchars($row['last_callback_time'] ?: '-') ?>
 </td>
 
 <td>
@@ -175,20 +226,28 @@ Chưa có callback fail/retry/dead.
 <td>
 
 <?php
-if($row['is_dead']) {
+if($row['last_callback_status'] === 'callback_dead') {
     echo '<span class="badge bg-danger badge-status">DEAD</span>';
-} elseif($row['retry_count'] > 0) {
-    echo '<span class="badge bg-warning badge-status">RETRY</span>';
-} else {
+} elseif($row['last_callback_status'] === 'callback_fail') {
     echo '<span class="badge bg-danger badge-status">FAIL</span>';
+} elseif($row['last_callback_status'] === 'callback_retry') {
+    echo '<span class="badge bg-warning badge-status">RETRY</span>';
+} elseif($row['last_callback_status'] === 'callback_success') {
+    echo '<span class="badge bg-success badge-status">SUCCESS</span>';
+} else {
+    echo '<span class="badge bg-secondary badge-status">UNKNOWN</span>';
 }
 ?>
 
 </td>
 
 <td>
+<?= htmlspecialchars($row['last_callback_note'] ?: '-') ?>
+</td>
 
-<a href="?resend=<?= $row['id'] ?>"
+<td>
+
+<a href="?resend=<?= (int)$row['id'] ?><?= htmlspecialchars($filterQuery) ?>"
    class="btn btn-sm btn-primary"
    onclick="return confirm('Resend callback?')">
 

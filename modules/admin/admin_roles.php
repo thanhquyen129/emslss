@@ -1,8 +1,10 @@
 <?php
 session_start();
 require_once __DIR__ . '/../../config/db.php';
+require_once __DIR__ . '/../../config/auth.php';
 
-$roles = $conn->query("SELECT * FROM emslss_roles ORDER BY id ASC");
+emslss_ensure_roles_seed($conn);
+$rolesList = emslss_fetch_all_roles($conn);
 ?>
 
 <!DOCTYPE html>
@@ -27,14 +29,14 @@ $roles = $conn->query("SELECT * FROM emslss_roles ORDER BY id ASC");
 <th>Description</th>
 </tr>
 
-<?php while($r = $roles->fetch_assoc()): ?>
+<?php foreach ($rolesList as $r): ?>
 <tr>
 <td><?= $r['id'] ?></td>
 <td><?= htmlspecialchars($r['role_code']) ?></td>
 <td><?= htmlspecialchars($r['role_name']) ?></td>
 <td><?= htmlspecialchars($r['description']) ?></td>
 </tr>
-<?php endwhile; ?>
+<?php endforeach; ?>
 
 </table>
 </div>

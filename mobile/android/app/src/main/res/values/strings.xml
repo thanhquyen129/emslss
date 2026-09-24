@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">EMS-LSS</string>
+    <string name="title_activity_main">EMS-LSS</string>
+    <string name="package_name">vn.lsslogistics.app</string>
+    <string name="custom_url_scheme">vn.lsslogistics.app</string>
+    <string name="onesignal_app_id">debdeb86-0e7f-47f6-8bc7-2c5252fda208</string>
+    <string name="app_web_base_url">https://lsslogistics.vn</string>
+</resources>

@@ -1,6 +1,9 @@
 <?php
 session_start();
 include '../../config/db.php';
+require_once __DIR__ . '/../../config/upload.php';
+require_once __DIR__ . '/../../config/order_helpers.php';
+require_once __DIR__ . '/helpers.php';
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
@@ -63,6 +66,25 @@ $tracking_sql = "
 ";
 
 $tracking_result = $conn->query($tracking_sql);
+
+$imgStmt = $conn->prepare('SELECT id, image_path, created_at FROM emslss_images WHERE order_id = ? ORDER BY created_at DESC');
+$imgStmt->bind_param('i', $order_id);
+$imgStmt->execute();
+$imageRows = [];
+$imgRes = $imgStmt->get_result();
+while ($img = $imgRes->fetch_assoc()) {
+    $img['image_path'] = emslss_upload_url($img['image_path'] ?? '');
+    $imageRows[] = $img;
+}
+$cargoDesc = '';
+$cargoStmt = $conn->prepare("SELECT meta_value FROM emslss_order_meta WHERE order_id=? AND meta_key='cargo_description' ORDER BY id DESC LIMIT 1");
+$cargoStmt->bind_param('i', $order_id);
+$cargoStmt->execute();
+$cargoRow = $cargoStmt->get_result()->fetch_assoc();
+if ($cargoRow) {
+    $cargoDesc = (string) $cargoRow['meta_value'];
+}
+$canDeleteImages = ($order['status'] === 'assigned_pickup');
 ?>
 
 <!DOCTYPE html>
@@ -141,15 +163,10 @@ body{
         <div class="d-flex justify-content-between align-items-start mb-3">
             <div>
                 <div class="header-code">
-                    <a href="/modules/admin/admin_order_detail.php?id=<?= intval($order['id']) ?>">
-                        <?= htmlspecialchars($order['ems_code']) ?>
-                    </a>
+                    <?= shipper_order_code_html($order, 'shipper_order_detail.php?id=' . (int) $order['id']) ?>
                 </div>
                 <span class="status-badge"><?= htmlspecialchars($order['status']) ?></span>
             </div>
-            <small class="text-muted">
-                <?= date('d/m/Y H:i', strtotime($order['created_at'])) ?>
-            </small>
         </div>
 
     </div>
@@ -205,12 +222,16 @@ body{
 
         <div class="mb-3">
             <div class="label">Khối lượng</div>
-            <div class="value"><?= htmlspecialchars($order['weight']) ?> kg</div>
+            <div class="value"><?= emslss_format_weight_html($order['weight'] ?? null) ?></div>
         </div>
 
         <div class="mb-3">
             <div class="label">Loại hàng</div>
             <div class="value"><?= htmlspecialchars($order['cargo_type']) ?></div>
+            <?php if ($cargoDesc !== ''): ?>
+            <div class="label mt-2">Nội dung hàng</div>
+            <div class="value"><?= htmlspecialchars($cargoDesc) ?></div>
+            <?php endif; ?>
         </div>
 
         <div class="mb-3">
@@ -231,6 +252,17 @@ body{
                 </div>
             </div>
         <?php endwhile; ?>
+    </div>
+
+    <div class="box">
+        <div class="section-title">🖼 Ảnh đơn hàng</div>
+        <?php if ($canDeleteImages): ?>
+            <p class="small text-muted">Có thể xóa ảnh trước khi pickup.</p>
+        <?php endif; ?>
+        <?php
+        $can_delete = $canDeleteImages;
+        include __DIR__ . '/../../templates/shipper_image_gallery.php';
+        ?>
     </div>
 
     <div class="d-grid gap-2 pb-4">

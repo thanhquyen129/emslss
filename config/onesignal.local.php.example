@@ -1,0 +1,5 @@
+<?php
+// Copy thành onesignal.local.php trên server và điền App API Key (os_v2_app_...).
+return [
+    'rest_api_key' => 'os_v2_app_REPLACE_ME',
+];

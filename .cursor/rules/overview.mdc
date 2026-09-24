@@ -1,0 +1,40 @@
+---
+description: Tổng quan dự án EMS-LSS, tech stack, cấu trúc, cấu hình & secrets
+alwaysApply: true
+---
+
+# EMS-LSS — Tổng quan
+
+Hệ thống logistics trung gian (LSS): nhận đơn từ EMS, điều phối pickup/delivery,
+cập nhật tracking, callback trạng thái về EMS. PHP thuần (procedural), không framework,
+deploy trên shared hosting (cPanel/WAMP).
+
+## Ngôn ngữ
+- Trả lời, giải thích, comment bằng **tiếng Việt**. Chuỗi UI/lỗi tiếng Việt có dấu.
+- Tên biến/hàm/bảng giữ tiếng Anh, `snake_case`.
+
+## Tech stack
+- PHP thuần (procedural), KHÔNG framework, KHÔNG Composer/autoload.
+- MySQL qua **mysqli** (OO: `$conn->prepare(...)`).
+- Frontend: Bootstrap 5.3.2 + jQuery 3.7.1 qua CDN (`templates/header.php`).
+- Không build step, không Node/npm. Sửa file là chạy ngay trên server.
+
+## Cấu trúc thư mục
+- `api/` — endpoint JSON giao tiếp EMS (mỗi file `require 'bootstrap.php'`).
+- `config/` — `system.php` là nguồn chân lý, `db.php`, `auth.php`, `upload.php`.
+- `cron/` — job nền (retry callback...). `modules/` — màn hình theo role.
+- `templates/` — header/footer/sidebar/topbar dùng chung. `index.php` redirect tới login.
+
+> Có nhiều file trùng tên cũ (vd `modules/pickup_dashboard.php` vs
+> `modules/pickup/pickup_dashboard.php`). Xác nhận đúng file được route tới trước khi sửa.
+
+## Cấu hình & secrets
+- KHÔNG hardcode credential/secret trong module. Đọc qua `config/system.php`
+  (biến môi trường `EMSLSS_*`, fallback default).
+- KHÔNG dùng `config/app.php` và `config/roles.php.php` cho code mới (legacy, hardcode credential).
+- Không tham chiếu file rác/test trong code mới: `test_*.php`, `sqlexe.php`, `restore*.php`,
+  `backup.php`, ảnh trong `modules/shipper/uploads/`.
+
+## Style
+- Format trong repo không đồng nhất — **bám style sẵn có của chính file đang sửa**, không reformat hàng loạt.
+- KHÔNG comment thuật lại code; chỉ comment khi giải thích ý đồ/ràng buộc nghiệp vụ.

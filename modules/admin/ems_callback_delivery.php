@@ -93,15 +93,37 @@ function sendDeliveryCallback($order_id, $conn)
     ];
 }
 
-// gọi trực tiếp nếu test
+// gọi trực tiếp nếu test (chỉ admin, có menu)
 if (isset($_GET['order_id'])) {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'admin') {
+        header('Location: ../login.php');
+        exit;
+    }
 
     $order_id = intval($_GET['order_id']);
-
     $result = sendDeliveryCallback($order_id, $conn);
-
-    echo "<pre>";
-    print_r($result);
-    echo "</pre>";
+    ?>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Test EMS callback (legacy)</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<?php include __DIR__ . '/../../templates/admin_topbar.php'; ?>
+<div class="container py-4">
+    <p class="text-muted small">Legacy test — ưu tiên dùng <code>api/callback_delivery.php</code> + Callback Monitor.</p>
+    <pre class="bg-light p-3 rounded border"><?php echo htmlspecialchars(print_r($result, true)); ?></pre>
+    <a href="callback_monitor.php" class="btn btn-secondary btn-sm">Callback Monitor</a>
+</div>
+</body>
+</html>
+    <?php
+    exit;
 }
 ?>

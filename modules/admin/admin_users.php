@@ -1,13 +1,22 @@
 <?php
 session_start();
 require_once __DIR__ . '/../../config/db.php';
+require_once __DIR__ . '/../../config/auth.php';
 
-$result = $conn->query("
-    SELECT u.*, r.role_name
+if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'admin') {
+    header('Location: ../login.php');
+    exit;
+}
+
+emslss_ensure_user_roles_table($conn);
+emslss_ensure_roles_seed($conn);
+
+$result = $conn->query('
+    SELECT u.*
     FROM emslss_users u
-    LEFT JOIN emslss_roles r ON u.role_id = r.id
     ORDER BY u.id DESC
-");
+');
+$deleted = isset($_GET['deleted']);
 ?>
 
 <!DOCTYPE html>
@@ -19,10 +28,14 @@ $result = $conn->query("
 </head>
 <body>
 
-<?php include __DIR__.'/../../templates/admin_topbar.php'; ?>
+<?php include __DIR__ . '/../../templates/admin_topbar.php'; ?>
 
 <div class="container mt-4">
     <h3>Quản lý Users</h3>
+
+    <?php if ($deleted): ?>
+    <div class="alert alert-success">Đã xóa user thành công.</div>
+    <?php endif; ?>
 
     <a href="admin_user_edit.php" class="btn btn-primary mb-3">+ Thêm User</a>
 
@@ -39,19 +52,22 @@ $result = $conn->query("
             </tr>
         </thead>
         <tbody>
-        <?php while($row = $result->fetch_assoc()): ?>
+        <?php while ($row = $result->fetch_assoc()): ?>
             <tr>
-                <td><?= $row['id'] ?></td>
-                <td><?= $row['username'] ?></td>
-                <td><?= $row['full_name'] ?></td>
-                <td><?= $row['role_name'] ?? $row['role'] ?></td>
-                <td><?= $row['phone'] ?></td>
+                <td><?= (int) $row['id'] ?></td>
+                <td><?= htmlspecialchars($row['username']) ?></td>
+                <td><?= htmlspecialchars($row['full_name']) ?></td>
+                <td><small><?= htmlspecialchars(emslss_user_roles_label($conn, (int) $row['id'], $row)) ?></small></td>
+                <td><?= htmlspecialchars($row['phone']) ?></td>
                 <td>
                     <?= $row['is_active'] ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-danger">Disabled</span>' ?>
                 </td>
-                <td>
-                    <a href="admin_user_edit.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-warning">Sửa</a>
-                    <a href="admin_user_disable.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-danger">Disable</a>
+                <td class="text-nowrap">
+                    <a href="admin_user_edit.php?id=<?= (int) $row['id'] ?>" class="btn btn-sm btn-warning">Sửa</a>
+                    <a href="admin_user_disable.php?id=<?= (int) $row['id'] ?>" class="btn btn-sm btn-secondary">Disable</a>
+                    <?php if ((int) $row['id'] !== (int) $_SESSION['user_id']): ?>
+                    <a href="admin_user_delete.php?id=<?= (int) $row['id'] ?>" class="btn btn-sm btn-danger">Xóa</a>
+                    <?php endif; ?>
                 </td>
             </tr>
         <?php endwhile; ?>
