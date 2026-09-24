@@ -75,11 +75,7 @@ if(session_status() == PHP_SESSION_NONE){
 
 <div style="height:70px;"></div>
 
-<script>
-if (!window.bootstrap) {
-    document.write('<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"><\/script>');
-}
-</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <?php if (!empty($_SESSION['user_id']) && (($_SESSION['role'] ?? '') === 'admin')): ?>
 <script>
 window.EMSLSS_PUSH = {

@@ -100,10 +100,10 @@ body { background: #f5f7fb; }
                 <tr>
                     <td><a href="admin_order_detail.php?id=<?= (int)$row['id'] ?>"><?= htmlspecialchars($row['ems_code']) ?></a></td>
                     <td><?= statusBadge($row['status']) ?></td>
-                    <td><?= admin_render_trim_span($row['post_office_name']) ?></td>
+                    <td><?= admin_render_trim_span($row['post_office_name'] ?? '') ?></td>
                     <td class="small"><?= emslss_order_cargo_html($row, $orderCargoMeta[(int)$row['id']] ?? []) ?></td>
-                    <td><?= admin_render_trim_span($row['post_office_address']) ?></td>
-                    <td><?= admin_render_trim_span($row['receiver_name'] . ' — ' . $row['receiver_address']) ?></td>
+                    <td><?= admin_render_trim_span($row['post_office_address'] ?? '') ?></td>
+                    <td><?= admin_render_trim_span(($row['receiver_name'] ?? '') . ' — ' . ($row['receiver_address'] ?? '')) ?></td>
                     <td style="min-width:130px"><?= admin_render_pickup_select($row, $pickupUsers) ?></td>
                     <td style="min-width:130px"><?= admin_render_delivery_select($row, $deliveryUsers) ?></td>
                     <td class="small"><?= admin_render_ack_html((int)$row['id'], $orderMeta) ?></td>

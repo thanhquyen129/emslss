@@ -494,11 +494,11 @@
 				<tr>
 					<td><a href="admin_order_detail.php?id=<?= (int)$row['id'] ?>"><?= htmlspecialchars($row['ems_code']) ?></a></td>
 					<td><?= statusBadge($row['status']) ?></td>
-					<td><?= admin_render_trim_span($row['post_office_name']) ?></td>
-					<td><?= admin_render_trim_span($row['post_office_address']) ?></td>
+					<td><?= admin_render_trim_span($row['post_office_name'] ?? '') ?></td>
+					<td><?= admin_render_trim_span($row['post_office_address'] ?? '') ?></td>
 					<td class="small"><?= emslss_order_cargo_html($row, $orderCargoMeta[(int)$row['id']] ?? []) ?></td>
-					<td><?= admin_render_trim_span($row['holder_name'] . ' (' . $row['holder_phone'] . ')') ?></td>
-					<td><?= admin_render_trim_span($row['receiver_name'] . ' — ' . $row['receiver_address']) ?></td>
+					<td><?= admin_render_trim_span(($row['holder_name'] ?? '') . ' (' . ($row['holder_phone'] ?? '') . ')') ?></td>
+					<td><?= admin_render_trim_span(($row['receiver_name'] ?? '') . ' — ' . ($row['receiver_address'] ?? '')) ?></td>
 					<td style="min-width:140px"><?= admin_render_pickup_select($row, $pickupUsers) ?></td>
 					<td style="min-width:140px"><?= admin_render_delivery_select($row, $deliveryUsers) ?></td>
 					<td class="small"><?= admin_render_ack_html((int)$row['id'], $orderMeta) ?></td>
@@ -536,18 +536,18 @@
 					<?= admin_render_ack_html((int)$row['id'], $orderMeta) ?>
 
 					<div class="mb-2">
-						<strong>🏤 <?= admin_render_trim_span($row['post_office_name']) ?></strong><br>
-						<span class="small-line"><?= admin_render_trim_span($row['post_office_address']) ?></span>
+						<strong>🏤 <?= admin_render_trim_span($row['post_office_name'] ?? '') ?></strong><br>
+						<span class="small-line"><?= admin_render_trim_span($row['post_office_address'] ?? '') ?></span>
 					</div>
 
 					<div class="mb-2 small-line">
-						👤 <?= admin_render_trim_span($row['holder_name']) ?>
-						| 📞 <?= htmlspecialchars($row['holder_phone']) ?>
+						👤 <?= admin_render_trim_span($row['holder_name'] ?? '') ?>
+						| 📞 <?= htmlspecialchars((string) ($row['holder_phone'] ?? '')) ?>
 					</div>
 
 					<div class="mb-3 order-extra">
-						📍 <?= admin_render_trim_span($row['sender_address']) ?><br>
-						➜ <?= admin_render_trim_span($row['receiver_address']) ?>
+						📍 <?= admin_render_trim_span($row['sender_address'] ?? '') ?><br>
+						➜ <?= admin_render_trim_span($row['receiver_address'] ?? '') ?>
 					</div>
 
 					<?= admin_render_cargo_line($row, $orderCargoMeta) ?>
@@ -651,7 +651,6 @@
 	</div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
 <script>

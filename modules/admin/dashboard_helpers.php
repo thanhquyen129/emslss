@@ -1,9 +1,9 @@
 <?php
 require_once __DIR__ . '/../../config/order_helpers.php';
 
-function admin_trim_text(string $text, int $len = 50): string
+function admin_trim_text(?string $text, int $len = 50): string
 {
-    $text = (string) $text;
+    $text = (string) ($text ?? '');
     if (mb_strlen($text) <= $len) {
         return htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
     }
@@ -11,9 +11,9 @@ function admin_trim_text(string $text, int $len = 50): string
     return htmlspecialchars($short, ENT_QUOTES, 'UTF-8') . '…';
 }
 
-function admin_trim_attr(string $text): string
+function admin_trim_attr(?string $text): string
 {
-    return htmlspecialchars((string) $text, ENT_QUOTES, 'UTF-8');
+    return htmlspecialchars((string) ($text ?? ''), ENT_QUOTES, 'UTF-8');
 }
 
 function admin_can_assign_delivery(string $status, array $row = []): bool
@@ -62,9 +62,9 @@ function admin_render_ack_html(int $orderId, array $orderMeta): string
     return $html;
 }
 
-function admin_render_trim_span(string $text, int $len = 50): string
+function admin_render_trim_span(?string $text, int $len = 50): string
 {
-    $full = (string) $text;
+    $full = (string) ($text ?? '');
     if ($full === '') {
         return '';
     }
