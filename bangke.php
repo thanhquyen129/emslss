@@ -5,13 +5,46 @@
  */
 require_once __DIR__ . '/bangke/bootstrap.php';
 require_once __DIR__ . '/bangke/export.php';
+require_once __DIR__ . '/bangke/import.php';
 
 $flash = '';
 $flashType = 'ok';
 $today = date('Y-m-d');
+$importResult = null;
+$importMonth = null;
 
 // --- Actions: print / export ---
 $action = $_POST['action'] ?? $_GET['action'] ?? '';
+
+if ($action === 'template') {
+    bangke_import_send_template();
+    exit;
+}
+
+// File vượt post_max_size thì PHP bỏ trống toàn bộ $_POST/$_FILES
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$_POST && !$_FILES && (int) ($_SERVER['CONTENT_LENGTH'] ?? 0) > 0) {
+    $flash = 'File vượt quá dung lượng máy chủ cho phép (tối đa 5 MB).';
+    $flashType = 'err';
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'import') {
+    try {
+        $importResult = bangke_import_file($conn, $_FILES['import_file'] ?? []);
+        if ($importResult['last_date'] !== null) {
+            $importMonth = substr($importResult['last_date'], 0, 7);
+        }
+        $flash = sprintf(
+            'Import xong: thêm mới %d dòng, bỏ qua %d dòng trùng, %d dòng lỗi.',
+            $importResult['inserted'],
+            $importResult['skipped'],
+            count($importResult['errors'])
+        );
+        $flashType = $importResult['inserted'] > 0 || !$importResult['errors'] ? 'ok' : 'err';
+    } catch (RuntimeException $e) {
+        $flash = $e->getMessage();
+        $flashType = 'err';
+    }
+}
 if ($action === 'print' || $action === 'export') {
     $ids = $_POST['ids'] ?? [];
     if (!is_array($ids)) {
@@ -86,7 +119,7 @@ if (isset($_GET['saved'])) {
 
 $months = bangke_fetch_months($conn);
 $currentMonth = date('Y-m');
-$activeMonth = trim((string) ($_GET['m'] ?? ''));
+$activeMonth = $importMonth ?? trim((string) ($_GET['m'] ?? ''));
 if (!preg_match('/^\d{4}-\d{2}$/', $activeMonth)) {
     $activeMonth = $months[0] ?? $currentMonth;
 }
@@ -205,6 +238,34 @@ body {
 }
 .flash.ok { background: var(--ok-bg); color: var(--ok); }
 .flash.err { background: var(--err-bg); color: var(--err); }
+.flash ul {
+  margin: 8px 0 0; padding-left: 20px;
+  font-weight: 500; font-size: .88rem; color: var(--err);
+  max-height: 180px; overflow: auto;
+}
+
+.import-row {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
+}
+.file-pick {
+  flex: 1; min-width: 260px;
+  display: flex; align-items: center; gap: 10px;
+  border: 1.5px dashed #9fb4cc; border-radius: 10px;
+  padding: 8px 10px; background: #f7fafd; cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.file-pick:hover { border-color: #3d7ab5; background: #fff; }
+.file-pick input[type="file"] { display: none; }
+.file-pick .pick-btn {
+  background: var(--navy); color: #fff; border-radius: 8px;
+  padding: 7px 12px; font-weight: 700; font-size: .88rem; white-space: nowrap;
+}
+.file-pick .pick-name {
+  color: var(--muted); font-size: .92rem;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.import-hint { margin: 10px 0 0; color: var(--muted); font-size: .86rem; }
+.import-hint a { color: #1f5f99; font-weight: 600; }
 
 .form-grid {
   display: grid;
@@ -370,7 +431,19 @@ input[type="checkbox"] {
   </header>
 
   <?php if ($flash !== ''): ?>
-    <div class="flash <?= $flashType === 'ok' ? 'ok' : 'err' ?>"><?= bangke_h($flash) ?></div>
+    <div class="flash <?= $flashType === 'ok' ? 'ok' : 'err' ?>">
+      <?= bangke_h($flash) ?>
+      <?php if ($importResult && $importResult['errors']): ?>
+        <ul>
+          <?php foreach (array_slice($importResult['errors'], 0, 50) as $e): ?>
+            <li><?= bangke_h($e) ?></li>
+          <?php endforeach; ?>
+          <?php if (count($importResult['errors']) > 50): ?>
+            <li>… và <?= count($importResult['errors']) - 50 ?> dòng lỗi khác.</li>
+          <?php endif; ?>
+        </ul>
+      <?php endif; ?>
+    </div>
   <?php endif; ?>
 
   <section class="panel">
@@ -427,6 +500,32 @@ input[type="checkbox"] {
           <button type="reset" class="btn btn-ghost">Xóa form</button>
           <button type="submit" class="btn btn-primary">Lưu bản ghi</button>
         </div>
+      </form>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-hd">
+      <h2>Import từ Excel</h2>
+      <span>.xlsx · .csv · .xls (xuất từ trang này)</span>
+    </div>
+    <div class="panel-bd">
+      <form method="post" enctype="multipart/form-data" id="importForm">
+        <input type="hidden" name="action" value="import">
+        <input type="hidden" name="MAX_FILE_SIZE" value="<?= BANGKE_IMPORT_MAX_BYTES ?>">
+        <div class="import-row">
+          <label class="file-pick">
+            <input type="file" name="import_file" id="importFile" accept=".xlsx,.csv,.xls" required>
+            <span class="pick-btn">Chọn file</span>
+            <span class="pick-name" id="importFileName">Chưa chọn file</span>
+          </label>
+          <a class="btn btn-ghost" href="bangke.php?action=template">Tải file mẫu</a>
+          <button type="submit" class="btn btn-primary" id="btnImport">Import</button>
+        </div>
+        <p class="import-hint">
+          Dòng đầu là tiêu đề cột: Ngày yêu cầu, Chặng, Số hiệu chuyến bay, Airway Bill, Số VIN, Số Serial, Số kiện, Khối lượng.
+          Ngày ghi dạng dd/mm/yyyy (bỏ trống = hôm nay). Dòng trùng Airway Bill + VIN + Serial với dữ liệu đã có sẽ được bỏ qua.
+        </p>
       </form>
     </div>
   </section>
@@ -561,6 +660,17 @@ input[type="checkbox"] {
   });
 
   refresh();
+
+  var importFile = document.getElementById('importFile');
+  var importFileName = document.getElementById('importFileName');
+  importFile.addEventListener('change', function () {
+    importFileName.textContent = importFile.files.length ? importFile.files[0].name : 'Chưa chọn file';
+  });
+  document.getElementById('importForm').addEventListener('submit', function () {
+    var btn = document.getElementById('btnImport');
+    btn.disabled = true;
+    btn.textContent = 'Đang import…';
+  });
 })();
 </script>
 </body>
