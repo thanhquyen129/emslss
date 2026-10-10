@@ -45,17 +45,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'import') {
         $flashType = 'err';
     }
 }
-if ($action === 'print' || $action === 'export') {
+if ($action === 'print' || $action === 'print_ems' || $action === 'export') {
     $ids = $_POST['ids'] ?? [];
     if (!is_array($ids)) {
         $ids = [];
     }
     $rows = bangke_fetch_by_ids($conn, $ids);
+    $sttMap = $_POST['stt'] ?? [];
+    foreach ($rows as &$row) {
+        $rowId = (int) ($row['id'] ?? 0);
+        if (isset($row['stt']) && (int) $row['stt'] > 0) {
+            $row['_stt'] = (int) $row['stt'];
+        } elseif (isset($sttMap[$rowId]) && (int) $sttMap[$rowId] > 0) {
+            $row['_stt'] = (int) $sttMap[$rowId];
+        } else {
+            $row['_stt'] = 0;
+        }
+    }
+    unset($row);
+    // Sắp xếp các dòng theo STT tăng dần để in bill đúng thứ tự STT
+    usort($rows, static function ($a, $b) {
+        $sttA = (int) (!empty($a['_stt']) ? $a['_stt'] : (!empty($a['stt']) ? $a['stt'] : 999999));
+        $sttB = (int) (!empty($b['_stt']) ? $b['_stt'] : (!empty($b['stt']) ? $b['stt'] : 999999));
+        if ($sttA !== $sttB) {
+            return $sttA <=> $sttB;
+        }
+        return ($a['id'] ?? 0) <=> ($b['id'] ?? 0);
+    });
     if (!$rows) {
         $flash = 'Vui lòng chọn ít nhất một dòng trong danh sách.';
         $flashType = 'err';
     } elseif ($action === 'print') {
         bangke_render_print($rows);
+        exit;
+    } elseif ($action === 'print_ems') {
+        bangke_render_ems_print($rows);
         exit;
     } else {
         bangke_export_excel($rows, 'bang_ke_lss');
@@ -63,8 +87,35 @@ if ($action === 'print' || $action === 'export') {
     }
 }
 
-// --- Save ---
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'save' || isset($_POST['save']))) {
+// --- Delete single ---
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'delete') {
+    $delId = (int) ($_POST['id'] ?? 0);
+    $delCount = 0;
+    if ($delId > 0) {
+        $delCount = bangke_delete_by_ids($conn, [$delId]);
+    }
+    $ym = trim((string) ($_GET['m'] ?? date('Y-m')));
+    header('Location: bangke.php?m=' . urlencode($ym) . '&deleted=' . ($delCount > 0 ? '1' : '0'));
+    exit;
+}
+
+// --- Delete selected ---
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'delete_selected') {
+    $ids = $_POST['ids'] ?? [];
+    if (!is_array($ids)) {
+        $ids = [];
+    }
+    $delCount = bangke_delete_by_ids($conn, $ids);
+    $ym = trim((string) ($_GET['m'] ?? date('Y-m')));
+    header('Location: bangke.php?m=' . urlencode($ym) . '&deleted=' . $delCount);
+    exit;
+}
+
+// --- Save / Update ---
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['save', 'update'], true)) {
+    $isUpdate = ($action === 'update');
+    $id = (int) ($_POST['id'] ?? 0);
+    $stt = (int) ($_POST['stt'] ?? 0);
     $request_date = trim((string) ($_POST['request_date'] ?? ''));
     $route_leg = trim((string) ($_POST['route_leg'] ?? ''));
     $flight_no = trim((string) ($_POST['flight_no'] ?? ''));
@@ -78,17 +129,63 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'save' || isset($_POST
         $request_date = $today;
     }
 
-    if ($route_leg === '' && $airway_bill === '' && $vin_no === '' && $serial_no === '') {
+    if (!$isUpdate && $stt <= 0) {
+        $ym = substr($request_date, 0, 7);
+        $range = bangke_month_range($ym);
+        if ($range) {
+            $stmtMax = $conn->prepare("SELECT COALESCE(MAX(stt), 0) FROM bangke_items WHERE request_date >= ? AND request_date < ?");
+            $stmtMax->bind_param('ss', $range[0], $range[1]);
+            $stmtMax->execute();
+            $stt = (int) ($stmtMax->get_result()->fetch_row()[0] ?? 0) + 1;
+            $stmtMax->close();
+        } else {
+            $stt = 1;
+        }
+    }
+
+    if ($isUpdate && $id <= 0) {
+        $flash = 'Bản ghi cần sửa không hợp lệ.';
+        $flashType = 'err';
+    } elseif ($route_leg === '' && $airway_bill === '' && $vin_no === '' && $serial_no === '') {
         $flash = 'Nhập ít nhất Chặng, Airway Bill, VIN hoặc Serial.';
         $flashType = 'err';
+    } elseif ($isUpdate) {
+        $stmt = $conn->prepare(
+            "UPDATE bangke_items
+             SET stt = ?, request_date = ?, route_leg = ?, flight_no = ?, airway_bill = ?, vin_no = ?, serial_no = ?, package_count = ?, weight = ?
+             WHERE id = ?"
+        );
+        $stmt->bind_param(
+            'issssssidi',
+            $stt,
+            $request_date,
+            $route_leg,
+            $flight_no,
+            $airway_bill,
+            $vin_no,
+            $serial_no,
+            $package_count,
+            $weight,
+            $id
+        );
+        if ($stmt->execute()) {
+            $stmt->close();
+            $ym = substr($request_date, 0, 7);
+            header('Location: bangke.php?m=' . urlencode($ym) . '&updated=1');
+            exit;
+        }
+        $flash = 'Lỗi cập nhật dữ liệu. Vui lòng thử lại.';
+        $flashType = 'err';
+        $stmt->close();
     } else {
         $stmt = $conn->prepare(
             "INSERT INTO bangke_items
-             (request_date, route_leg, flight_no, airway_bill, vin_no, serial_no, package_count, weight)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+             (stt, request_date, route_leg, flight_no, airway_bill, vin_no, serial_no, package_count, weight)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
         $stmt->bind_param(
-            'ssssssid',
+            'issssssid',
+            $stt,
             $request_date,
             $route_leg,
             $flight_no,
@@ -99,9 +196,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'save' || isset($_POST
             $weight
         );
         if ($stmt->execute()) {
-            $flash = 'Đã lưu bản ghi thành công.';
-            $flashType = 'ok';
-            // Redirect tránh F5 submit lại
+            $stmt->close();
             $ym = substr($request_date, 0, 7);
             header('Location: bangke.php?m=' . urlencode($ym) . '&saved=1');
             exit;
@@ -112,19 +207,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'save' || isset($_POST
     }
 }
 
+// Kiểm tra chế độ sửa bản ghi
+$editId = (int) ($_GET['edit'] ?? 0);
+$editRow = null;
+if ($editId > 0) {
+    $editRow = bangke_fetch_by_id($conn, $editId);
+    if (!$editRow) {
+        $flash = 'Không tìm thấy bản ghi #' . $editId . ' để sửa.';
+        $flashType = 'err';
+    }
+}
+
 if (isset($_GET['saved'])) {
     $flash = 'Đã lưu bản ghi thành công.';
     $flashType = 'ok';
+} elseif (isset($_GET['updated'])) {
+    $flash = 'Đã cập nhật bản ghi thành công.';
+    $flashType = 'ok';
+} elseif (isset($_GET['deleted'])) {
+    $n = (int) $_GET['deleted'];
+    if ($n > 0) {
+        $flash = $n === 1 ? 'Đã xóa bản ghi thành công.' : sprintf('Đã xóa %d bản ghi thành công.', $n);
+        $flashType = 'ok';
+    } else {
+        $flash = 'Không có bản ghi nào bị xóa.';
+        $flashType = 'err';
+    }
 }
 
 $months = bangke_fetch_months($conn);
 $currentMonth = date('Y-m');
 $activeMonth = $importMonth ?? trim((string) ($_GET['m'] ?? ''));
+if ($editRow && !isset($_GET['m'])) {
+    $activeMonth = substr($editRow['request_date'], 0, 7);
+}
 if (!preg_match('/^\d{4}-\d{2}$/', $activeMonth)) {
     $activeMonth = $months[0] ?? $currentMonth;
-}
-if (!in_array($activeMonth, $months, true) && $months) {
-    // Tháng mới chưa có data nhưng user vừa lưu → đã có trong $months
 }
 if (!$months) {
     $months = [$currentMonth];
@@ -142,14 +260,15 @@ foreach ($list as $r) {
 }
 
 $formDefaults = [
-    'request_date' => $_POST['request_date'] ?? $today,
-    'route_leg' => $_POST['route_leg'] ?? '',
-    'flight_no' => $_POST['flight_no'] ?? '',
-    'airway_bill' => $_POST['airway_bill'] ?? '',
-    'vin_no' => $_POST['vin_no'] ?? '',
-    'serial_no' => $_POST['serial_no'] ?? '',
-    'package_count' => $_POST['package_count'] ?? '',
-    'weight' => $_POST['weight'] ?? '',
+    'stt' => $_POST['stt'] ?? ($editRow['stt'] ?? ''),
+    'request_date' => $_POST['request_date'] ?? ($editRow['request_date'] ?? $today),
+    'route_leg' => $_POST['route_leg'] ?? ($editRow['route_leg'] ?? ''),
+    'flight_no' => $_POST['flight_no'] ?? ($editRow['flight_no'] ?? ''),
+    'airway_bill' => $_POST['airway_bill'] ?? ($editRow['airway_bill'] ?? ''),
+    'vin_no' => $_POST['vin_no'] ?? ($editRow['vin_no'] ?? ''),
+    'serial_no' => $_POST['serial_no'] ?? ($editRow['serial_no'] ?? ''),
+    'package_count' => $_POST['package_count'] ?? ($editRow['package_count'] ?? ''),
+    'weight' => $_POST['weight'] ?? ($editRow['weight'] ?? ''),
 ];
 ?>
 <!DOCTYPE html>
@@ -319,6 +438,29 @@ body {
   border: 1px solid var(--line);
 }
 .btn-ghost:hover { background: #e4ecf6; }
+.btn-danger { background: var(--err); color: #fff; }
+.btn-danger:hover { background: #961d14; }
+
+.btn-action {
+  appearance: none; border: 1px solid transparent; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 4px 8px; border-radius: 6px;
+  font-family: inherit; font-size: .80rem; font-weight: 600;
+  text-decoration: none; line-height: 1.25;
+  transition: background .12s, border-color .12s, color .12s, transform .12s;
+}
+.btn-action:hover { transform: translateY(-1px); }
+.btn-action:active { transform: translateY(0); }
+.btn-action-edit {
+  background: #eaf2fd; color: #1652a2; border-color: #c5dbf8; margin-right: 4px;
+}
+.btn-action-edit:hover { background: #d3e5fe; color: #0d3e80; border-color: #9ec5f6; }
+.btn-action-del {
+  background: #fdecea; color: var(--err); border-color: #f7c3be;
+}
+.btn-action-del:hover { background: #fadad7; color: #961d14; border-color: #f2a69f; }
+tbody tr.editing { background: #e7f0fd !important; outline: 2px solid #2b7fff; }
+td.action-col, th.action-col { text-align: center; white-space: nowrap; width: 125px; }
 
 .toolbar {
   display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
@@ -446,15 +588,23 @@ input[type="checkbox"] {
     </div>
   <?php endif; ?>
 
-  <section class="panel">
+  <section class="panel" id="nhap-lieu">
     <div class="panel-hd">
-      <h2>Nhập liệu</h2>
-      <span>Ngày mặc định = hôm nay</span>
+      <h2><?= $editRow ? ('Sửa bản ghi #' . (int) $editRow['id']) : 'Nhập liệu' ?></h2>
+      <span><?= $editRow ? 'Chỉnh sửa thông tin rồi bấm Cập nhật' : 'Ngày mặc định = hôm nay' ?></span>
     </div>
     <div class="panel-bd">
-      <form method="post" autocomplete="off">
-        <input type="hidden" name="action" value="save">
+      <form method="post" autocomplete="off" action="bangke.php?m=<?= urlencode($activeMonth) ?>">
+        <input type="hidden" name="action" value="<?= $editRow ? 'update' : 'save' ?>">
+        <?php if ($editRow): ?>
+          <input type="hidden" name="id" value="<?= (int) $editRow['id'] ?>">
+        <?php endif; ?>
         <div class="form-grid">
+          <div class="field">
+            <label for="stt">STT</label>
+            <input class="mono" type="number" id="stt" name="stt" min="1" step="1" placeholder="Tự động"
+                   value="<?= $formDefaults['stt'] ? (int) $formDefaults['stt'] : '' ?>">
+          </div>
           <div class="field">
             <label for="request_date">Ngày yêu cầu</label>
             <input type="date" id="request_date" name="request_date" required
@@ -497,8 +647,13 @@ input[type="checkbox"] {
           </div>
         </div>
         <div class="form-actions">
-          <button type="reset" class="btn btn-ghost">Xóa form</button>
-          <button type="submit" class="btn btn-primary">Lưu bản ghi</button>
+          <?php if ($editRow): ?>
+            <a href="bangke.php?m=<?= urlencode($activeMonth) ?>" class="btn btn-ghost">Hủy sửa</a>
+            <button type="submit" class="btn btn-primary">Cập nhật bản ghi</button>
+          <?php else: ?>
+            <button type="reset" class="btn btn-ghost">Xóa form</button>
+            <button type="submit" class="btn btn-primary">Lưu bản ghi</button>
+          <?php endif; ?>
         </div>
       </form>
     </div>
@@ -523,8 +678,8 @@ input[type="checkbox"] {
           <button type="submit" class="btn btn-primary" id="btnImport">Import</button>
         </div>
         <p class="import-hint">
-          Dòng đầu là tiêu đề cột: Ngày yêu cầu, Chặng, Số hiệu chuyến bay, Airway Bill, Số VIN, Số Serial, Số kiện, Khối lượng.
-          Ngày ghi dạng dd/mm/yyyy (bỏ trống = hôm nay). Dòng trùng Airway Bill + VIN + Serial với dữ liệu đã có sẽ được bỏ qua.
+          Dòng đầu là tiêu đề cột: STT, Ngày yêu cầu, Chặng, Số hiệu chuyến bay, Airway Bill, Số VIN, Số Serial, Số kiện, Khối lượng.
+          Ngày ghi dạng dd/mm/yyyy (bỏ trống = hôm nay). STT bỏ trống sẽ tự động sinh tăng dần theo thứ tự dòng. Dòng trùng Airway Bill + VIN + Serial với dữ liệu đã có sẽ được bỏ qua.
         </p>
       </form>
     </div>
@@ -540,7 +695,9 @@ input[type="checkbox"] {
         <div class="toolbar">
           <button type="button" class="btn btn-ghost" id="btnSelectAll">Chọn tất cả</button>
           <button type="submit" name="action" value="print" class="btn btn-navy" id="btnPrint">In bill</button>
+          <button type="submit" name="action" value="print_ems" class="btn btn-navy" id="btnEms" style="background:#1a5fa8">In bill EMS</button>
           <button type="submit" name="action" value="export" class="btn btn-primary" id="btnExport">Xuất Excel</button>
+          <button type="button" class="btn btn-danger" id="btnDeleteSelected">Xóa đã chọn</button>
           <div class="grow" id="selectedHint">Chưa chọn dòng nào</div>
           <div class="stats">
             <div class="stat">Kiện: <b><?= (int) $sumPkg ?></b></div>
@@ -565,15 +722,17 @@ input[type="checkbox"] {
                   <th>Số Serial</th>
                   <th class="num">Số kiện</th>
                   <th class="num">KL (kg)</th>
+                  <th class="action-col">Thao tác</th>
                 </tr>
               </thead>
               <tbody>
               <?php foreach ($list as $i => $r): ?>
-                <tr>
+                <tr class="<?= ($editId === (int) $r['id']) ? 'editing' : '' ?>">
                   <td class="check">
                     <input type="checkbox" class="row-check" name="ids[]" value="<?= (int) $r['id'] ?>">
+                    <input type="hidden" name="stt[<?= (int) $r['id'] ?>]" value="<?= (int) (!empty($r['stt']) ? $r['stt'] : ($i + 1)) ?>">
                   </td>
-                  <td><?= $i + 1 ?></td>
+                  <td class="mono"><strong><?= (int) (!empty($r['stt']) ? $r['stt'] : ($i + 1)) ?></strong></td>
                   <td><?= bangke_h(date('d/m/Y', strtotime($r['request_date']))) ?></td>
                   <td><?= bangke_h($r['route_leg']) ?></td>
                   <td class="mono"><?= bangke_h($r['flight_no']) ?></td>
@@ -582,6 +741,14 @@ input[type="checkbox"] {
                   <td class="mono"><?= bangke_h($r['serial_no']) ?></td>
                   <td class="num"><?= (int) $r['package_count'] ?></td>
                   <td class="num"><?= bangke_h(rtrim(rtrim(number_format((float) $r['weight'], 2, '.', ''), '0'), '.') ?: '0') ?></td>
+                  <td class="action-col">
+                    <a class="btn-action btn-action-edit"
+                       href="bangke.php?m=<?= urlencode($activeMonth) ?>&edit=<?= (int) $r['id'] ?>#nhap-lieu"
+                       title="Sửa bản ghi #<?= (int) $r['id'] ?>">Sửa</a>
+                    <button type="button" class="btn-action btn-action-del"
+                            onclick="confirmDelete(<?= (int) $r['id'] ?>)"
+                            title="Xóa bản ghi #<?= (int) $r['id'] ?>">Xóa</button>
+                  </td>
                 </tr>
               <?php endforeach; ?>
               </tbody>
@@ -598,6 +765,11 @@ input[type="checkbox"] {
           <?php endforeach; ?>
         </nav>
       </form>
+
+      <form id="singleDeleteForm" method="post" action="bangke.php?m=<?= urlencode($activeMonth) ?>" style="display:none">
+        <input type="hidden" name="action" value="delete">
+        <input type="hidden" name="id" id="deleteTargetId" value="">
+      </form>
     </div>
   </section>
 </div>
@@ -609,7 +781,9 @@ input[type="checkbox"] {
   var hint = document.getElementById('selectedHint');
   var btnSelectAll = document.getElementById('btnSelectAll');
   var btnPrint = document.getElementById('btnPrint');
+  var btnEms = document.getElementById('btnEms');
   var btnExport = document.getElementById('btnExport');
+  var btnDeleteSelected = document.getElementById('btnDeleteSelected');
 
   function selectedCount() {
     return checks.filter(function (c) { return c.checked; }).length;
@@ -629,7 +803,9 @@ input[type="checkbox"] {
     }
     var disabled = n === 0;
     if (btnPrint) btnPrint.disabled = disabled;
+    if (btnEms) btnEms.disabled = disabled;
     if (btnExport) btnExport.disabled = disabled;
+    if (btnDeleteSelected) btnDeleteSelected.disabled = disabled;
     checks.forEach(syncRowStyle);
   }
 
@@ -652,6 +828,32 @@ input[type="checkbox"] {
     c.addEventListener('change', refresh);
   });
 
+  if (btnDeleteSelected) {
+    btnDeleteSelected.addEventListener('click', function () {
+      var n = selectedCount();
+      if (n === 0) {
+        alert('Vui lòng chọn ít nhất một dòng để xóa.');
+        return;
+      }
+      if (confirm('Bạn có chắc chắn muốn xóa ' + n + ' dòng đã chọn không? Thao tác này không thể hoàn tác.')) {
+        var form = document.getElementById('listForm');
+        var input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'action';
+        input.value = 'delete_selected';
+        form.appendChild(input);
+        form.submit();
+      }
+    });
+  }
+
+  window.confirmDelete = function (id) {
+    if (confirm('Bạn có chắc chắn muốn xóa bản ghi #' + id + ' không?')) {
+      document.getElementById('deleteTargetId').value = id;
+      document.getElementById('singleDeleteForm').submit();
+    }
+  };
+
   document.getElementById('listForm').addEventListener('submit', function (e) {
     if (selectedCount() === 0) {
       e.preventDefault();
@@ -663,14 +865,21 @@ input[type="checkbox"] {
 
   var importFile = document.getElementById('importFile');
   var importFileName = document.getElementById('importFileName');
-  importFile.addEventListener('change', function () {
-    importFileName.textContent = importFile.files.length ? importFile.files[0].name : 'Chưa chọn file';
-  });
-  document.getElementById('importForm').addEventListener('submit', function () {
-    var btn = document.getElementById('btnImport');
-    btn.disabled = true;
-    btn.textContent = 'Đang import…';
-  });
+  if (importFile) {
+    importFile.addEventListener('change', function () {
+      importFileName.textContent = importFile.files.length ? importFile.files[0].name : 'Chưa chọn file';
+    });
+  }
+  var importForm = document.getElementById('importForm');
+  if (importForm) {
+    importForm.addEventListener('submit', function () {
+      var btn = document.getElementById('btnImport');
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Đang import…';
+      }
+    });
+  }
 })();
 </script>
 </body>

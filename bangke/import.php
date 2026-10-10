@@ -33,6 +33,7 @@ function bangke_import_normalize_header(string $s): string
 function bangke_import_header_aliases(): array
 {
     return [
+        'stt' => ['stt', 'sothutu', 'no', 'num', 'order', 'thutu', 'sttno'],
         'request_date' => ['ngayyeucau', 'ngay', 'date', 'bookingdate', 'ngayyeucaubookingdate'],
         'route_leg' => ['chang', 'route', 'tuyen', 'changbay'],
         'flight_no' => ['sohieuchuyenbay', 'chuyenbay', 'flight', 'flightno', 'sohieu', 'sochuyenbay'],
@@ -347,6 +348,28 @@ function bangke_import_file(mysqli $conn, array $file): array
     $seen = [];
     $skipped = 0;
 
+    // Quản lý STT theo tháng: nếu người dùng không nhập hoặc quên nhập, tự động sinh tăng dần
+    $maxSttByMonth = [];
+    $getMaxStt = static function (string $ym) use ($conn, &$maxSttByMonth): int {
+        if (isset($maxSttByMonth[$ym])) {
+            return $maxSttByMonth[$ym];
+        }
+        $range = bangke_month_range($ym);
+        if (!$range) {
+            $maxSttByMonth[$ym] = 0;
+            return 0;
+        }
+        $stmt = $conn->prepare("SELECT COALESCE(MAX(stt), 0) FROM bangke_items WHERE request_date >= ? AND request_date < ?");
+        $stmt->bind_param('ss', $range[0], $range[1]);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        $val = (int) ($res->fetch_row()[0] ?? 0);
+        $stmt->close();
+        $maxSttByMonth[$ym] = $val;
+        return $val;
+    };
+    $runningSttByMonth = [];
+
     $total = count($rows);
     for ($i = $headerIdx + 1; $i < $total; $i++) {
         $excelRow = $i + 1;
@@ -389,6 +412,24 @@ function bangke_import_file(mysqli $conn, array $file): array
         }
         $row['request_date'] = $date === '' ? $today : $date;
 
+        $rawStt = bangke_import_parse_number($get('stt'));
+        $parsedStt = ($rawStt !== null && $rawStt > 0) ? (int) round($rawStt) : 0;
+
+        $ym = substr($row['request_date'], 0, 7);
+        if (!isset($runningSttByMonth[$ym])) {
+            $runningSttByMonth[$ym] = $getMaxStt($ym);
+        }
+        if ($parsedStt > 0) {
+            $row['stt'] = $parsedStt;
+            if ($row['stt'] > $runningSttByMonth[$ym]) {
+                $runningSttByMonth[$ym] = $row['stt'];
+            }
+        } else {
+            // Không/quên nhập STT -> tự động sinh tăng dần
+            $runningSttByMonth[$ym]++;
+            $row['stt'] = $runningSttByMonth[$ym];
+        }
+
         $pkg = bangke_import_parse_number($get('package_count'));
         $weight = bangke_import_parse_number($get('weight'));
         if ($pkg === null || $pkg < 0) {
@@ -427,8 +468,8 @@ function bangke_import_file(mysqli $conn, array $file): array
         );
         $insStmt = $conn->prepare(
             "INSERT INTO bangke_items
-             (request_date, route_leg, flight_no, airway_bill, vin_no, serial_no, package_count, weight)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+             (stt, request_date, route_leg, flight_no, airway_bill, vin_no, serial_no, package_count, weight)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
 
         $conn->begin_transaction();
@@ -444,7 +485,8 @@ function bangke_import_file(mysqli $conn, array $file): array
                     }
                 }
                 $insStmt->bind_param(
-                    'ssssssid',
+                    'issssssid',
+                    $r['stt'],
                     $r['request_date'],
                     $r['route_leg'],
                     $r['flight_no'],
@@ -485,8 +527,8 @@ function bangke_import_send_template(): void
     header('Pragma: no-cache');
     header('Expires: 0');
 
-    $headers = ['Ngày yêu cầu', 'Chặng', 'Số hiệu chuyến bay', 'Airway Bill', 'Số VIN', 'Số Serial', 'Số kiện', 'Khối lượng (kg)'];
-    $widths = [90, 140, 110, 120, 150, 120, 60, 90];
+    $headers = ['STT', 'Ngày yêu cầu', 'Chặng', 'Số hiệu chuyến bay', 'Airway Bill', 'Số VIN', 'Số Serial', 'Số kiện', 'Khối lượng (kg)'];
+    $widths = [50, 90, 140, 110, 120, 150, 120, 60, 90];
 
     echo "\xEF\xBB\xBF";
     echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
@@ -496,7 +538,7 @@ function bangke_import_send_template(): void
     echo ' <Worksheet ss:Name="Import"><Table>' . "\n";
     foreach ($widths as $i => $w) {
         // Cột ngày + mã để dạng text, tránh Excel tự đổi VIN/Serial dài thành số khoa học
-        $style = in_array($i, [0, 3, 4, 5], true) ? ' ss:StyleID="T"' : '';
+        $style = in_array($i, [1, 4, 5, 6], true) ? ' ss:StyleID="T"' : '';
         echo '  <Column ss:Width="' . $w . '"' . $style . '/>' . "\n";
     }
     echo '  <Row>';
