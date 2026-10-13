@@ -63,8 +63,13 @@ if ($action === 'print' || $action === 'print_ems' || $action === 'export') {
         }
     }
     unset($row);
-    // Sắp xếp các dòng theo STT tăng dần để in bill đúng thứ tự STT
+    // Sắp xếp các dòng theo tháng và STT tăng dần để in bill đúng thứ tự STT
     usort($rows, static function ($a, $b) {
+        $ymA = substr((string) ($a['request_date'] ?? ''), 0, 7);
+        $ymB = substr((string) ($b['request_date'] ?? ''), 0, 7);
+        if ($ymA !== $ymB) {
+            return $ymA <=> $ymB;
+        }
         $sttA = (int) (!empty($a['_stt']) ? $a['_stt'] : (!empty($a['stt']) ? $a['stt'] : 999999));
         $sttB = (int) (!empty($b['_stt']) ? $b['_stt'] : (!empty($b['stt']) ? $b['stt'] : 999999));
         if ($sttA !== $sttB) {
@@ -87,6 +92,82 @@ if ($action === 'print' || $action === 'print_ems' || $action === 'export') {
     }
 }
 
+// --- Đọc các tham số bộ lọc tìm kiếm ---
+$filterDateFrom = trim((string) ($_GET['date_from'] ?? ''));
+$filterDateTo = trim((string) ($_GET['date_to'] ?? ''));
+$filterRoute = trim((string) ($_GET['route'] ?? ''));
+$filterFlight = trim((string) ($_GET['flight'] ?? ''));
+$filterAwb = trim((string) ($_GET['awb'] ?? ''));
+$filterVinSerial = trim((string) ($_GET['vin_serial'] ?? ''));
+
+$months = bangke_fetch_months($conn);
+$currentMonth = date('Y-m');
+$reqMonth = trim((string) ($_GET['m'] ?? ''));
+
+// Kiểm tra chế độ sửa bản ghi sớm để xác định tháng nếu chưa có m
+$editId = (int) ($_GET['edit'] ?? 0);
+$editRow = null;
+if ($editId > 0) {
+    $editRow = bangke_fetch_by_id($conn, $editId);
+    if (!$editRow) {
+        $flash = 'Không tìm thấy bản ghi #' . $editId . ' để sửa.';
+        $flashType = 'err';
+    }
+}
+
+if ($importMonth !== null) {
+    $activeMonth = $importMonth;
+} elseif ($reqMonth === 'all') {
+    $activeMonth = 'all';
+} elseif (preg_match('/^\d{4}-\d{2}$/', $reqMonth)) {
+    $activeMonth = $reqMonth;
+} elseif ($editRow && $reqMonth === '') {
+    $activeMonth = substr($editRow['request_date'], 0, 7);
+} else {
+    $activeMonth = $months[0] ?? $currentMonth;
+}
+
+if (!$months) {
+    $months = [$currentMonth];
+}
+
+$isFilterActive = (
+    $activeMonth === 'all'
+    || $filterDateFrom !== ''
+    || $filterDateTo !== ''
+    || $filterRoute !== ''
+    || $filterFlight !== ''
+    || $filterAwb !== ''
+    || $filterVinSerial !== ''
+);
+
+// Mảng tham số query để bảo lưu bộ lọc qua các link, form và redirect
+$filterParams = [];
+if ($activeMonth !== '') {
+    $filterParams['m'] = $activeMonth;
+}
+if ($filterDateFrom !== '') {
+    $filterParams['date_from'] = $filterDateFrom;
+}
+if ($filterDateTo !== '') {
+    $filterParams['date_to'] = $filterDateTo;
+}
+if ($filterRoute !== '') {
+    $filterParams['route'] = $filterRoute;
+}
+if ($filterFlight !== '') {
+    $filterParams['flight'] = $filterFlight;
+}
+if ($filterAwb !== '') {
+    $filterParams['awb'] = $filterAwb;
+}
+if ($filterVinSerial !== '') {
+    $filterParams['vin_serial'] = $filterVinSerial;
+}
+
+$pageQuery = http_build_query($filterParams);
+$pageUrl = 'bangke.php' . ($pageQuery !== '' ? '?' . $pageQuery : '');
+
 // --- Delete single ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'delete') {
     $delId = (int) ($_POST['id'] ?? 0);
@@ -94,8 +175,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'delete') {
     if ($delId > 0) {
         $delCount = bangke_delete_by_ids($conn, [$delId]);
     }
-    $ym = trim((string) ($_GET['m'] ?? date('Y-m')));
-    header('Location: bangke.php?m=' . urlencode($ym) . '&deleted=' . ($delCount > 0 ? '1' : '0'));
+    $redirParams = $filterParams;
+    $redirParams['deleted'] = ($delCount > 0 ? '1' : '0');
+    header('Location: bangke.php?' . http_build_query($redirParams));
     exit;
 }
 
@@ -106,8 +188,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'delete_selected') {
         $ids = [];
     }
     $delCount = bangke_delete_by_ids($conn, $ids);
-    $ym = trim((string) ($_GET['m'] ?? date('Y-m')));
-    header('Location: bangke.php?m=' . urlencode($ym) . '&deleted=' . $delCount);
+    $redirParams = $filterParams;
+    $redirParams['deleted'] = (string) $delCount;
+    header('Location: bangke.php?' . http_build_query($redirParams));
     exit;
 }
 
@@ -170,8 +253,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['save', 'update'
         );
         if ($stmt->execute()) {
             $stmt->close();
-            $ym = substr($request_date, 0, 7);
-            header('Location: bangke.php?m=' . urlencode($ym) . '&updated=1');
+            $redirParams = $filterParams;
+            $redirParams['updated'] = '1';
+            header('Location: bangke.php?' . http_build_query($redirParams));
             exit;
         }
         $flash = 'Lỗi cập nhật dữ liệu. Vui lòng thử lại.';
@@ -207,17 +291,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['save', 'update'
     }
 }
 
-// Kiểm tra chế độ sửa bản ghi
-$editId = (int) ($_GET['edit'] ?? 0);
-$editRow = null;
-if ($editId > 0) {
-    $editRow = bangke_fetch_by_id($conn, $editId);
-    if (!$editRow) {
-        $flash = 'Không tìm thấy bản ghi #' . $editId . ' để sửa.';
-        $flashType = 'err';
-    }
-}
-
 if (isset($_GET['saved'])) {
     $flash = 'Đã lưu bản ghi thành công.';
     $flashType = 'ok';
@@ -235,23 +308,15 @@ if (isset($_GET['saved'])) {
     }
 }
 
-$months = bangke_fetch_months($conn);
-$currentMonth = date('Y-m');
-$activeMonth = $importMonth ?? trim((string) ($_GET['m'] ?? ''));
-if ($editRow && !isset($_GET['m'])) {
-    $activeMonth = substr($editRow['request_date'], 0, 7);
-}
-if (!preg_match('/^\d{4}-\d{2}$/', $activeMonth)) {
-    $activeMonth = $months[0] ?? $currentMonth;
-}
-if (!$months) {
-    $months = [$currentMonth];
-    $activeMonth = $currentMonth;
-} elseif (!in_array($activeMonth, $months, true)) {
-    $activeMonth = $months[0];
-}
-
-$list = bangke_fetch_by_month($conn, $activeMonth);
+$list = bangke_fetch_items($conn, [
+    'month' => $activeMonth,
+    'date_from' => $filterDateFrom,
+    'date_to' => $filterDateTo,
+    'route' => $filterRoute,
+    'flight' => $filterFlight,
+    'awb' => $filterAwb,
+    'vin_serial' => $filterVinSerial,
+]);
 $sumPkg = 0;
 $sumW = 0.0;
 foreach ($list as $r) {
@@ -397,7 +462,7 @@ body {
   font-size: .78rem; font-weight: 700; text-transform: uppercase;
   letter-spacing: .04em; color: var(--muted);
 }
-.field input {
+.field input, .field select {
   width: 100%;
   border: 1.5px solid var(--line);
   border-radius: 10px;
@@ -408,7 +473,7 @@ body {
   background: #fbfcfe;
   transition: border-color .15s, box-shadow .15s, background .15s;
 }
-.field input:focus {
+.field input:focus, .field select:focus {
   outline: none;
   border-color: #3d7ab5;
   background: #fff;
@@ -418,6 +483,39 @@ body {
   display: flex; justify-content: flex-end; gap: 10px;
   margin-top: 16px; padding-top: 4px;
 }
+
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+.filter-actions {
+  display: flex; justify-content: flex-end; align-items: center; gap: 10px;
+  margin-top: 16px; padding-top: 4px;
+}
+.filter-tags {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+  margin-top: 16px; padding-top: 14px;
+  border-top: 1px dashed var(--line);
+  font-size: .88rem;
+}
+.filter-tag-label {
+  color: var(--muted); font-weight: 700; text-transform: uppercase;
+  font-size: .75rem; letter-spacing: .04em;
+}
+.filter-tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: #eef3f9; border: 1px solid var(--line); border-radius: 8px;
+  padding: 4px 10px; color: var(--navy); font-size: .84rem;
+}
+.filter-tag b { color: var(--ink); }
+.filter-tag-clear {
+  color: var(--err); text-decoration: none; font-weight: 700;
+  font-size: .84rem; margin-left: 6px; padding: 4px 8px;
+  border-radius: 6px; background: var(--err-bg);
+  transition: background .12s;
+}
+.filter-tag-clear:hover { background: #fad7d4; }
 
 .btn {
   appearance: none; border: 0; cursor: pointer;
@@ -550,15 +648,15 @@ input[type="checkbox"] {
 }
 
 @media (max-width: 900px) {
-  .form-grid { grid-template-columns: repeat(2, 1fr); }
+  .form-grid, .filter-grid { grid-template-columns: repeat(2, 1fr); }
   .field.span2 { grid-column: span 2; }
   .hero { flex-direction: column; align-items: flex-start; }
 }
 @media (max-width: 560px) {
-  .form-grid { grid-template-columns: 1fr; }
+  .form-grid, .filter-grid { grid-template-columns: 1fr; }
   .field.span2 { grid-column: auto; }
-  .form-actions { justify-content: stretch; }
-  .form-actions .btn { width: 100%; }
+  .form-actions, .filter-actions { justify-content: stretch; }
+  .form-actions .btn, .filter-actions .btn { width: 100%; }
 }
 </style>
 </head>
@@ -594,7 +692,7 @@ input[type="checkbox"] {
       <span><?= $editRow ? 'Chỉnh sửa thông tin rồi bấm Cập nhật' : 'Ngày mặc định = hôm nay' ?></span>
     </div>
     <div class="panel-bd">
-      <form method="post" autocomplete="off" action="bangke.php?m=<?= urlencode($activeMonth) ?>">
+      <form method="post" autocomplete="off" action="<?= bangke_h($pageUrl) ?>">
         <input type="hidden" name="action" value="<?= $editRow ? 'update' : 'save' ?>">
         <?php if ($editRow): ?>
           <input type="hidden" name="id" value="<?= (int) $editRow['id'] ?>">
@@ -648,7 +746,7 @@ input[type="checkbox"] {
         </div>
         <div class="form-actions">
           <?php if ($editRow): ?>
-            <a href="bangke.php?m=<?= urlencode($activeMonth) ?>" class="btn btn-ghost">Hủy sửa</a>
+            <a href="<?= bangke_h($pageUrl) ?>" class="btn btn-ghost">Hủy sửa</a>
             <button type="submit" class="btn btn-primary">Cập nhật bản ghi</button>
           <?php else: ?>
             <button type="reset" class="btn btn-ghost">Xóa form</button>
@@ -685,13 +783,99 @@ input[type="checkbox"] {
     </div>
   </section>
 
+  <section class="panel" id="bo-loc">
+    <div class="panel-hd">
+      <h2>Bộ lọc &amp; Tìm kiếm</h2>
+      <span>Lọc theo ngày, chặng bay, chuyến bay, số bill, số VIN / Serial...</span>
+    </div>
+    <div class="panel-bd">
+      <form method="get" action="bangke.php" id="filterForm">
+        <div class="filter-grid">
+          <div class="field">
+            <label for="f_m">Tháng</label>
+            <select id="f_m" name="m">
+              <option value="all" <?= $activeMonth === 'all' ? 'selected' : '' ?>>Tất cả các tháng</option>
+              <?php foreach ($months as $ym): ?>
+                <option value="<?= bangke_h($ym) ?>" <?= $activeMonth === $ym ? 'selected' : '' ?>>
+                  Tháng <?= bangke_h(bangke_month_label($ym)) ?>
+                </option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+          <div class="field">
+            <label for="f_date_from">Từ ngày</label>
+            <input type="date" id="f_date_from" name="date_from" value="<?= bangke_h($filterDateFrom) ?>">
+          </div>
+          <div class="field">
+            <label for="f_date_to">Đến ngày</label>
+            <input type="date" id="f_date_to" name="date_to" value="<?= bangke_h($filterDateTo) ?>">
+          </div>
+          <div class="field">
+            <label for="f_route">Chặng bay</label>
+            <input type="text" id="f_route" name="route" placeholder="VD: HAN, SGN, BMV..." value="<?= bangke_h($filterRoute) ?>">
+          </div>
+          <div class="field">
+            <label for="f_flight">Số hiệu chuyến bay</label>
+            <input class="mono" type="text" id="f_flight" name="flight" placeholder="VD: VN1603..." value="<?= bangke_h($filterFlight) ?>">
+          </div>
+          <div class="field">
+            <label for="f_awb">Airway Bill (Số bill)</label>
+            <input class="mono" type="text" id="f_awb" name="awb" placeholder="VD: 738-..." value="<?= bangke_h($filterAwb) ?>">
+          </div>
+          <div class="field span2">
+            <label for="f_vin_serial">Số VIN / Serial</label>
+            <input class="mono" type="text" id="f_vin_serial" name="vin_serial" placeholder="Nhập số VIN hoặc Serial..." value="<?= bangke_h($filterVinSerial) ?>">
+          </div>
+        </div>
+        <div class="filter-actions">
+          <?php if ($isFilterActive): ?>
+            <a href="bangke.php?m=<?= urlencode($activeMonth === 'all' ? ($months[0] ?? date('Y-m')) : $activeMonth) ?>" class="btn btn-ghost" title="Xóa các điều kiện lọc và quay về tháng mặc định">
+              ✕ Đặt lại
+            </a>
+          <?php endif; ?>
+          <button type="submit" class="btn btn-navy">🔍 Tìm kiếm</button>
+        </div>
+      </form>
+
+      <?php if ($isFilterActive): ?>
+        <div class="filter-tags">
+          <span class="filter-tag-label">Đang lọc:</span>
+          <?php if ($activeMonth === 'all'): ?>
+            <span class="filter-tag">Tháng: <b>Tất cả các tháng</b></span>
+          <?php elseif ($activeMonth !== ''): ?>
+            <span class="filter-tag">Tháng: <b><?= bangke_h(bangke_month_label($activeMonth)) ?></b></span>
+          <?php endif; ?>
+          <?php if ($filterDateFrom !== ''): ?>
+            <span class="filter-tag">Từ ngày: <b><?= bangke_h(date('d/m/Y', strtotime($filterDateFrom))) ?></b></span>
+          <?php endif; ?>
+          <?php if ($filterDateTo !== ''): ?>
+            <span class="filter-tag">Đến ngày: <b><?= bangke_h(date('d/m/Y', strtotime($filterDateTo))) ?></b></span>
+          <?php endif; ?>
+          <?php if ($filterRoute !== ''): ?>
+            <span class="filter-tag">Chặng: <b><?= bangke_h($filterRoute) ?></b></span>
+          <?php endif; ?>
+          <?php if ($filterFlight !== ''): ?>
+            <span class="filter-tag">Chuyến: <b><?= bangke_h($filterFlight) ?></b></span>
+          <?php endif; ?>
+          <?php if ($filterAwb !== ''): ?>
+            <span class="filter-tag">Số bill: <b><?= bangke_h($filterAwb) ?></b></span>
+          <?php endif; ?>
+          <?php if ($filterVinSerial !== ''): ?>
+            <span class="filter-tag">VIN/Serial: <b><?= bangke_h($filterVinSerial) ?></b></span>
+          <?php endif; ?>
+          <a href="bangke.php?m=<?= urlencode($activeMonth === 'all' ? ($months[0] ?? date('Y-m')) : $activeMonth) ?>" class="filter-tag-clear" title="Xóa toàn bộ bộ lọc">Xóa lọc</a>
+        </div>
+      <?php endif; ?>
+    </div>
+  </section>
+
   <section class="panel">
     <div class="panel-hd">
-      <h2>Danh sách tháng <?= bangke_h(bangke_month_label($activeMonth)) ?></h2>
+      <h2><?= $isFilterActive ? 'Kết quả tìm kiếm' : ('Danh sách tháng ' . bangke_h(bangke_month_label($activeMonth))) ?></h2>
       <span><?= count($list) ?> dòng</span>
     </div>
     <div class="panel-bd">
-      <form method="post" id="listForm" action="bangke.php?m=<?= urlencode($activeMonth) ?>">
+      <form method="post" id="listForm" action="<?= bangke_h($pageUrl) ?>">
         <div class="toolbar">
           <button type="button" class="btn btn-ghost" id="btnSelectAll">Chọn tất cả</button>
           <button type="submit" name="action" value="print" class="btn btn-navy" id="btnPrint">In bill</button>
@@ -700,6 +884,7 @@ input[type="checkbox"] {
           <button type="button" class="btn btn-danger" id="btnDeleteSelected">Xóa đã chọn</button>
           <div class="grow" id="selectedHint">Chưa chọn dòng nào</div>
           <div class="stats">
+            <div class="stat">Dòng: <b><?= count($list) ?></b></div>
             <div class="stat">Kiện: <b><?= (int) $sumPkg ?></b></div>
             <div class="stat">KL: <b><?= bangke_h(rtrim(rtrim(number_format($sumW, 2, '.', ''), '0'), '.') ?: '0') ?></b> kg</div>
           </div>
@@ -707,7 +892,9 @@ input[type="checkbox"] {
 
         <div class="table-wrap">
           <?php if (!$list): ?>
-            <div class="empty">Chưa có dữ liệu trong tháng này. Hãy nhập form phía trên rồi bấm Lưu.</div>
+            <div class="empty">
+              <?= $isFilterActive ? 'Không tìm thấy kết quả nào phù hợp với bộ lọc tìm kiếm.' : 'Chưa có dữ liệu trong tháng này. Hãy nhập form phía trên rồi bấm Lưu.' ?>
+            </div>
           <?php else: ?>
             <table>
               <thead>
@@ -727,6 +914,9 @@ input[type="checkbox"] {
               </thead>
               <tbody>
               <?php foreach ($list as $i => $r): ?>
+                <?php
+                $rowEditUrl = 'bangke.php?' . http_build_query(array_merge($filterParams, ['edit' => (int) $r['id']])) . '#nhap-lieu';
+                ?>
                 <tr class="<?= ($editId === (int) $r['id']) ? 'editing' : '' ?>">
                   <td class="check">
                     <input type="checkbox" class="row-check" name="ids[]" value="<?= (int) $r['id'] ?>">
@@ -743,7 +933,7 @@ input[type="checkbox"] {
                   <td class="num"><?= bangke_h(rtrim(rtrim(number_format((float) $r['weight'], 2, '.', ''), '0'), '.') ?: '0') ?></td>
                   <td class="action-col">
                     <a class="btn-action btn-action-edit"
-                       href="bangke.php?m=<?= urlencode($activeMonth) ?>&edit=<?= (int) $r['id'] ?>#nhap-lieu"
+                       href="<?= bangke_h($rowEditUrl) ?>"
                        title="Sửa bản ghi #<?= (int) $r['id'] ?>">Sửa</a>
                     <button type="button" class="btn-action btn-action-del"
                             onclick="confirmDelete(<?= (int) $r['id'] ?>)"
@@ -756,17 +946,29 @@ input[type="checkbox"] {
           <?php endif; ?>
         </div>
 
+        <?php
+        $tabParams = array_filter([
+            'route' => $filterRoute,
+            'flight' => $filterFlight,
+            'awb' => $filterAwb,
+            'vin_serial' => $filterVinSerial,
+        ]);
+        ?>
         <nav class="sheet-bar" aria-label="Tab theo tháng">
+          <a class="sheet-tab <?= $activeMonth === 'all' ? 'active' : '' ?>"
+             href="bangke.php?<?= bangke_h(http_build_query(array_merge(['m' => 'all'], $tabParams))) ?>">
+            Tất cả các tháng
+          </a>
           <?php foreach ($months as $ym): ?>
             <a class="sheet-tab <?= $ym === $activeMonth ? 'active' : '' ?>"
-               href="bangke.php?m=<?= urlencode($ym) ?>">
+               href="bangke.php?<?= bangke_h(http_build_query(array_merge(['m' => $ym], $tabParams))) ?>">
               <?= bangke_h(bangke_month_label($ym)) ?>
             </a>
           <?php endforeach; ?>
         </nav>
       </form>
 
-      <form id="singleDeleteForm" method="post" action="bangke.php?m=<?= urlencode($activeMonth) ?>" style="display:none">
+      <form id="singleDeleteForm" method="post" action="<?= bangke_h($pageUrl) ?>" style="display:none">
         <input type="hidden" name="action" value="delete">
         <input type="hidden" name="id" id="deleteTargetId" value="">
       </form>
@@ -828,6 +1030,24 @@ input[type="checkbox"] {
     c.addEventListener('change', refresh);
   });
 
+  if (btnPrint) {
+    btnPrint.addEventListener('click', function () {
+      document.getElementById('listForm').target = '_blank';
+    });
+  }
+
+  if (btnEms) {
+    btnEms.addEventListener('click', function () {
+      document.getElementById('listForm').target = '_blank';
+    });
+  }
+
+  if (btnExport) {
+    btnExport.addEventListener('click', function () {
+      document.getElementById('listForm').target = '_self';
+    });
+  }
+
   if (btnDeleteSelected) {
     btnDeleteSelected.addEventListener('click', function () {
       var n = selectedCount();
@@ -837,6 +1057,7 @@ input[type="checkbox"] {
       }
       if (confirm('Bạn có chắc chắn muốn xóa ' + n + ' dòng đã chọn không? Thao tác này không thể hoàn tác.')) {
         var form = document.getElementById('listForm');
+        form.target = '_self';
         var input = document.createElement('input');
         input.type = 'hidden';
         input.name = 'action';

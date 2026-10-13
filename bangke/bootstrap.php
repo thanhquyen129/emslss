@@ -266,29 +266,140 @@ function bangke_fmt_weight($weight): string
     return ($w === '' ? '0' : $w);
 }
 
-function bangke_fetch_by_month(mysqli $conn, string $ym): array
+/**
+ * Lấy danh sách bản ghi theo bộ lọc linh hoạt:
+ * - month: 'YYYY-MM' hoặc 'all'
+ * - date_from: 'YYYY-MM-DD'
+ * - date_to: 'YYYY-MM-DD'
+ * - route: Chặng bay (tìm kiếm LIKE)
+ * - flight: Số hiệu chuyến bay (tìm kiếm LIKE)
+ * - awb: Airway Bill (tìm kiếm LIKE)
+ * - vin_serial: Số VIN hoặc Serial (tìm kiếm LIKE)
+ * - q: Từ khóa tìm kiếm tự do trên nhiều trường
+ *
+ * @param mysqli $conn
+ * @param array<string, mixed> $filters
+ * @return array<int, array<string, mixed>>
+ */
+function bangke_fetch_items(mysqli $conn, array $filters = []): array
 {
-    $range = bangke_month_range($ym);
-    if (!$range) {
+    $where = [];
+    $params = [];
+    $types = '';
+
+    // 1. Lọc theo tháng (nếu chỉ định và khác 'all')
+    $month = trim((string) ($filters['month'] ?? ''));
+    if ($month !== '' && $month !== 'all') {
+        $range = bangke_month_range($month);
+        if ($range) {
+            $where[] = 'request_date >= ? AND request_date < ?';
+            $params[] = $range[0];
+            $params[] = $range[1];
+            $types .= 'ss';
+        } else {
+            return [];
+        }
+    }
+
+    // 2. Lọc theo Từ ngày (date_from)
+    $dateFrom = trim((string) ($filters['date_from'] ?? ''));
+    if ($dateFrom !== '' && preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateFrom)) {
+        $where[] = 'request_date >= ?';
+        $params[] = $dateFrom;
+        $types .= 's';
+    }
+
+    // 3. Lọc theo Đến ngày (date_to)
+    $dateTo = trim((string) ($filters['date_to'] ?? ''));
+    if ($dateTo !== '' && preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateTo)) {
+        $where[] = 'request_date <= ?';
+        $params[] = $dateTo;
+        $types .= 's';
+    }
+
+    // 4. Lọc theo Chặng bay
+    $route = trim((string) ($filters['route'] ?? ''));
+    if ($route !== '') {
+        $where[] = 'route_leg LIKE ?';
+        $params[] = '%' . $route . '%';
+        $types .= 's';
+    }
+
+    // 5. Lọc theo Số hiệu chuyến bay
+    $flight = trim((string) ($filters['flight'] ?? ''));
+    if ($flight !== '') {
+        $where[] = 'flight_no LIKE ?';
+        $params[] = '%' . $flight . '%';
+        $types .= 's';
+    }
+
+    // 6. Lọc theo Airway Bill
+    $awb = trim((string) ($filters['awb'] ?? ''));
+    if ($awb !== '') {
+        $where[] = 'airway_bill LIKE ?';
+        $params[] = '%' . $awb . '%';
+        $types .= 's';
+    }
+
+    // 7. Lọc theo Số VIN hoặc Serial
+    $vinSerial = trim((string) ($filters['vin_serial'] ?? ''));
+    if ($vinSerial !== '') {
+        $where[] = '(vin_no LIKE ? OR serial_no LIKE ?)';
+        $pattern = '%' . $vinSerial . '%';
+        $params[] = $pattern;
+        $params[] = $pattern;
+        $types .= 'ss';
+    }
+
+    // 8. Lọc từ khóa chung nếu có
+    $q = trim((string) ($filters['q'] ?? ''));
+    if ($q !== '') {
+        $where[] = '(route_leg LIKE ? OR flight_no LIKE ? OR airway_bill LIKE ? OR vin_no LIKE ? OR serial_no LIKE ?)';
+        $pattern = '%' . $q . '%';
+        for ($i = 0; $i < 5; $i++) {
+            $params[] = $pattern;
+            $types .= 's';
+        }
+    }
+
+    $whereSql = $where ? ('WHERE ' . implode(' AND ', $where)) : '';
+
+    // Sắp xếp: Nếu lọc theo 1 tháng cụ thể và không lọc khoảng ngày mở rộng: ưu tiên theo STT
+    // Nếu xem tất cả các tháng hoặc xuyên tháng: sắp theo request_date ASC, stt ASC, id ASC
+    if ($month !== '' && $month !== 'all') {
+        $orderBy = 'ORDER BY CASE WHEN stt > 0 THEN stt ELSE 999999 END ASC, request_date ASC, id ASC';
+    } else {
+        $orderBy = 'ORDER BY request_date ASC, CASE WHEN stt > 0 THEN stt ELSE 999999 END ASC, id ASC';
+    }
+
+    $sql = "SELECT id, stt, request_date, route_leg, flight_no, airway_bill,
+                   vin_no, serial_no, package_count, weight, created_at
+            FROM bangke_items
+            $whereSql
+            $orderBy";
+
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) {
         return [];
     }
-    // Dùng khoảng ngày (DATE) để tránh lỗi mix collation utf8mb4_unicode_ci vs general_ci
-    $stmt = $conn->prepare(
-        "SELECT id, stt, request_date, route_leg, flight_no, airway_bill,
-                vin_no, serial_no, package_count, weight, created_at
-         FROM bangke_items
-         WHERE request_date >= ? AND request_date < ?
-         ORDER BY CASE WHEN stt > 0 THEN stt ELSE 999999 END ASC, request_date ASC, id ASC"
-    );
-    $stmt->bind_param('ss', $range[0], $range[1]);
+    if ($params) {
+        $stmt->bind_param($types, ...$params);
+    }
     $stmt->execute();
     $res = $stmt->get_result();
     $rows = [];
-    while ($row = $res->fetch_assoc()) {
-        $rows[] = $row;
+    if ($res) {
+        while ($row = $res->fetch_assoc()) {
+            $rows[] = $row;
+        }
     }
     $stmt->close();
     return $rows;
+}
+
+function bangke_fetch_by_month(mysqli $conn, string $ym): array
+{
+    return bangke_fetch_items($conn, ['month' => $ym]);
 }
 
 function bangke_fetch_by_ids(mysqli $conn, array $ids): array
