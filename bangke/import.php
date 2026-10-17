@@ -342,33 +342,8 @@ function bangke_import_file(mysqli $conn, array $file): array
     }
     [$headerIdx, $map] = $header;
 
-    $today = date('Y-m-d');
     $errors = [];
     $valid = [];
-    $seen = [];
-    $skipped = 0;
-
-    // Quản lý STT theo tháng: nếu người dùng không nhập hoặc quên nhập, tự động sinh tăng dần
-    $maxSttByMonth = [];
-    $getMaxStt = static function (string $ym) use ($conn, &$maxSttByMonth): int {
-        if (isset($maxSttByMonth[$ym])) {
-            return $maxSttByMonth[$ym];
-        }
-        $range = bangke_month_range($ym);
-        if (!$range) {
-            $maxSttByMonth[$ym] = 0;
-            return 0;
-        }
-        $stmt = $conn->prepare("SELECT COALESCE(MAX(stt), 0) FROM bangke_items WHERE request_date >= ? AND request_date < ?");
-        $stmt->bind_param('ss', $range[0], $range[1]);
-        $stmt->execute();
-        $res = $stmt->get_result();
-        $val = (int) ($res->fetch_row()[0] ?? 0);
-        $stmt->close();
-        $maxSttByMonth[$ym] = $val;
-        return $val;
-    };
-    $runningSttByMonth = [];
 
     $total = count($rows);
     for ($i = $headerIdx + 1; $i < $total; $i++) {
@@ -388,7 +363,7 @@ function bangke_import_file(mysqli $conn, array $file): array
         if (strpos(bangke_import_normalize_header($joined), 'tongcong') === 0) {
             continue;
         }
-        if (count($valid) + $skipped + count($errors) >= BANGKE_IMPORT_MAX_ROWS) {
+        if (count($valid) + count($errors) >= BANGKE_IMPORT_MAX_ROWS) {
             throw new RuntimeException('File có quá ' . BANGKE_IMPORT_MAX_ROWS . ' dòng. Hãy chia nhỏ file rồi import từng phần.');
         }
 
@@ -405,31 +380,33 @@ function bangke_import_file(mysqli $conn, array $file): array
             continue;
         }
 
-        $date = bangke_import_parse_date($get('request_date'));
-        if ($date === null) {
-            $errors[] = "Dòng $excelRow: ngày yêu cầu \"" . $get('request_date') . '" không hợp lệ (dùng dd/mm/yyyy).';
+        // 1. Kiểm tra Ngày yêu cầu: bắt buộc nhập, không được để trống
+        $rawDateStr = $get('request_date');
+        if ($rawDateStr === '') {
+            $errors[] = "Dòng $excelRow: Cột Ngày yêu cầu đang để trống. Vui lòng nhập ngày (định dạng dd/mm/yyyy).";
             continue;
         }
-        $row['request_date'] = $date === '' ? $today : $date;
-
-        $rawStt = bangke_import_parse_number($get('stt'));
-        $parsedStt = ($rawStt !== null && $rawStt > 0) ? (int) round($rawStt) : 0;
-
-        $ym = substr($row['request_date'], 0, 7);
-        if (!isset($runningSttByMonth[$ym])) {
-            $runningSttByMonth[$ym] = $getMaxStt($ym);
+        $date = bangke_import_parse_date($rawDateStr);
+        if ($date === null || $date === '') {
+            $errors[] = "Dòng $excelRow: Ngày yêu cầu \"$rawDateStr\" không đúng định dạng (dùng dd/mm/yyyy).";
+            continue;
         }
-        if ($parsedStt > 0) {
-            $row['stt'] = $parsedStt;
-            if ($row['stt'] > $runningSttByMonth[$ym]) {
-                $runningSttByMonth[$ym] = $row['stt'];
-            }
-        } else {
-            // Không/quên nhập STT -> tự động sinh tăng dần
-            $runningSttByMonth[$ym]++;
-            $row['stt'] = $runningSttByMonth[$ym];
-        }
+        $row['request_date'] = $date;
 
+        // 2. Kiểm tra STT: bắt buộc nhập, không được để trống và phải là số nguyên dương
+        $rawSttStr = $get('stt');
+        if ($rawSttStr === '') {
+            $errors[] = "Dòng $excelRow: Cột STT đang để trống. Vui lòng nhập số thứ tự trong file upload.";
+            continue;
+        }
+        $rawStt = bangke_import_parse_number($rawSttStr);
+        if ($rawStt === null || $rawStt <= 0) {
+            $errors[] = "Dòng $excelRow: Cột STT (\"$rawSttStr\") không hợp lệ (phải là số nguyên dương).";
+            continue;
+        }
+        $row['stt'] = (int) round($rawStt);
+
+        // 3. Số kiện và Khối lượng
         $pkg = bangke_import_parse_number($get('package_count'));
         $weight = bangke_import_parse_number($get('weight'));
         if ($pkg === null || $pkg < 0) {
@@ -443,29 +420,23 @@ function bangke_import_file(mysqli $conn, array $file): array
         $row['package_count'] = (int) round($pkg);
         $row['weight'] = round($weight, 2);
 
-        // Chỉ chống trùng khi có ít nhất một mã định danh; dòng chỉ có Chặng thì luôn thêm
-        if ($row['airway_bill'] !== '' || $row['vin_no'] !== '' || $row['serial_no'] !== '') {
-            $key = bangke_import_dup_key($row['airway_bill'], $row['vin_no'], $row['serial_no']);
-            if (isset($seen[$key])) {
-                $skipped++;
-                continue;
-            }
-            $seen[$key] = true;
-            $row['check_dup'] = true;
-        } else {
-            $row['check_dup'] = false;
-        }
+        // Dữ liệu có thể trùng Airway Bill + VIN + Serial nên vẫn cho phép upload để in bill
         $valid[] = $row;
+    }
+
+    // Nếu có bất kỳ ô trống hoặc dòng lỗi nào, dừng import để người dùng điều chỉnh file upload
+    if (!empty($errors)) {
+        return [
+            'inserted' => 0,
+            'skipped' => 0,
+            'errors' => $errors,
+            'last_date' => null,
+        ];
     }
 
     $inserted = 0;
     $lastDate = null;
     if ($valid) {
-        $dupStmt = $conn->prepare(
-            "SELECT id FROM bangke_items
-             WHERE airway_bill = ? AND vin_no = ? AND serial_no = ?
-             LIMIT 1"
-        );
         $insStmt = $conn->prepare(
             "INSERT INTO bangke_items
              (stt, request_date, route_leg, flight_no, airway_bill, vin_no, serial_no, package_count, weight)
@@ -475,15 +446,6 @@ function bangke_import_file(mysqli $conn, array $file): array
         $conn->begin_transaction();
         try {
             foreach ($valid as $r) {
-                if ($r['check_dup']) {
-                    $dupStmt->bind_param('sss', $r['airway_bill'], $r['vin_no'], $r['serial_no']);
-                    $dupStmt->execute();
-                    $exists = $dupStmt->get_result()->fetch_row();
-                    if ($exists) {
-                        $skipped++;
-                        continue;
-                    }
-                }
                 $insStmt->bind_param(
                     'issssssid',
                     $r['stt'],
@@ -507,14 +469,13 @@ function bangke_import_file(mysqli $conn, array $file): array
             $conn->rollback();
             throw new RuntimeException('Lỗi ghi dữ liệu, không có dòng nào được import. Vui lòng thử lại.');
         }
-        $dupStmt->close();
         $insStmt->close();
     }
 
     return [
         'inserted' => $inserted,
-        'skipped' => $skipped,
-        'errors' => $errors,
+        'skipped' => 0,
+        'errors' => [],
         'last_date' => $lastDate,
     ];
 }
@@ -546,5 +507,17 @@ function bangke_import_send_template(): void
         echo '<Cell ss:StyleID="H"><Data ss:Type="String">' . bangke_h($h) . '</Data></Cell>';
     }
     echo "</Row>\n";
+    $sampleDate = date('d/m/Y');
+    echo "  <Row>\n";
+    echo '    <Cell><Data ss:Type="Number">1</Data></Cell>' . "\n";
+    echo '    <Cell ss:StyleID="T"><Data ss:Type="String">' . $sampleDate . '</Data></Cell>' . "\n";
+    echo '    <Cell><Data ss:Type="String">HAN - SGN</Data></Cell>' . "\n";
+    echo '    <Cell ss:StyleID="T"><Data ss:Type="String">VN210</Data></Cell>' . "\n";
+    echo '    <Cell ss:StyleID="T"><Data ss:Type="String">738-12345678</Data></Cell>' . "\n";
+    echo '    <Cell ss:StyleID="T"><Data ss:Type="String">VF123456789</Data></Cell>' . "\n";
+    echo '    <Cell ss:StyleID="T"><Data ss:Type="String">SN987654321</Data></Cell>' . "\n";
+    echo '    <Cell><Data ss:Type="Number">1</Data></Cell>' . "\n";
+    echo '    <Cell><Data ss:Type="Number">15.5</Data></Cell>' . "\n";
+    echo "  </Row>\n";
     echo "  </Table></Worksheet>\n</Workbook>\n";
 }

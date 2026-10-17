@@ -33,13 +33,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'import') {
         if ($importResult['last_date'] !== null) {
             $importMonth = substr($importResult['last_date'], 0, 7);
         }
-        $flash = sprintf(
-            'Import xong: thêm mới %d dòng, bỏ qua %d dòng trùng, %d dòng lỗi.',
-            $importResult['inserted'],
-            $importResult['skipped'],
-            count($importResult['errors'])
-        );
-        $flashType = $importResult['inserted'] > 0 || !$importResult['errors'] ? 'ok' : 'err';
+        if (!empty($importResult['errors'])) {
+            $flash = sprintf(
+                'File upload có %d dòng có ô trống hoặc không hợp lệ. Vui lòng điều chỉnh file theo thông báo bên dưới rồi import lại.',
+                count($importResult['errors'])
+            );
+            $flashType = 'err';
+        } else {
+            $flash = sprintf(
+                'Import thành công: đã thêm mới %d dòng vào danh sách.',
+                $importResult['inserted']
+            );
+            $flashType = 'ok';
+        }
     } catch (RuntimeException $e) {
         $flash = $e->getMessage();
         $flashType = 'err';
@@ -658,6 +664,83 @@ input[type="checkbox"] {
   .form-actions, .filter-actions { justify-content: stretch; }
   .form-actions .btn, .filter-actions .btn { width: 100%; }
 }
+
+/* Modal xác nhận xóa */
+.modal-backdrop {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(12, 35, 64, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 16px;
+  animation: modalFadeIn 0.18s ease-out;
+}
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.modal-box {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 24px 60px rgba(12, 35, 64, 0.25);
+  width: 100%;
+  max-width: 480px;
+  padding: 24px;
+  border: 1px solid var(--line);
+  animation: modalZoomIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes modalZoomIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.modal-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.modal-icon-danger {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--err-bg);
+  color: var(--err);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.modal-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--navy);
+  line-height: 1.3;
+}
+.modal-subtitle {
+  margin: 4px 0 0;
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+.modal-body {
+  font-size: 0.95rem;
+  color: var(--ink);
+  line-height: 1.5;
+  background: #f8fafc;
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  margin-bottom: 20px;
+}
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
 </style>
 </head>
 <body>
@@ -776,8 +859,8 @@ input[type="checkbox"] {
           <button type="submit" class="btn btn-primary" id="btnImport">Import</button>
         </div>
         <p class="import-hint">
-          Dòng đầu là tiêu đề cột: STT, Ngày yêu cầu, Chặng, Số hiệu chuyến bay, Airway Bill, Số VIN, Số Serial, Số kiện, Khối lượng.
-          Ngày ghi dạng dd/mm/yyyy (bỏ trống = hôm nay). STT bỏ trống sẽ tự động sinh tăng dần theo thứ tự dòng. Dòng trùng Airway Bill + VIN + Serial với dữ liệu đã có sẽ được bỏ qua.
+          Dòng đầu là tiêu đề cột: STT, Ngày yêu cầu, Chặng, Số hiệu chuyến bay, Airway Bill, Số VIN, Số Serial, Số kiện, Khối lượng.<br>
+          <strong>Lưu ý:</strong> Cột <b>STT</b> và <b>Ngày yêu cầu</b> (định dạng dd/mm/yyyy) là bắt buộc, không được để trống (hệ thống sẽ hiện thông báo để điều chỉnh file upload nếu có ô trống). Hệ thống cho phép upload các dòng trùng Airway Bill, VIN, Serial để in bill.
         </p>
       </form>
     </div>
@@ -976,6 +1059,32 @@ input[type="checkbox"] {
   </section>
 </div>
 
+<!-- Modal xác nhận xóa dữ liệu -->
+<div id="confirmDeleteModal" class="modal-backdrop" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-icon-danger">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+      </div>
+      <div>
+        <h3 id="modalTitle" class="modal-title">Xác nhận xóa dữ liệu</h3>
+        <p class="modal-subtitle">Thao tác này sẽ xóa vĩnh viễn dữ liệu khỏi hệ thống</p>
+      </div>
+    </div>
+    <div class="modal-body" id="modalMessage">
+      Bạn có chắc chắn muốn xóa các dòng đã chọn không? Hành động này không thể hoàn tác.
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-ghost" id="modalBtnCancel">Hủy bỏ</button>
+      <button type="button" class="btn btn-danger" id="modalBtnConfirm">Đồng ý xóa</button>
+    </div>
+  </div>
+</div>
+
 <script>
 (function () {
   var checkAll = document.getElementById('checkAll');
@@ -986,6 +1095,59 @@ input[type="checkbox"] {
   var btnEms = document.getElementById('btnEms');
   var btnExport = document.getElementById('btnExport');
   var btnDeleteSelected = document.getElementById('btnDeleteSelected');
+
+  // Modal xác nhận xóa
+  var confirmModal = document.getElementById('confirmDeleteModal');
+  var modalMsg = document.getElementById('modalMessage');
+  var modalBtnCancel = document.getElementById('modalBtnCancel');
+  var modalBtnConfirm = document.getElementById('modalBtnConfirm');
+  var pendingDeleteAction = null;
+
+  function showConfirmModal(messageHtml, onConfirm) {
+    if (!confirmModal) {
+      if (confirm(messageHtml.replace(/<[^>]+>/g, ''))) {
+        onConfirm();
+      }
+      return;
+    }
+    modalMsg.innerHTML = messageHtml;
+    pendingDeleteAction = onConfirm;
+    confirmModal.style.display = 'flex';
+    if (modalBtnConfirm) modalBtnConfirm.focus();
+  }
+
+  function hideConfirmModal() {
+    if (confirmModal) confirmModal.style.display = 'none';
+    pendingDeleteAction = null;
+  }
+
+  if (modalBtnCancel) {
+    modalBtnCancel.addEventListener('click', hideConfirmModal);
+  }
+
+  if (confirmModal) {
+    confirmModal.addEventListener('click', function (e) {
+      if (e.target === confirmModal) {
+        hideConfirmModal();
+      }
+    });
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && confirmModal && confirmModal.style.display === 'flex') {
+      hideConfirmModal();
+    }
+  });
+
+  if (modalBtnConfirm) {
+    modalBtnConfirm.addEventListener('click', function () {
+      if (typeof pendingDeleteAction === 'function') {
+        var actionFn = pendingDeleteAction;
+        hideConfirmModal();
+        actionFn();
+      }
+    });
+  }
 
   function selectedCount() {
     return checks.filter(function (c) { return c.checked; }).length;
@@ -1055,7 +1217,9 @@ input[type="checkbox"] {
         alert('Vui lòng chọn ít nhất một dòng để xóa.');
         return;
       }
-      if (confirm('Bạn có chắc chắn muốn xóa ' + n + ' dòng đã chọn không? Thao tác này không thể hoàn tác.')) {
+      var msg = 'Bạn có chắc chắn muốn xóa <strong>' + n + ' dòng đã chọn</strong> không?<br>' +
+                '<span style="color:var(--err);font-weight:600;display:inline-block;margin-top:8px;">⚠️ Hành động này sẽ xóa vĩnh viễn dữ liệu và không thể hoàn tác.</span>';
+      showConfirmModal(msg, function () {
         var form = document.getElementById('listForm');
         form.target = '_self';
         var input = document.createElement('input');
@@ -1064,15 +1228,17 @@ input[type="checkbox"] {
         input.value = 'delete_selected';
         form.appendChild(input);
         form.submit();
-      }
+      });
     });
   }
 
   window.confirmDelete = function (id) {
-    if (confirm('Bạn có chắc chắn muốn xóa bản ghi #' + id + ' không?')) {
+    var msg = 'Bạn có chắc chắn muốn xóa <strong>bản ghi #' + id + '</strong> không?<br>' +
+              '<span style="color:var(--err);font-weight:600;display:inline-block;margin-top:8px;">⚠️ Dữ liệu sẽ bị xóa vĩnh viễn và không thể hoàn tác.</span>';
+    showConfirmModal(msg, function () {
       document.getElementById('deleteTargetId').value = id;
       document.getElementById('singleDeleteForm').submit();
-    }
+    });
   };
 
   document.getElementById('listForm').addEventListener('submit', function (e) {
