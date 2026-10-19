@@ -410,23 +410,49 @@ function bangke_fetch_by_ids(mysqli $conn, array $ids): array
     if (!$ids) {
         return [];
     }
-    $placeholders = implode(',', array_fill(0, count($ids), '?'));
-    $types = str_repeat('i', count($ids));
-    $stmt = $conn->prepare(
-        "SELECT id, stt, request_date, route_leg, flight_no, airway_bill,
-                vin_no, serial_no, package_count, weight, created_at
-         FROM bangke_items
-         WHERE id IN ($placeholders)
-         ORDER BY CASE WHEN stt > 0 THEN stt ELSE 999999 END ASC, request_date ASC, id ASC"
-    );
-    $stmt->bind_param($types, ...$ids);
-    $stmt->execute();
-    $res = $stmt->get_result();
     $rows = [];
-    while ($row = $res->fetch_assoc()) {
-        $rows[] = $row;
+    $chunks = array_chunk($ids, 1000);
+    foreach ($chunks as $chunk) {
+        $placeholders = implode(',', array_fill(0, count($chunk), '?'));
+        $types = str_repeat('i', count($chunk));
+        $stmt = $conn->prepare(
+            "SELECT id, stt, request_date, route_leg, flight_no, airway_bill,
+                    vin_no, serial_no, package_count, weight, created_at
+             FROM bangke_items
+             WHERE id IN ($placeholders)"
+        );
+        if (!$stmt) {
+            continue;
+        }
+        $stmt->bind_param($types, ...$chunk);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        if ($res) {
+            while ($row = $res->fetch_assoc()) {
+                $rows[] = $row;
+            }
+        }
+        $stmt->close();
     }
-    $stmt->close();
+
+    // Sắp xếp các dòng theo tháng, STT tăng dần, request_date, id
+    usort($rows, static function ($a, $b) {
+        $ymA = substr((string) ($a['request_date'] ?? ''), 0, 7);
+        $ymB = substr((string) ($b['request_date'] ?? ''), 0, 7);
+        if ($ymA !== $ymB) {
+            return $ymA <=> $ymB;
+        }
+        $sttA = (int) (!empty($a['stt']) ? $a['stt'] : 999999);
+        $sttB = (int) (!empty($b['stt']) ? $b['stt'] : 999999);
+        if ($sttA !== $sttB) {
+            return $sttA <=> $sttB;
+        }
+        $dateCmp = strcmp((string) ($a['request_date'] ?? ''), (string) ($b['request_date'] ?? ''));
+        if ($dateCmp !== 0) {
+            return $dateCmp;
+        }
+        return ((int) ($a['id'] ?? 0)) <=> ((int) ($b['id'] ?? 0));
+    });
     return $rows;
 }
 
@@ -457,14 +483,20 @@ function bangke_delete_by_ids(mysqli $conn, array $ids): int
     if (!$ids) {
         return 0;
     }
-    $placeholders = implode(',', array_fill(0, count($ids), '?'));
-    $types = str_repeat('i', count($ids));
-    $stmt = $conn->prepare("DELETE FROM bangke_items WHERE id IN ($placeholders)");
-    $stmt->bind_param($types, ...$ids);
-    $stmt->execute();
-    $affected = $stmt->affected_rows;
-    $stmt->close();
-    return $affected;
+    $totalAffected = 0;
+    $chunks = array_chunk($ids, 1000);
+    foreach ($chunks as $chunk) {
+        $placeholders = implode(',', array_fill(0, count($chunk), '?'));
+        $types = str_repeat('i', count($chunk));
+        $stmt = $conn->prepare("DELETE FROM bangke_items WHERE id IN ($placeholders)");
+        if ($stmt) {
+            $stmt->bind_param($types, ...$chunk);
+            $stmt->execute();
+            $totalAffected += $stmt->affected_rows;
+            $stmt->close();
+        }
+    }
+    return $totalAffected;
 }
 
 bangke_ensure_table($conn);

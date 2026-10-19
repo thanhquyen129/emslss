@@ -3,6 +3,10 @@
  * Bảng kê hàng không — chức năng độc lập trên domain lsslogistics.vn
  * Không phụ thuộc auth / module EMS-LSS.
  */
+@ini_set('max_input_vars', '100000');
+@ini_set('memory_limit', '512M');
+@set_time_limit(600);
+
 require_once __DIR__ . '/bangke/bootstrap.php';
 require_once __DIR__ . '/bangke/export.php';
 require_once __DIR__ . '/bangke/import.php';
@@ -23,7 +27,7 @@ if ($action === 'template') {
 
 // File vượt post_max_size thì PHP bỏ trống toàn bộ $_POST/$_FILES
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$_POST && !$_FILES && (int) ($_SERVER['CONTENT_LENGTH'] ?? 0) > 0) {
-    $flash = 'File vượt quá dung lượng máy chủ cho phép (tối đa 5 MB).';
+    $flash = 'File vượt quá dung lượng máy chủ cho phép (tối đa 50 MB).';
     $flashType = 'err';
 }
 
@@ -56,6 +60,11 @@ if ($action === 'print' || $action === 'print_ems' || $action === 'export') {
     if (!is_array($ids)) {
         $ids = [];
     }
+    if (!empty($_POST['ids_csv'])) {
+        $csvIds = array_filter(array_map('trim', explode(',', (string) $_POST['ids_csv'])));
+        $ids = array_merge($ids, $csvIds);
+    }
+    $ids = array_values(array_unique(array_filter(array_map('intval', $ids))));
     $rows = bangke_fetch_by_ids($conn, $ids);
     $sttMap = $_POST['stt'] ?? [];
     foreach ($rows as &$row) {
@@ -193,6 +202,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'delete_selected') {
     if (!is_array($ids)) {
         $ids = [];
     }
+    if (!empty($_POST['ids_csv'])) {
+        $csvIds = array_filter(array_map('trim', explode(',', (string) $_POST['ids_csv'])));
+        $ids = array_merge($ids, $csvIds);
+    }
+    $ids = array_values(array_unique(array_filter(array_map('intval', $ids))));
     $delCount = bangke_delete_by_ids($conn, $ids);
     $redirParams = $filterParams;
     $redirParams['deleted'] = (string) $delCount;
@@ -959,6 +973,7 @@ input[type="checkbox"] {
     </div>
     <div class="panel-bd">
       <form method="post" id="listForm" action="<?= bangke_h($pageUrl) ?>">
+        <input type="hidden" name="ids_csv" id="idsCsv" value="">
         <div class="toolbar">
           <button type="button" class="btn btn-ghost" id="btnSelectAll">Chọn tất cả</button>
           <button type="submit" name="action" value="print" class="btn btn-navy" id="btnPrint">In bill</button>
@@ -1003,7 +1018,6 @@ input[type="checkbox"] {
                 <tr class="<?= ($editId === (int) $r['id']) ? 'editing' : '' ?>">
                   <td class="check">
                     <input type="checkbox" class="row-check" name="ids[]" value="<?= (int) $r['id'] ?>">
-                    <input type="hidden" name="stt[<?= (int) $r['id'] ?>]" value="<?= (int) (!empty($r['stt']) ? $r['stt'] : ($i + 1)) ?>">
                   </td>
                   <td class="mono"><strong><?= (int) (!empty($r['stt']) ? $r['stt'] : ($i + 1)) ?></strong></td>
                   <td><?= bangke_h(date('d/m/Y', strtotime($r['request_date']))) ?></td>
@@ -1210,6 +1224,14 @@ input[type="checkbox"] {
     });
   }
 
+  function prepareListFormSubmit() {
+    var checkedVals = checks.filter(function (c) { return c.checked; }).map(function (c) { return c.value; });
+    var idsCsvInput = document.getElementById('idsCsv');
+    if (idsCsvInput) {
+      idsCsvInput.value = checkedVals.join(',');
+    }
+  }
+
   if (btnDeleteSelected) {
     btnDeleteSelected.addEventListener('click', function () {
       var n = selectedCount();
@@ -1222,6 +1244,7 @@ input[type="checkbox"] {
       showConfirmModal(msg, function () {
         var form = document.getElementById('listForm');
         form.target = '_self';
+        prepareListFormSubmit();
         var input = document.createElement('input');
         input.type = 'hidden';
         input.name = 'action';
@@ -1241,12 +1264,17 @@ input[type="checkbox"] {
     });
   };
 
-  document.getElementById('listForm').addEventListener('submit', function (e) {
-    if (selectedCount() === 0) {
-      e.preventDefault();
-      alert('Vui lòng chọn ít nhất một dòng.');
-    }
-  });
+  var listFormEl = document.getElementById('listForm');
+  if (listFormEl) {
+    listFormEl.addEventListener('submit', function (e) {
+      if (selectedCount() === 0) {
+        e.preventDefault();
+        alert('Vui lòng chọn ít nhất một dòng.');
+        return;
+      }
+      prepareListFormSubmit();
+    });
+  }
 
   refresh();
 

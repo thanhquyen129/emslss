@@ -4,10 +4,12 @@
  * Đọc bằng PHP thuần, không cần Composer.
  */
 
-const BANGKE_IMPORT_MAX_BYTES = 5242880;
-const BANGKE_IMPORT_MAX_ROWS = 5000;
-// Chặn file .xlsx nén tỉ lệ cao (zip bomb) làm tràn RAM shared hosting
-const BANGKE_IMPORT_MAX_XML_BYTES = 52428800;
+@ini_set('memory_limit', '512M');
+@set_time_limit(600);
+
+const BANGKE_IMPORT_MAX_BYTES = 52428800; // 50 MB
+const BANGKE_IMPORT_MAX_XML_BYTES = 209715200; // 200 MB
+
 
 function bangke_import_normalize_header(string $s): string
 {
@@ -167,9 +169,6 @@ function bangke_import_read_xlsx(string $path): array
             $cells[$col] = $val;
         }
         $rows[] = $cells;
-        if (count($rows) > BANGKE_IMPORT_MAX_ROWS + 20) {
-            break;
-        }
     }
     return $rows;
 }
@@ -199,9 +198,6 @@ function bangke_import_read_spreadsheetml(string $content): array
             $col += 1 + (int) ($attr['MergeAcross'] ?? 0);
         }
         $rows[] = $cells;
-        if (count($rows) > BANGKE_IMPORT_MAX_ROWS + 20) {
-            break;
-        }
     }
     return $rows;
 }
@@ -230,9 +226,6 @@ function bangke_import_read_csv(string $content): array
     $rows = [];
     while (($r = fgetcsv($fh, 0, $delim, '"', '')) !== false) {
         $rows[] = $r;
-        if (count($rows) > BANGKE_IMPORT_MAX_ROWS + 20) {
-            break;
-        }
     }
     fclose($fh);
     return $rows;
@@ -308,13 +301,13 @@ function bangke_import_file(mysqli $conn, array $file): array
         throw new RuntimeException('Vui lòng chọn file để import.');
     }
     if ($err === UPLOAD_ERR_INI_SIZE || $err === UPLOAD_ERR_FORM_SIZE) {
-        throw new RuntimeException('File vượt quá dung lượng cho phép (tối đa 5 MB).');
+        throw new RuntimeException('File vượt quá dung lượng cho phép (tối đa 50 MB).');
     }
     if ($err !== UPLOAD_ERR_OK || !is_uploaded_file($file['tmp_name'] ?? '')) {
         throw new RuntimeException('Upload file thất bại, vui lòng thử lại.');
     }
     if ((int) $file['size'] > BANGKE_IMPORT_MAX_BYTES) {
-        throw new RuntimeException('File vượt quá dung lượng cho phép (tối đa 5 MB).');
+        throw new RuntimeException('File vượt quá dung lượng cho phép (tối đa 50 MB).');
     }
 
     $ext = strtolower(pathinfo((string) $file['name'], PATHINFO_EXTENSION));
@@ -362,9 +355,6 @@ function bangke_import_file(mysqli $conn, array $file): array
         }
         if (strpos(bangke_import_normalize_header($joined), 'tongcong') === 0) {
             continue;
-        }
-        if (count($valid) + count($errors) >= BANGKE_IMPORT_MAX_ROWS) {
-            throw new RuntimeException('File có quá ' . BANGKE_IMPORT_MAX_ROWS . ' dòng. Hãy chia nhỏ file rồi import từng phần.');
         }
 
         $row = [
