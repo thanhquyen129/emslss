@@ -8,7 +8,12 @@ $can_delete = $can_delete ?? true;
 <?php if (empty($imageRows)): ?>
     <div class="col-12 text-muted">Chưa có ảnh</div>
 <?php else: ?>
-    <?php foreach ($imageRows as $img): ?>
+    <?php foreach ($imageRows as $img):
+        $stageMeta = function_exists('emslss_image_stage_meta')
+            ? emslss_image_stage_meta($img['image_path'] ?? '')
+            : ['stage' => 'misc', 'label' => 'Ảnh chứng từ', 'badge_class' => 'bg-secondary'];
+        $itemCanDelete = $can_delete && ($stageMeta['stage'] !== 'delivery_fail');
+    ?>
     <div class="col-6 col-md-4 image-gallery-item" data-image-id="<?= (int) $img['id'] ?>">
         <div class="position-relative">
             <img src="<?= htmlspecialchars($img['image_path']) ?>"
@@ -16,7 +21,10 @@ $can_delete = $can_delete ?? true;
                  style="height:140px;object-fit:cover;cursor:pointer"
                  data-full="<?= htmlspecialchars($img['image_path']) ?>"
                  alt="proof">
-            <?php if ($can_delete): ?>
+            <span class="badge <?= htmlspecialchars($stageMeta['badge_class']) ?> position-absolute top-0 start-0 m-1">
+                <?= htmlspecialchars($stageMeta['label']) ?>
+            </span>
+            <?php if ($itemCanDelete): ?>
             <button type="button"
                     class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1 btn-delete-image"
                     data-image-id="<?= (int) $img['id'] ?>"

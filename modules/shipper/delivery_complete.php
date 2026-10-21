@@ -38,15 +38,31 @@ if ($order['status'] == 'delivered') {
     die("Đơn đã hoàn tất, không thể submit lại.");
 }
 
-$failCountStmt = $conn->prepare("SELECT COUNT(*) c FROM emslss_tracking WHERE order_id=? AND status='failed'");
-$failCountStmt->bind_param('i', $order_id);
-$failCountStmt->execute();
-$deliveryFailCount = (int)($failCountStmt->get_result()->fetch_assoc()['c'] ?? 0);
+$failTrackStmt = $conn->prepare("SELECT note, created_at FROM emslss_tracking WHERE order_id=? AND status='failed' ORDER BY id ASC");
+$failTrackStmt->bind_param('i', $order_id);
+$failTrackStmt->execute();
+$prevFailTracks = $failTrackStmt->get_result()->fetch_all(MYSQLI_ASSOC);
+$deliveryFailCount = count($prevFailTracks);
 
-$existingImgStmt = $conn->prepare("SELECT COUNT(*) c FROM emslss_images WHERE order_id=? AND image_path LIKE '%/delivery/%'");
-$existingImgStmt->bind_param('i', $order_id);
-$existingImgStmt->execute();
-$existingDeliveryImages = (int)($existingImgStmt->get_result()->fetch_assoc()['c'] ?? 0);
+$failMetaStmt = $conn->prepare("SELECT meta_value, created_at FROM emslss_order_meta WHERE order_id=? AND meta_key='fail_note' ORDER BY id ASC");
+$failMetaStmt->bind_param('i', $order_id);
+$failMetaStmt->execute();
+$prevFailNotes = $failMetaStmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
+$existingDeliveryImages = 0;
+$prevFailImages = [];
+$allDelivImgStmt = $conn->prepare("SELECT id, image_path, created_at FROM emslss_images WHERE order_id=? AND image_path LIKE '%/delivery/%' ORDER BY id ASC");
+$allDelivImgStmt->bind_param('i', $order_id);
+$allDelivImgStmt->execute();
+$allDelivImgRes = $allDelivImgStmt->get_result();
+while ($imgRow = $allDelivImgRes->fetch_assoc()) {
+    if (emslss_is_delivery_fail_image($imgRow['image_path'] ?? '')) {
+        $imgRow['url'] = emslss_upload_url($imgRow['image_path'] ?? '');
+        $prevFailImages[] = $imgRow;
+    } else {
+        $existingDeliveryImages++;
+    }
+}
 
 $sigMetaStmt = $conn->prepare("SELECT meta_value FROM emslss_order_meta WHERE order_id=? AND meta_key='customer_signature' ORDER BY id DESC LIMIT 1");
 $sigMetaStmt->bind_param('i', $order_id);
@@ -69,7 +85,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $has_signature  = !empty($_FILES['signature_image']['name']) || !empty($_FILES['signature_gallery']['name']);
     $signaturePath  = null;
     $proofFiles = ['proof_images', 'proof_gallery'];
-    $sigFiles = ['signature_image', 'signature_gallery'];
+    $failFiles  = ['fail_images', 'fail_gallery'];
+    $sigFiles   = ['signature_image', 'signature_gallery'];
 
     if ($message === '' && $action === 'success') {
         if ($recipient_name === '') {
@@ -104,46 +121,59 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             $proofPaths = [];
-            foreach ($proofFiles as $field) {
-                if (!empty($_FILES[$field]['name'][0])) {
-                    $proofPaths = array_merge($proofPaths, emslss_upload_save_multipart_field('delivery', $_FILES[$field]));
-                }
-            }
-            if ($proofPaths !== []) {
-                $savedFiles = array_merge($savedFiles, $proofPaths);
-                emslss_upload_insert_images($conn, $order_id, $proofPaths, $user_id);
-            }
-            if ($action === 'success' && $proofPaths === [] && $existingDeliveryImages === 0) {
-                throw new RuntimeException('Không lưu được ảnh phát. Vui lòng thử lại.');
-            }
-
-            foreach ($sigFiles as $field) {
-                if (!empty($_FILES[$field]['name'])) {
-                    $sigPaths = emslss_upload_save_multipart_field('signatures', $_FILES[$field]);
-                    $signaturePath = $sigPaths[0] ?? null;
-                    if ($signaturePath !== null) {
-                        $savedFiles[] = $signaturePath;
-                        break;
+            $failPaths  = [];
+            if ($action === 'success') {
+                foreach ($proofFiles as $field) {
+                    if (!empty($_FILES[$field]['name'][0])) {
+                        $proofPaths = array_merge($proofPaths, emslss_upload_save_multipart_field('delivery', $_FILES[$field]));
                     }
                 }
-            }
-            if ($action === 'success' && $signaturePath === null && !empty($existingSignaturePath)) {
-                $signaturePath = $existingSignaturePath;
-            }
-            if ($action === 'success' && $signaturePath === null) {
-                throw new RuntimeException('Không lưu được ảnh chữ ký. Vui lòng thử lại.');
+                if ($proofPaths !== []) {
+                    $savedFiles = array_merge($savedFiles, $proofPaths);
+                    emslss_upload_insert_images($conn, $order_id, $proofPaths, $user_id);
+                }
+                if ($proofPaths === [] && $existingDeliveryImages === 0) {
+                    throw new RuntimeException('Không lưu được ảnh phát. Vui lòng thử lại.');
+                }
+
+                foreach ($sigFiles as $field) {
+                    if (!empty($_FILES[$field]['name'])) {
+                        $sigPaths = emslss_upload_save_multipart_field('signatures', $_FILES[$field]);
+                        $signaturePath = $sigPaths[0] ?? null;
+                        if ($signaturePath !== null) {
+                            $savedFiles[] = $signaturePath;
+                            break;
+                        }
+                    }
+                }
+                if ($signaturePath === null && !empty($existingSignaturePath)) {
+                    $signaturePath = $existingSignaturePath;
+                }
+                if ($signaturePath === null) {
+                    throw new RuntimeException('Không lưu được ảnh chữ ký. Vui lòng thử lại.');
+                }
+            } else {
+                foreach ($failFiles as $field) {
+                    if (!empty($_FILES[$field]['name'][0])) {
+                        $failPaths = array_merge($failPaths, emslss_upload_save_multipart_field('delivery', $_FILES[$field], 'fail'));
+                    }
+                }
+                if ($failPaths !== []) {
+                    $savedFiles = array_merge($savedFiles, $failPaths);
+                    emslss_upload_insert_images($conn, $order_id, $failPaths, $user_id);
+                }
             }
 
             // update order
             $up = $conn->prepare("
                 UPDATE emslss_orders
-                SET status=?
+                SET status=?, updated_at=NOW()
                 WHERE id=?
             ");
             $up->bind_param("si", $new_status, $order_id);
             $up->execute();
 
-            // lưu thông tin có cấu trúc vào order_meta (dùng đúng key mà trang chi tiết render)
+            // lưu thông tin có cấu trúc vào order_meta (dùng đúng key mà trang chi tiết render, giữ nguyên dữ liệu cũ)
             $metaStmt = $conn->prepare("
                 INSERT INTO emslss_order_meta(order_id, meta_key, meta_value)
                 VALUES(?,?,?)
@@ -163,6 +193,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             } else {
                 $metaInsert('fail_note', $fail_reason . ($note !== '' ? '. ' . $note : ''));
+                foreach ($failPaths as $fp) {
+                    $metaInsert('fail_image', $fp);
+                }
             }
 
             // tracking
@@ -235,6 +268,46 @@ body{background:#f5f7fa;}
 <div class="alert alert-danger"><?= htmlspecialchars($message) ?></div>
 <?php endif; ?>
 
+<?php if ($deliveryFailCount > 0 || !empty($prevFailNotes) || !empty($prevFailImages)): ?>
+<div class="alert alert-warning border-warning mb-3">
+    <div class="fw-bold mb-1">⚠️ Thông tin giao thất bại trước đó (vẫn được giữ lại khi giao lại):</div>
+    <?php if (!empty($prevFailTracks)): ?>
+        <ul class="mb-2 ps-3 small">
+            <?php foreach ($prevFailTracks as $idx => $ft): ?>
+            <li>
+                <strong>Lần <?= $idx + 1 ?>:</strong> <?= htmlspecialchars($ft['note'] ?? '') ?>
+                <?php if (!empty($ft['created_at'])): ?>
+                <span class="text-muted">(<?= htmlspecialchars($ft['created_at']) ?>)</span>
+                <?php endif; ?>
+            </li>
+            <?php endforeach; ?>
+        </ul>
+    <?php elseif (!empty($prevFailNotes)): ?>
+        <ul class="mb-2 ps-3 small">
+            <?php foreach ($prevFailNotes as $idx => $fn): ?>
+            <li>
+                <strong>Lần <?= $idx + 1 ?>:</strong> <?= htmlspecialchars($fn['meta_value'] ?? '') ?>
+                <?php if (!empty($fn['created_at'])): ?>
+                <span class="text-muted">(<?= htmlspecialchars($fn['created_at']) ?>)</span>
+                <?php endif; ?>
+            </li>
+            <?php endforeach; ?>
+        </ul>
+    <?php endif; ?>
+
+    <?php if (!empty($prevFailImages)): ?>
+        <div class="small fw-semibold mb-1">🖼 Ảnh giao thất bại trước đó (<?= count($prevFailImages) ?> ảnh):</div>
+        <div class="d-flex flex-wrap gap-2">
+            <?php foreach ($prevFailImages as $fImg): ?>
+            <a href="<?= htmlspecialchars($fImg['url']) ?>" target="_blank" class="d-inline-block text-decoration-none">
+                <img src="<?= htmlspecialchars($fImg['url']) ?>" alt="fail-proof" class="rounded border" style="width:72px;height:72px;object-fit:cover">
+            </a>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+</div>
+<?php endif; ?>
+
 <form method="POST" enctype="multipart/form-data" id="completeForm">
 
 <div class="mb-3">
@@ -253,14 +326,17 @@ body{background:#f5f7fa;}
             placeholder="Người trực tiếp nhận hàng" value="<?= htmlspecialchars($_POST['recipient_name'] ?? '') ?>">
     </div>
     <div class="mb-3">
-        <label>Ảnh phát — chụp</label>
+        <label>Ảnh phát thành công — chụp <span class="text-danger">*</span></label>
         <input type="file" name="proof_images[]" multiple class="form-control" accept="image/*" capture="environment" disabled>
     </div>
     <div class="mb-3">
-        <label>Ảnh phát — chọn từ thư viện (nhiều ảnh)</label>
+        <label>Ảnh phát thành công — chọn từ thư viện (nhiều ảnh)</label>
         <input type="file" name="proof_gallery[]" multiple class="form-control" accept="image/*" disabled>
         <?php if ($existingDeliveryImages > 0): ?>
-        <div class="form-text text-success">Đã có <?= $existingDeliveryImages ?> ảnh phát từ lần trước.</div>
+        <div class="form-text text-success">Đã có <?= $existingDeliveryImages ?> ảnh phát thành công từ trước.</div>
+        <?php endif; ?>
+        <?php if (!empty($prevFailImages)): ?>
+        <div class="form-text text-muted">Ảnh giao thành công mới sẽ được lưu bổ sung, vẫn giữ nguyên <?= count($prevFailImages) ?> ảnh giao thất bại trước đó.</div>
         <?php endif; ?>
     </div>
     <div class="mb-3">
@@ -292,6 +368,17 @@ body{background:#f5f7fa;}
         </select>
     </div>
     <div class="mb-3">
+        <label>Ảnh giao thất bại — chụp</label>
+        <input type="file" name="fail_images[]" multiple class="form-control" accept="image/*" capture="environment" disabled>
+    </div>
+    <div class="mb-3">
+        <label>Ảnh giao thất bại — chọn từ thư viện (nhiều ảnh)</label>
+        <input type="file" name="fail_gallery[]" multiple class="form-control" accept="image/*" disabled>
+        <?php if (!empty($prevFailImages)): ?>
+        <div class="form-text text-muted">Đã có <?= count($prevFailImages) ?> ảnh giao thất bại từ lần trước — ảnh mới sẽ được lưu thêm.</div>
+        <?php endif; ?>
+    </div>
+    <div class="mb-3">
         <label>Ghi chú thêm (tùy chọn)</label>
         <textarea name="fail_note_extra" id="fail_note_extra" class="form-control" disabled rows="2"></textarea>
     </div>
@@ -299,6 +386,7 @@ body{background:#f5f7fa;}
 
 <input type="hidden" name="action" id="actionField" value="">
 <button type="submit" id="btnSubmit" class="btn btn-primary w-100 mt-2" disabled>Xác nhận &amp; Submit</button>
+<a href="shipper_dashboard.php" class="btn btn-outline-secondary w-100 mt-2">← Quay lại</a>
 
 </form>
 

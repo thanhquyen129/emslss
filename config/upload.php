@@ -451,3 +451,60 @@ function emslss_upload_delete_image(mysqli $conn, int $imageId, int $orderId): b
     emslss_upload_delete_file($row['image_path']);
     return true;
 }
+
+/**
+ * Kiểm tra đường dẫn ảnh có phải ảnh giao hàng thất bại (lưu với suffix 'fail').
+ */
+function emslss_is_delivery_fail_image(?string $storedPath): bool
+{
+    if ($storedPath === null || $storedPath === '') {
+        return false;
+    }
+    $path = str_replace('\\', '/', trim($storedPath));
+    $deliverySeg = '/' . emslss_upload_subdir_name('delivery') . '/';
+    $isDelivery = str_contains($path, $deliverySeg) || str_contains($path, '/delivery/') || str_starts_with($path, 'uploads/delivery/');
+    if (!$isDelivery) {
+        return false;
+    }
+    $base = basename($path);
+    return (bool) preg_match('/^\d+_[0-9a-f]{8}_fail(?:_\d+)?_/i', $base) || str_contains($base, '_fail_');
+}
+
+/**
+ * Phân loại ảnh đơn hàng để hiển thị nhãn (Thu gom / Giao thất bại / Giao thành công).
+ *
+ * @return array{stage: string, label: string, badge_class: string}
+ */
+function emslss_image_stage_meta(?string $storedPath): array
+{
+    $path = str_replace('\\', '/', trim((string) $storedPath));
+    $pickupSeg = '/' . emslss_upload_subdir_name('pickup') . '/';
+    if (str_contains($path, $pickupSeg) || str_contains($path, '/pickup/') || str_starts_with($path, 'uploads/pickup/')) {
+        return [
+            'stage' => 'pickup',
+            'label' => 'Ảnh thu gom',
+            'badge_class' => 'bg-info text-dark',
+        ];
+    }
+    if (emslss_is_delivery_fail_image($path)) {
+        return [
+            'stage' => 'delivery_fail',
+            'label' => 'Ảnh giao thất bại',
+            'badge_class' => 'bg-danger',
+        ];
+    }
+    $deliverySeg = '/' . emslss_upload_subdir_name('delivery') . '/';
+    if (str_contains($path, $deliverySeg) || str_contains($path, '/delivery/') || str_starts_with($path, 'uploads/delivery/')) {
+        return [
+            'stage' => 'delivery_success',
+            'label' => 'Ảnh giao thành công',
+            'badge_class' => 'bg-success',
+        ];
+    }
+    return [
+        'stage' => 'misc',
+        'label' => 'Ảnh chứng từ',
+        'badge_class' => 'bg-secondary',
+    ];
+}
+

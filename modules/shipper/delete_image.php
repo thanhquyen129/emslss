@@ -45,6 +45,18 @@ if (!$chk->get_result()->fetch_assoc()) {
     exit;
 }
 
+if ($role === 'shipper') {
+    $imgChk = $conn->prepare('SELECT image_path FROM emslss_images WHERE id=? AND order_id=? LIMIT 1');
+    $imgChk->bind_param('ii', $image_id, $order_id);
+    $imgChk->execute();
+    $imgRow = $imgChk->get_result()->fetch_assoc();
+    if ($imgRow && emslss_is_delivery_fail_image($imgRow['image_path'] ?? '')) {
+        http_response_code(403);
+        echo json_encode(['ok' => false, 'error' => 'Không được xóa ảnh giao thất bại đã lưu']);
+        exit;
+    }
+}
+
 if (emslss_upload_delete_image($conn, $image_id, $order_id)) {
     echo json_encode(['ok' => true]);
 } else {

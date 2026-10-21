@@ -464,7 +464,7 @@ function emslss_export_detail_sql(string $whereSql): string
             (SELECT meta_value FROM emslss_order_meta WHERE order_id = o.id AND meta_key = 'lss_reject_reason' ORDER BY id DESC LIMIT 1) AS lss_reject_reason,
             (SELECT meta_value FROM emslss_order_meta WHERE order_id = o.id AND meta_key = 'delivery_recipient_name' ORDER BY id DESC LIMIT 1) AS delivery_recipient_name,
             (SELECT meta_value FROM emslss_order_meta WHERE order_id = o.id AND meta_key = 'delivery_note' ORDER BY id DESC LIMIT 1) AS delivery_note,
-            (SELECT meta_value FROM emslss_order_meta WHERE order_id = o.id AND meta_key = 'fail_note' ORDER BY id DESC LIMIT 1) AS fail_note,
+            (SELECT GROUP_CONCAT(meta_value ORDER BY id ASC SEPARATOR ' | ') FROM emslss_order_meta WHERE order_id = o.id AND meta_key = 'fail_note') AS fail_note,
             (SELECT COUNT(*) FROM emslss_images i WHERE i.order_id = o.id AND (i.image_path LIKE '%/pickup/%' OR i.image_path LIKE '%pickup%')) AS pickup_image_count,
             (SELECT COUNT(*) FROM emslss_images i WHERE i.order_id = o.id AND (i.image_path LIKE '%/delivery/%' OR i.image_path LIKE '%delivery%')) AS delivery_image_count,
             (SELECT COUNT(*) FROM emslss_order_meta m WHERE m.order_id = o.id AND m.meta_key = 'customer_signature') AS has_signature

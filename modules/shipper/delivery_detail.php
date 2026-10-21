@@ -53,13 +53,18 @@ while ($img = $res->fetch_assoc()) {
 $canDeleteImages = in_array($order['status'], ['assigned_delivery', 'in_transit', 'failed'], true);
 
 $meta = [];
-$metaStmt = $conn->prepare('SELECT meta_key, meta_value FROM emslss_order_meta WHERE order_id = ?');
+$metaStmt = $conn->prepare('SELECT meta_key, meta_value, created_at FROM emslss_order_meta WHERE order_id = ? ORDER BY id ASC');
 $metaStmt->bind_param('i', $order_id);
 $metaStmt->execute();
 $metaRes = $metaStmt->get_result();
 while ($m = $metaRes->fetch_assoc()) {
     $meta[$m['meta_key']][] = $m['meta_value'];
+    $meta[$m['meta_key'] . '_rows'][] = $m;
 }
+$latestRecipient = !empty($meta['delivery_recipient_name']) ? end($meta['delivery_recipient_name']) : '';
+$latestDeliveryNote = !empty($meta['delivery_note']) ? end($meta['delivery_note']) : '';
+$latestSignature = !empty($meta['customer_signature']) ? end($meta['customer_signature']) : '';
+$failNoteRows = $meta['fail_note_rows'] ?? [];
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -128,21 +133,33 @@ body { background: #f4f6f9; }
         ?>
     </div>
 
-    <?php if (!empty($meta['delivery_recipient_name'][0]) || !empty($meta['delivery_note'][0]) || !empty($meta['fail_note'][0]) || !empty($meta['customer_signature'][0])): ?>
+    <?php if ($latestRecipient !== '' || $latestDeliveryNote !== '' || !empty($failNoteRows) || $latestSignature !== ''): ?>
     <div class="card card-box p-4 mt-4">
         <h5>📝 Thông tin giao hàng</h5>
-        <?php if (!empty($meta['delivery_recipient_name'][0])): ?>
-            <p class="mb-2"><strong>Người nhận (đã ký nhận):</strong><br><?= htmlspecialchars($meta['delivery_recipient_name'][0]) ?></p>
+        <?php if ($latestRecipient !== ''): ?>
+            <p class="mb-2"><strong>Người nhận (đã ký nhận):</strong><br><?= htmlspecialchars($latestRecipient) ?></p>
         <?php endif; ?>
-        <?php if (!empty($meta['delivery_note'][0])): ?>
-            <p class="mb-2"><strong>Ghi chú phát:</strong><br><?= htmlspecialchars($meta['delivery_note'][0]) ?></p>
+        <?php if ($latestDeliveryNote !== ''): ?>
+            <p class="mb-2"><strong>Ghi chú phát:</strong><br><?= htmlspecialchars($latestDeliveryNote) ?></p>
         <?php endif; ?>
-        <?php if (!empty($meta['fail_note'][0])): ?>
-            <p class="mb-2"><strong>Lý do không thành công:</strong><br><?= htmlspecialchars($meta['fail_note'][0]) ?></p>
+        <?php if (!empty($failNoteRows)): ?>
+            <div class="mb-2">
+                <strong>Lý do giao không thành công<?= count($failNoteRows) > 1 ? ' (' . count($failNoteRows) . ' lần)' : '' ?>:</strong>
+                <ul class="mb-0 ps-3 mt-1">
+                    <?php foreach ($failNoteRows as $idx => $fnRow): ?>
+                    <li>
+                        <?= htmlspecialchars($fnRow['meta_value'] ?? '') ?>
+                        <?php if (!empty($fnRow['created_at'])): ?>
+                        <small class="text-muted">(<?= htmlspecialchars($fnRow['created_at']) ?>)</small>
+                        <?php endif; ?>
+                    </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
         <?php endif; ?>
-        <?php if (!empty($meta['customer_signature'][0])): ?>
+        <?php if ($latestSignature !== ''): ?>
             <strong>✍️ Chữ ký người nhận:</strong><br>
-            <img src="<?= htmlspecialchars(emslss_upload_url($meta['customer_signature'][0])) ?>" class="img-fluid rounded mt-2" style="max-height:200px">
+            <img src="<?= htmlspecialchars(emslss_upload_url($latestSignature)) ?>" class="img-fluid rounded mt-2" style="max-height:200px">
         <?php endif; ?>
     </div>
     <?php endif; ?>

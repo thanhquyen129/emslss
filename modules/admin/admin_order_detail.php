@@ -70,14 +70,20 @@ $images = $conn->query("
 */
 $meta = [];
 $meta_q = $conn->query("
-    SELECT meta_key, meta_value
+    SELECT meta_key, meta_value, created_at
     FROM emslss_order_meta
     WHERE order_id = $order_id
+    ORDER BY id ASC
 ");
 
 while ($m = $meta_q->fetch_assoc()) {
     $meta[$m['meta_key']][] = $m['meta_value'];
+    $meta[$m['meta_key'] . '_rows'][] = $m;
 }
+$latestRecipient = !empty($meta['delivery_recipient_name']) ? end($meta['delivery_recipient_name']) : '-';
+$latestDeliveryNote = !empty($meta['delivery_note']) ? end($meta['delivery_note']) : '-';
+$latestSignature = !empty($meta['customer_signature']) ? end($meta['customer_signature']) : null;
+$failNoteRows = $meta['fail_note_rows'] ?? [];
 
 /*
 |--------------------------------------------------------------------------
@@ -167,15 +173,27 @@ pre{
 <h5>Meta lỗi / note</h5>
 
 <p><b>Người nhận (đã ký nhận):</b><br>
-<?= htmlspecialchars($meta['delivery_recipient_name'][0] ?? '-') ?>
+<?= htmlspecialchars($latestRecipient) ?>
 </p>
 
 <p><b>Fail note:</b><br>
-<?= htmlspecialchars($meta['fail_note'][0] ?? '-') ?>
+<?php if (!empty($failNoteRows)): ?>
+    <?php foreach ($failNoteRows as $idx => $fnRow): ?>
+        <span class="d-block">
+            <?php if (count($failNoteRows) > 1): ?><b>Lần <?= $idx + 1 ?>:</b> <?php endif; ?>
+            <?= htmlspecialchars($fnRow['meta_value'] ?? '') ?>
+            <?php if (!empty($fnRow['created_at'])): ?>
+                <small class="text-muted">(<?= htmlspecialchars($fnRow['created_at']) ?>)</small>
+            <?php endif; ?>
+        </span>
+    <?php endforeach; ?>
+<?php else: ?>
+    -
+<?php endif; ?>
 </p>
 
 <p><b>Delivery note:</b><br>
-<?= htmlspecialchars($meta['delivery_note'][0] ?? '-') ?>
+<?= htmlspecialchars($latestDeliveryNote) ?>
 </p>
 
 <p><b>Retry count:</b><br>
@@ -202,17 +220,32 @@ pre{
 <div class="card p-3 mb-4">
 <h5>🖼 Ảnh pickup / delivery</h5>
 
-<?php while($img = $images->fetch_assoc()): ?>
-    <img src="<?= htmlspecialchars(emslss_upload_url($img['image_path'])) ?>" class="img-thumb">
+<div class="d-flex flex-wrap gap-2">
+<?php while($img = $images->fetch_assoc()):
+    $imgUrl = emslss_upload_url($img['image_path'] ?? '');
+    $stageMeta = emslss_image_stage_meta($img['image_path'] ?? '');
+?>
+    <div class="position-relative d-inline-block text-center">
+        <a href="<?= htmlspecialchars($imgUrl) ?>" target="_blank" class="d-block position-relative">
+            <img src="<?= htmlspecialchars($imgUrl) ?>" class="img-thumb">
+            <span class="badge <?= htmlspecialchars($stageMeta['badge_class']) ?> position-absolute top-0 start-0 m-2">
+                <?= htmlspecialchars($stageMeta['label']) ?>
+            </span>
+        </a>
+        <?php if (!empty($img['created_at'])): ?>
+        <small class="text-muted d-block"><?= htmlspecialchars($img['created_at']) ?></small>
+        <?php endif; ?>
+    </div>
 <?php endwhile; ?>
+</div>
 
 </div>
 
 <div class="card p-3 mb-4">
 <h5>✍️ Chữ ký khách hàng</h5>
 
-<?php if(isset($meta['customer_signature'][0])): ?>
-    <img src="<?= htmlspecialchars(emslss_upload_url($meta['customer_signature'][0])) ?>" class="img-fluid rounded">
+<?php if($latestSignature !== null): ?>
+    <img src="<?= htmlspecialchars(emslss_upload_url($latestSignature)) ?>" class="img-fluid rounded">
 <?php else: ?>
     <p>Chưa có chữ ký</p>
 <?php endif; ?>

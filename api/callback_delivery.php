@@ -9,7 +9,7 @@ require_once __DIR__ . '/../config/upload.php';
 function emslss_order_meta_map(mysqli $conn, int $orderId): array
 {
     $meta = [];
-    $stmt = $conn->prepare('SELECT meta_key, meta_value FROM emslss_order_meta WHERE order_id = ?');
+    $stmt = $conn->prepare('SELECT meta_key, meta_value FROM emslss_order_meta WHERE order_id = ? ORDER BY id DESC');
     $stmt->bind_param('i', $orderId);
     $stmt->execute();
     $res = $stmt->get_result();
@@ -49,13 +49,14 @@ function sendDeliveryCallback($order_id, $status = 'delivered', array $extra = [
 
     $eventTime = date('Y-m-d\TH:i:s');
     $meta = emslss_order_meta_map($conn, $order_id);
-    $images = [];
+    $allDeliveryImages = [];
+    $successImages = [];
+    $failImages = [];
     $imgStmt = $conn->prepare("
         SELECT image_path
         FROM emslss_images
         WHERE order_id = ?
-        ORDER BY created_at ASC
-        LIMIT 10
+        ORDER BY created_at ASC, id ASC
     ");
     $imgStmt->bind_param("i", $order_id);
     $imgStmt->execute();
@@ -69,7 +70,13 @@ function sendDeliveryCallback($order_id, $status = 'delivered', array $extra = [
         $isDelivery = str_contains($path, $deliverySeg)
             || str_contains($path, '/delivery/');
         if ($isDelivery) {
-            $images[] = emslss_upload_absolute_url($path);
+            $absUrl = emslss_upload_absolute_url($path);
+            $allDeliveryImages[] = $absUrl;
+            if (emslss_is_delivery_fail_image($path)) {
+                $failImages[] = $absUrl;
+            } else {
+                $successImages[] = $absUrl;
+            }
         }
     }
 
@@ -83,6 +90,7 @@ function sendDeliveryCallback($order_id, $status = 'delivered', array $extra = [
 
     if ($status === 'delivered') {
         // EMS bắt buộc: images, signature_image, note
+        $images = $successImages !== [] ? array_slice($successImages, -10) : array_slice($allDeliveryImages, -10);
         $data['images'] = $images;
 
         $signatureImage = trim((string) ($extra['signature_image'] ?? ''));
@@ -108,6 +116,7 @@ function sendDeliveryCallback($order_id, $status = 'delivered', array $extra = [
         }
     } else {
         // failed — EMS bắt buộc: reason
+        $images = $failImages !== [] ? array_slice($failImages, -10) : [];
         if ($images !== []) {
             $data['images'] = $images;
         }
