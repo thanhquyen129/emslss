@@ -50,6 +50,10 @@ if(session_status() == PHP_SESSION_NONE){
                 </li>
 
                 <li class="nav-item">
+                    <a class="nav-link" href="ds_bg_export.php">DS BG EMS</a>
+                </li>
+
+                <li class="nav-item">
                     <a class="nav-link" href="callback_monitor.php">Callback</a>
                 </li>
 
