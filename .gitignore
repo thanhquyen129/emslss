@@ -1,6 +1,11 @@
 /uploads/*
 !/uploads/.gitkeep
 
+# FTP / local IDE credentials — không commit
+hailybato.xml
+*.ftpconfig
+.vscode/sftp.json
+
 # Mobile (Capacitor)
 mobile/node_modules/
 mobile/android/.gradle/
