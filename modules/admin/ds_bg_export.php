@@ -39,7 +39,7 @@ body { background: #f0f4f8; }
     <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-2">
         <div>
             <h4 class="mb-1">Xuất danh sách bưu gửi EMS qua LSS</h4>
-            <small class="text-muted">File Excel theo mẫu EMS (STT, mã bưu gửi, ngày/giờ nhận, phát lần đầu, kết quả phát)</small>
+            <small class="text-muted">File Excel theo mẫu EMS (nhận dữ liệu, phát lần đầu, kết quả, trạng thái/thời gian phát lần cuối)</small>
         </div>
         <a href="<?= $isEmsPortal ? '/modules/ems/dashboard.php' : 'admin_reports.php' ?>" class="btn btn-outline-secondary btn-sm">← Quay lại</a>
     </div>
@@ -55,7 +55,8 @@ body { background: #f0f4f8; }
             <div class="card p-3 h-100">
                 <div class="text-muted small mb-1">Cột trong file xuất</div>
                 <div class="small">
-                    STT · Mã bưu gửi · Ngày/Giờ LSS nhận dữ liệu · Ngày/Giờ phát lần đầu · Kết quả phát
+                    STT · Mã bưu gửi · Ngày/Giờ LSS nhận · Ngày/Giờ phát lần đầu · Kết quả phát
+                    · Trạng thái cuối · Thời gian phát lần cuối
                 </div>
             </div>
         </div>
@@ -80,8 +81,10 @@ body { background: #f0f4f8; }
         </form>
         <p class="small text-muted mb-0">
             Lọc theo ngày EMS đẩy đơn vào LSS (<code>created_at</code>).
-            “Phát lần đầu” lấy mốc tracking <code>delivered</code>/<code>failed</code> sớm nhất;
-            “Kết quả phát” theo trạng thái hiện tại của đơn.
+            “Phát lần đầu” / “Kết quả phát” lấy mốc tracking <code>delivered</code>/<code>failed</code> sớm nhất
+            (chưa có mốc thì điền thời gian gán giao/<code>updated_at</code>, kết quả = Phát không thành công).
+            “Trạng thái cuối”: đã giao → Phát thành công; còn lại (trừ hủy) → Phát lần sau.
+            “Thời gian phát lần cuối” lấy mốc <code>delivered</code>/<code>failed</code> muộn nhất.
         </p>
     </div>
 </div>

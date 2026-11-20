@@ -3,19 +3,35 @@
  * Kết xuất danh sách bưu gửi EMS qua LSS theo mẫu docs/DS BG EMS qua LSS.xlsx
  */
 
-function emslss_ds_bg_result_label(string $status): string
+/** Nhãn kết quả phát lần đầu (theo mốc tracking delivered/failed sớm nhất). */
+function emslss_ds_bg_first_result_label(?string $firstDeliveryStatus): string
 {
-    $map = [
-        'delivered' => 'Phát thành công',
-        'failed' => 'Phát không thành công',
-        'cancelled' => 'Hủy',
-        'assigned_delivery' => 'Đang phát',
-        'in_transit' => 'Tại kho',
-        'picked_up' => 'Đã thu gom',
-        'assigned_pickup' => 'Đã gán pickup',
-        'new_order' => 'Chưa phát',
-    ];
-    return $map[$status] ?? $status;
+    if ($firstDeliveryStatus === 'delivered') {
+        return 'Phát thành công';
+    }
+    // Chưa có mốc phát / phát thất bại → coi là phát không thành công (sẽ phát lần sau).
+    return 'Phát không thành công';
+}
+
+/** Nhãn trạng thái cuối theo status hiện tại của đơn. */
+function emslss_ds_bg_final_status_label(string $status): string
+{
+    if ($status === 'delivered') {
+        return 'Phát thành công';
+    }
+    if ($status === 'cancelled') {
+        return 'Hủy';
+    }
+    return 'Phát lần sau';
+}
+
+function emslss_ds_bg_format_ts(?string $datetime, string $format): string
+{
+    if ($datetime === null || $datetime === '') {
+        return '';
+    }
+    $ts = strtotime($datetime);
+    return $ts ? date($format, $ts) : '';
 }
 
 /**
@@ -52,14 +68,28 @@ function emslss_ds_bg_list_sql(string $whereSql): string
             o.ems_code,
             o.status,
             o.created_at,
-            first_del.first_delivery_at
+            o.updated_at,
+            del.first_delivery_at,
+            del.first_delivery_status,
+            del.last_delivery_at,
+            assign.first_assigned_at
         FROM emslss_orders o
         LEFT JOIN (
-            SELECT order_id, MIN(created_at) AS first_delivery_at
+            SELECT
+                order_id,
+                MIN(created_at) AS first_delivery_at,
+                SUBSTRING_INDEX(GROUP_CONCAT(status ORDER BY created_at ASC, id ASC), ',', 1) AS first_delivery_status,
+                MAX(created_at) AS last_delivery_at
             FROM emslss_tracking
             WHERE status IN ('delivered', 'failed')
             GROUP BY order_id
-        ) first_del ON first_del.order_id = o.id
+        ) del ON del.order_id = o.id
+        LEFT JOIN (
+            SELECT order_id, MIN(created_at) AS first_assigned_at
+            FROM emslss_tracking
+            WHERE status = 'assigned_delivery'
+            GROUP BY order_id
+        ) assign ON assign.order_id = o.id
         WHERE $whereSql
         ORDER BY o.created_at ASC, o.id ASC
     ";
@@ -79,7 +109,16 @@ function emslss_ds_bg_count(mysqli $conn, string $whereSql, string $types, array
 }
 
 /**
- * @return array<int,array{ems_code:string,received_date:string,received_time:string,first_delivery_date:string,first_delivery_time:string,result:string}>
+ * @return array<int,array{
+ *   ems_code:string,
+ *   received_date:string,
+ *   received_time:string,
+ *   first_delivery_date:string,
+ *   first_delivery_time:string,
+ *   result:string,
+ *   final_status:string,
+ *   last_delivery_at:string
+ * }>
  */
 function emslss_ds_bg_fetch_rows(mysqli $conn, string $whereSql, string $types, array $params): array
 {
@@ -95,17 +134,26 @@ function emslss_ds_bg_fetch_rows(mysqli $conn, string $whereSql, string $types, 
     $res = $stmt->get_result();
     $rows = [];
     while ($row = $res->fetch_assoc()) {
-        $created = (string) ($row['created_at'] ?? '');
+        $status = (string) ($row['status'] ?? '');
         $firstAt = (string) ($row['first_delivery_at'] ?? '');
-        $createdTs = $created !== '' ? strtotime($created) : false;
-        $firstTs = $firstAt !== '' ? strtotime($firstAt) : false;
+        $firstStatus = $row['first_delivery_status'] ?? null;
+        $lastAt = (string) ($row['last_delivery_at'] ?? '');
+        $assignAt = (string) ($row['first_assigned_at'] ?? '');
+        $updatedAt = (string) ($row['updated_at'] ?? '');
+
+        // Chỗ trống: lấy mốc giao thất bại/phát; không có thì gán giao / updated_at.
+        $firstFill = $firstAt !== '' ? $firstAt : ($assignAt !== '' ? $assignAt : $updatedAt);
+        $lastFill = $lastAt !== '' ? $lastAt : $firstFill;
+
         $rows[] = [
             'ems_code' => (string) ($row['ems_code'] ?? ''),
-            'received_date' => $createdTs ? date('d/m/Y', $createdTs) : '',
-            'received_time' => $createdTs ? date('H:i:s', $createdTs) : '',
-            'first_delivery_date' => $firstTs ? date('d/m/Y', $firstTs) : '',
-            'first_delivery_time' => $firstTs ? date('H:i:s', $firstTs) : '',
-            'result' => emslss_ds_bg_result_label((string) ($row['status'] ?? '')),
+            'received_date' => emslss_ds_bg_format_ts((string) ($row['created_at'] ?? ''), 'd/m/Y'),
+            'received_time' => emslss_ds_bg_format_ts((string) ($row['created_at'] ?? ''), 'H:i:s'),
+            'first_delivery_date' => emslss_ds_bg_format_ts($firstFill, 'd/m/Y'),
+            'first_delivery_time' => emslss_ds_bg_format_ts($firstFill, 'H:i:s'),
+            'result' => emslss_ds_bg_first_result_label(is_string($firstStatus) ? $firstStatus : null),
+            'final_status' => emslss_ds_bg_final_status_label($status),
+            'last_delivery_at' => emslss_ds_bg_format_ts($lastFill, 'd/m/Y H:i:s'),
         ];
     }
     return $rows;
@@ -152,7 +200,10 @@ function emslss_ds_bg_build_sheet_parts(array $rows, string $title): array
         'Ngày phát lần đầu',
         'Giờ phát lần đầu',
         'Kết quả phát',
+        'Trạng thái cuối',
+        'Thời gian phát lần cuối (ngày giờ)',
     ];
+    $textColCount = count($headers) - 1; // trừ STT (số)
 
     $strings = [];
     $stringIndex = static function (string $value) use (&$strings): int {
@@ -177,6 +228,8 @@ function emslss_ds_bg_build_sheet_parts(array $rows, string $title): array
             $row['first_delivery_date'],
             $row['first_delivery_time'],
             $row['result'],
+            $row['final_status'],
+            $row['last_delivery_at'],
         ];
         $refs = [];
         foreach ($textCells as $c) {
@@ -189,7 +242,7 @@ function emslss_ds_bg_build_sheet_parts(array $rows, string $title): array
     }
 
     $uniqueCount = count($strings);
-    $totalCount = 1 + count($headers) + (count($rows) * 6);
+    $totalCount = 1 + count($headers) + (count($rows) * $textColCount);
     $sst = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' . "\n";
     $sst .= '<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="'
         . $totalCount . '" uniqueCount="' . $uniqueCount . '">';
@@ -203,6 +256,8 @@ function emslss_ds_bg_build_sheet_parts(array $rows, string $title): array
     }
     $sst .= '</sst>';
 
+    $lastCol = emslss_ds_bg_col_letter(count($headers));
+    $span = '1:' . count($headers);
     $lastRow = max(3, 3 + count($rows));
     $sheet = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' . "\n";
     $sheet .= '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"'
@@ -210,20 +265,20 @@ function emslss_ds_bg_build_sheet_parts(array $rows, string $title): array
         . ' xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"'
         . ' mc:Ignorable="x14ac"'
         . ' xmlns:x14ac="http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac">';
-    $sheet .= '<dimension ref="A1:G' . $lastRow . '"/>';
+    $sheet .= '<dimension ref="A1:' . $lastCol . $lastRow . '"/>';
     $sheet .= '<sheetViews><sheetView workbookViewId="0"/></sheetViews>';
     $sheet .= '<sheetFormatPr defaultRowHeight="15" x14ac:dyDescent="0.25"/>';
     $sheet .= '<cols>'
         . '<col min="1" max="1" width="10" customWidth="1"/>'
-        . '<col min="2" max="7" width="28.7109375" customWidth="1"/>'
+        . '<col min="2" max="' . count($headers) . '" width="28.7109375" customWidth="1"/>'
         . '</cols>';
     $sheet .= '<sheetData>';
 
-    $sheet .= '<row r="1" spans="1:7" ht="15.75" x14ac:dyDescent="0.25">'
+    $sheet .= '<row r="1" spans="' . $span . '" ht="15.75" x14ac:dyDescent="0.25">'
         . '<c r="A1" s="2" t="s"><v>' . $titleIdx . '</v></c>'
         . '</row>';
 
-    $sheet .= '<row r="3" spans="1:7" ht="15.75" x14ac:dyDescent="0.25">';
+    $sheet .= '<row r="3" spans="' . $span . '" ht="15.75" x14ac:dyDescent="0.25">';
     foreach ($headerIdx as $ci => $idx) {
         $col = emslss_ds_bg_col_letter($ci + 1);
         $sheet .= '<c r="' . $col . '3" s="2" t="s"><v>' . $idx . '</v></c>';
@@ -232,7 +287,7 @@ function emslss_ds_bg_build_sheet_parts(array $rows, string $title): array
 
     foreach ($dataRows as $ri => $dataRow) {
         $r = $ri + 4;
-        $sheet .= '<row r="' . $r . '" spans="1:7" ht="15.75" x14ac:dyDescent="0.25">';
+        $sheet .= '<row r="' . $r . '" spans="' . $span . '" ht="15.75" x14ac:dyDescent="0.25">';
         $sheet .= '<c r="A' . $r . '" s="1"><v>' . (int) $dataRow['stt'] . '</v></c>';
         foreach ($dataRow['refs'] as $ci => $idx) {
             $col = emslss_ds_bg_col_letter($ci + 2);
@@ -275,6 +330,30 @@ function emslss_ds_bg_send_xlsx(array $rows, string $dateFrom, string $dateTo): 
         return;
     }
 
+    // Bảo đảm package OOXML khai báo sharedStrings (template sửa bằng Excel/lib có thể làm mất).
+    $ctypes = $zip->getFromName('[Content_Types].xml');
+    if (is_string($ctypes) && strpos($ctypes, 'sharedStrings.xml') === false) {
+        $ctypes = str_replace(
+            '</Types>',
+            '<Override PartName="/xl/sharedStrings.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml"/></Types>',
+            $ctypes
+        );
+        $zip->deleteName('[Content_Types].xml');
+        $zip->addFromString('[Content_Types].xml', $ctypes);
+    }
+    $rels = $zip->getFromName('xl/_rels/workbook.xml.rels');
+    if (is_string($rels) && strpos($rels, 'sharedStrings') === false) {
+        $rels = str_replace(
+            '</Relationships>',
+            '<Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings" Target="sharedStrings.xml" Id="rIdSharedStrings"/></Relationships>',
+            $rels
+        );
+        $zip->deleteName('xl/_rels/workbook.xml.rels');
+        $zip->addFromString('xl/_rels/workbook.xml.rels', $rels);
+    }
+
+    $zip->deleteName('xl/sharedStrings.xml');
+    $zip->deleteName('xl/worksheets/sheet1.xml');
     $zip->addFromString('xl/sharedStrings.xml', $parts['shared']);
     $zip->addFromString('xl/worksheets/sheet1.xml', $parts['sheet']);
     $zip->close();
@@ -311,6 +390,7 @@ function emslss_ds_bg_send_spreadsheetml(array $rows, string $dateFrom, string $
     $headers = [
         'STT', 'Mã bưu gửi', 'Ngày LSS nhận dữ liệu', 'Giờ LSS nhận dữ liệu',
         'Ngày phát lần đầu', 'Giờ phát lần đầu', 'Kết quả phát',
+        'Trạng thái cuối', 'Thời gian phát lần cuối (ngày giờ)',
     ];
 
     echo "\xEF\xBB\xBF";
@@ -342,7 +422,8 @@ function emslss_ds_bg_send_spreadsheetml(array $rows, string $dateFrom, string $
     echo '<Worksheet ss:Name="Sheet1"><Table>' . "\n";
     echo '<Column ss:Width="50"/><Column ss:Width="140"/>'
         . '<Column ss:Width="120"/><Column ss:Width="120"/>'
-        . '<Column ss:Width="120"/><Column ss:Width="120"/><Column ss:Width="140"/>' . "\n";
+        . '<Column ss:Width="120"/><Column ss:Width="120"/><Column ss:Width="140"/>'
+        . '<Column ss:Width="140"/><Column ss:Width="180"/>' . "\n";
     echo '<Row><Cell ss:StyleID="Title"><Data ss:Type="String">'
         . emslss_ds_bg_xml_escape($title) . '</Data></Cell></Row>' . "\n";
     echo '<Row></Row>' . "\n";
@@ -359,6 +440,8 @@ function emslss_ds_bg_send_spreadsheetml(array $rows, string $dateFrom, string $
             $row['first_delivery_date'],
             $row['first_delivery_time'],
             $row['result'],
+            $row['final_status'],
+            $row['last_delivery_at'],
         ];
         echo '<Row>';
         echo '<Cell ss:StyleID="Cell"><Data ss:Type="Number">' . ($i + 1) . '</Data></Cell>';
