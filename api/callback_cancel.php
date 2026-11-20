@@ -109,7 +109,6 @@ function sendCancelCallback(int $order_id, array $extra = []): array
         $response = 'CURL ERROR: ' . curl_error($ch);
         $http_code = 0;
     }
-    curl_close($ch);
 
     $success = $http_code >= 200 && $http_code < 300;
     apiLog('CALLBACK_CANCEL', $bodyToSend, json_encode([

@@ -3,12 +3,13 @@ session_start();
 include '../../config/db.php';
 require_once __DIR__ . '/../../config/upload.php';
 require_once __DIR__ . '/../../config/order_helpers.php';
-include '../../templates/admin_topbar.php';
 
 if (!isset($_SESSION['user_id'])) {
-		header("Location: ../login.php");
+    header("Location: ../login.php");
     exit;
 }
+
+include '../../templates/admin_topbar.php';
 
 $order_id = intval($_GET['id'] ?? 0);
 

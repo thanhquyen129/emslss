@@ -199,8 +199,6 @@ function sendDeliveryCallback($order_id, $status = 'delivered', array $extra = [
         $http_code = 0;
     }
 
-    curl_close($ch);
-
     $success = ($http_code >= 200 && $http_code < 300);
     $logResponse = json_encode([
         'success' => $success,

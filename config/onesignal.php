@@ -109,7 +109,6 @@ function emslss_onesignal_send(array $payload): array
     $errno = curl_errno($ch);
     $err = curl_error($ch);
     $code = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
 
     if ($errno) {
         return ['ok' => false, 'response' => null, 'error' => $err ?: 'curl_error'];

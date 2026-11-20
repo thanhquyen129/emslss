@@ -58,7 +58,6 @@ function upload_check_http_status(string $url): string
         ]);
         curl_exec($ch);
         $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
         return $code > 0 ? (string) $code : 'curl_err';
     }
     $ctx = stream_context_create(['http' => ['method' => 'HEAD', 'timeout' => 8]]);
