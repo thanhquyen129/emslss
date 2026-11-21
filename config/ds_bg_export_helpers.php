@@ -9,8 +9,17 @@ function emslss_ds_bg_first_result_label(?string $firstDeliveryStatus): string
     if ($firstDeliveryStatus === 'delivered') {
         return 'Phát thành công';
     }
-    // Chưa có mốc phát / phát thất bại → coi là phát không thành công (sẽ phát lần sau).
-    return 'Phát không thành công';
+    if ($firstDeliveryStatus === 'failed') {
+        return 'Phát không thành công';
+    }
+    // Chưa có mốc phát thật → để trống (không bịa “phát không thành công”).
+    return '';
+}
+
+/** Đơn đã vào giai đoạn phát (có/đang/đã phát). */
+function emslss_ds_bg_is_delivery_phase(string $status): bool
+{
+    return in_array($status, ['assigned_delivery', 'failed', 'delivered'], true);
 }
 
 /** Nhãn trạng thái cuối theo status hiện tại của đơn. */
@@ -22,7 +31,11 @@ function emslss_ds_bg_final_status_label(string $status): string
     if ($status === 'cancelled') {
         return 'Hủy';
     }
-    return 'Phát lần sau';
+    if (emslss_ds_bg_is_delivery_phase($status)) {
+        return 'Phát lần sau';
+    }
+    // LSS chỉ nhận dữ liệu / chưa phát hàng thật → Đơn mới.
+    return 'Đơn mới';
 }
 
 function emslss_ds_bg_format_ts(?string $datetime, string $format): string
@@ -136,14 +149,29 @@ function emslss_ds_bg_fetch_rows(mysqli $conn, string $whereSql, string $types, 
     while ($row = $res->fetch_assoc()) {
         $status = (string) ($row['status'] ?? '');
         $firstAt = (string) ($row['first_delivery_at'] ?? '');
-        $firstStatus = $row['first_delivery_status'] ?? null;
+        $firstStatus = is_string($row['first_delivery_status'] ?? null)
+            ? (string) $row['first_delivery_status']
+            : null;
         $lastAt = (string) ($row['last_delivery_at'] ?? '');
         $assignAt = (string) ($row['first_assigned_at'] ?? '');
         $updatedAt = (string) ($row['updated_at'] ?? '');
 
-        // Chỗ trống: lấy mốc giao thất bại/phát; không có thì gán giao / updated_at.
-        $firstFill = $firstAt !== '' ? $firstAt : ($assignAt !== '' ? $assignAt : $updatedAt);
-        $lastFill = $lastAt !== '' ? $lastAt : $firstFill;
+        $firstFill = '';
+        $lastFill = '';
+        $result = '';
+
+        if ($firstAt !== '') {
+            // Có mốc phát thật (delivered/failed).
+            $firstFill = $firstAt;
+            $lastFill = $lastAt !== '' ? $lastAt : $firstAt;
+            $result = emslss_ds_bg_first_result_label($firstStatus);
+        } elseif (emslss_ds_bg_is_delivery_phase($status)) {
+            // Đã gán phát nhưng chưa có mốc delivered/failed.
+            $firstFill = $assignAt !== '' ? $assignAt : $updatedAt;
+            $lastFill = $firstFill;
+            $result = 'Phát không thành công';
+        }
+        // new_order / pickup / transit / cancelled: không điền cột phát giả.
 
         $rows[] = [
             'ems_code' => (string) ($row['ems_code'] ?? ''),
@@ -151,7 +179,7 @@ function emslss_ds_bg_fetch_rows(mysqli $conn, string $whereSql, string $types, 
             'received_time' => emslss_ds_bg_format_ts((string) ($row['created_at'] ?? ''), 'H:i:s'),
             'first_delivery_date' => emslss_ds_bg_format_ts($firstFill, 'd/m/Y'),
             'first_delivery_time' => emslss_ds_bg_format_ts($firstFill, 'H:i:s'),
-            'result' => emslss_ds_bg_first_result_label(is_string($firstStatus) ? $firstStatus : null),
+            'result' => $result,
             'final_status' => emslss_ds_bg_final_status_label($status),
             'last_delivery_at' => emslss_ds_bg_format_ts($lastFill, 'd/m/Y H:i:s'),
         ];

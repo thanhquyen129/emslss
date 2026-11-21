@@ -81,10 +81,11 @@ body { background: #f0f4f8; }
         </form>
         <p class="small text-muted mb-0">
             Lọc theo ngày EMS đẩy đơn vào LSS (<code>created_at</code>).
-            “Phát lần đầu” / “Kết quả phát” lấy mốc tracking <code>delivered</code>/<code>failed</code> sớm nhất
-            (chưa có mốc thì điền thời gian gán giao/<code>updated_at</code>, kết quả = Phát không thành công).
-            “Trạng thái cuối”: đã giao → Phát thành công; còn lại (trừ hủy) → Phát lần sau.
-            “Thời gian phát lần cuối” lấy mốc <code>delivered</code>/<code>failed</code> muộn nhất.
+            “Phát lần đầu” / “Kết quả phát” / “Thời gian phát lần cuối” chỉ điền khi đã có mốc phát thật
+            (<code>delivered</code>/<code>failed</code>) hoặc đơn đã vào giai đoạn giao
+            (<code>assigned_delivery</code>/<code>failed</code>/<code>delivered</code>).
+            Đơn mới nhận (chưa phát hàng) → cột phát để trống, trạng thái cuối = <strong>Đơn mới</strong>.
+            Đã giao → Phát thành công; đang/thất bại phát → Phát lần sau; hủy → Hủy.
         </p>
     </div>
 </div>
