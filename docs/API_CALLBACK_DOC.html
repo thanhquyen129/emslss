@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<style>
+  body {
+    font-family: "Times New Roman", Times, serif;
+    font-size: 13pt;
+    margin: 2.5cm 3cm;
+    color: #000;
+    line-height: 1.5;
+  }
+  h1 {
+    font-size: 18pt;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 6pt;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  h2 {
+    font-size: 14pt;
+    font-weight: bold;
+    margin-top: 18pt;
+    margin-bottom: 6pt;
+    border-bottom: 1.5px solid #000;
+    padding-bottom: 2pt;
+  }
+  h3 {
+    font-size: 13pt;
+    font-weight: bold;
+    margin-top: 12pt;
+    margin-bottom: 4pt;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 12pt;
+    font-size: 12pt;
+  }
+  th {
+    background-color: #1F3864;
+    color: #fff;
+    padding: 6pt 8pt;
+    text-align: left;
+    font-weight: bold;
+  }
+  td {
+    border: 1px solid #AAAAAA;
+    padding: 5pt 8pt;
+    vertical-align: top;
+  }
+  tr:nth-child(even) td {
+    background-color: #F2F5FA;
+  }
+  code, .code-inline {
+    font-family: "Courier New", monospace;
+    font-size: 11pt;
+    background-color: #F0F0F0;
+    padding: 0 3pt;
+    border-radius: 2px;
+  }
+  pre {
+    font-family: "Courier New", monospace;
+    font-size: 10.5pt;
+    background-color: #F8F8F8;
+    border: 1px solid #CCCCCC;
+    padding: 10pt 12pt;
+    margin: 8pt 0;
+    line-height: 1.6;
+    white-space: pre;
+  }
+  .required { color: #C00000; font-weight: bold; }
+  .optional { color: #555; }
+  .success  { color: #375623; }
+  .error    { color: #C00000; }
+  .note {
+    border-left: 4px solid #1F3864;
+    padding: 6pt 10pt;
+    background-color: #EEF2FA;
+    margin: 10pt 0;
+    font-size: 12pt;
+  }
+  hr { border: none; border-top: 1px solid #CCC; margin: 16pt 0; }
+  p { margin: 4pt 0 8pt 0; }
+</style>
+</head>
+<body>
+
+<h1>Tài liệu EMS API Callback — LSS Logistics</h1>
+<hr>
+
+<!-- ================================================ -->
+<h2>1. Thông tin kết nối</h2>
+
+<table>
+  <tr><th>Thông tin</th><th>Giá trị</th></tr>
+  <tr><td>URL</td><td><code>POST https://emslss.ems.com.vn/api/lss/callback</code></td></tr>
+  <tr><td>Content-Type</td><td><code>application/json</code></td></tr>
+  <tr><td>Xác thực</td><td>Header <code>X-API-KEY: EMSLSS2026</code></td></tr>
+</table>
+
+<!-- ================================================ -->
+<h2>2. Request</h2>
+
+<h3>2.1 Headers</h3>
+<table>
+  <tr><th>Header</th><th>Bắt buộc</th><th>Mô tả</th></tr>
+  <tr><td><code>X-API-KEY</code></td><td class="required">✔</td><td>API key xác thực</td></tr>
+  <tr><td><code>Content-Type</code></td><td class="required">✔</td><td><code>application/json</code></td></tr>
+</table>
+
+<h3>2.2 Body</h3>
+<table>
+  <tr><th>Trường</th><th>Kiểu</th><th>Bắt buộc</th><th>Mô tả</th></tr>
+  <tr>
+    <td><code>ems_code</code></td><td>string</td>
+    <td class="required">✔</td>
+    <td>Mã EMS đơn hàng</td>
+  </tr>
+  <tr>
+    <td><code>status</code></td><td>string</td>
+    <td class="required">✔</td>
+    <td>Trạng thái callback (xem mục 3)</td>
+  </tr>
+  <tr>
+    <td><code>time</code></td><td>datetime</td>
+    <td class="optional">—</td>
+    <td>Thời gian xảy ra sự kiện.<br>Format: <code>yyyy-MM-ddTHH:mm:ss</code> (giờ Việt Nam).<br>Mặc định: thời gian server nhận request.</td>
+  </tr>
+  <tr>
+    <td><code>images</code></td><td>string[]</td>
+    <td class="required">✔ (*)</td>
+    <td>Danh sách URL ảnh. Bắt buộc với <code>picked_up</code>, <code>delivered</code>.</td>
+  </tr>
+  <tr>
+    <td><code>signature_image</code></td><td>string</td>
+    <td class="required">✔ (*)</td>
+    <td>URL ảnh chữ ký người nhận. Bắt buộc với <code>delivered</code>.</td>
+  </tr>
+  <tr>
+    <td><code>note</code></td><td>string</td>
+    <td class="optional">—</td>
+    <td>Thông tin giao nhận.</td>
+  </tr>
+  <tr>
+    <td><code>reason</code></td><td>string</td>
+    <td class="required">✔ (*)</td>
+    <td>Lý do thất bại. Bắt buộc với <code>failed</code>.</td>
+  </tr>
+</table>
+
+<!-- ================================================ -->
+<h2>3. Danh sách trạng thái</h2>
+
+<table>
+  <tr><th>Giá trị gửi lên</th><th>Ý nghĩa</th><th>Trường bắt buộc thêm</th></tr>
+  <tr><td><code>new_order</code></td><td>Đơn hàng mới tạo</td><td>—</td></tr>
+  <tr><td><code>assigned_pickup</code></td><td>Đã phân công lấy hàng</td><td>—</td></tr>
+  <tr><td><code>picked_up</code></td><td>Đã lấy hàng thành công</td><td><code>images</code></td></tr>
+  <tr><td><code>in_transit</code></td><td>Đang vận chuyển</td><td>—</td></tr>
+  <tr><td><code>delivered</code></td><td>Giao hàng thành công</td><td><code>images</code>, <code>signature_image</code>, <code>note</code></td></tr>
+  <tr><td><code>failed</code></td><td>Giao hàng thất bại</td><td><code>reason</code></td></tr>
+  <tr><td><code>cancelled</code></td><td>Đã hủy đơn</td><td>—</td></tr>
+</table>
+
+<div class="note">
+  Các trạng thái không có trong danh sách trên vẫn được ghi nhận vào lịch sử nhưng không cập nhật trạng thái chính của đơn hàng.
+</div>
+
+<!-- ================================================ -->
+<h2>4. Response</h2>
+
+<h3>4.1 Thành công — HTTP 200</h3>
+<pre>{
+  "status": "success"
+}</pre>
+
+<h3>4.2 Lỗi — HTTP 400 / 404 / 500</h3>
+<pre>{
+  "status":  "error",
+  "code":    "03",
+  "message": "Trạng thái 'picked_up' bắt buộc phải có ảnh"
+}</pre>
+
+<!-- ================================================ -->
+<h2>5. Bảng mã lỗi</h2>
+
+<table>
+  <tr><th>Code</th><th>HTTP</th><th>Mô tả</th></tr>
+  <tr><td><code>01</code></td><td>400</td><td>Thiếu <code>ems_code</code></td></tr>
+  <tr><td><code>02</code></td><td>400</td><td>Thiếu <code>status</code></td></tr>
+  <tr><td><code>03</code></td><td>400</td><td><code>picked_up</code>: thiếu <code>images</code></td></tr>
+  <tr><td><code>04</code></td><td>400</td><td><code>delivered</code>: thiếu <code>images</code></td></tr>
+  <tr><td><code>05</code></td><td>400</td><td><code>delivered</code>: thiếu <code>signature_image</code></td></tr>
+  <tr><td><code>06</code></td><td>400</td><td><code>delivered</code>: thiếu <code>note</code></td></tr>
+  <tr><td><code>07</code></td><td>400</td><td><code>failed</code>: thiếu <code>reason</code></td></tr>
+  <tr><td><code>08</code></td><td>404</td><td>Không tìm thấy đơn hàng với <code>ems_code</code> đã cung cấp</td></tr>
+  <tr><td><code>99</code></td><td>500</td><td>Lỗi hệ thống</td></tr>
+</table>
+
+<!-- ================================================ -->
+<h2>6. Ví dụ Request</h2>
+
+<h3>6.1 picked_up</h3>
+<pre>{
+  "ems_code": "VD123456789VN",
+  "status":   "picked_up",
+  "time":     "2024-01-15T08:00:00",
+  "images":   ["/uploads/pickup1.jpg"]
+}</pre>
+
+<h3>6.2 delivered</h3>
+<pre>{
+  "ems_code":        "VD123456789VN",
+  "status":          "delivered",
+  "time":            "2024-01-15T10:30:00",
+  "images":          ["/uploads/del1.jpg"],
+  "signature_image": "/uploads/sign1.jpg",
+  "note":            "Giao cho bảo vệ tầng 1"
+}</pre>
+
+<h3>6.3 failed</h3>
+<pre>{
+  "ems_code": "VD123456789VN",
+  "status":   "failed",
+  "time":     "2024-01-15T10:30:00",
+  "reason":   "Không liên lạc được người nhận sau 3 lần gọi"
+}</pre>
+
+<h3>6.4 cancelled</h3>
+<pre>{
+  "ems_code": "VD123456789VN",
+  "status":   "cancelled",
+  "time":     "2024-01-15T09:00:00"
+}</pre>
+
+</body>
+</html>

@@ -1,0 +1,48 @@
+name: Deploy FTP
+
+on:
+  push:
+    branches:
+      - emslss
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-ftp-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Deploy to lsslogistics.vn
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftp
+          port: 21
+          # Thư mục gốc public_html trên host (đổi nếu FTP vào subfolder)
+          server-dir: ./
+          local-dir: ./
+          dangerous-clean-slate: false
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/.github/**
+            **/node_modules/**
+            mobile/**
+            **/.cursor/**
+            **/agent-transcripts/**
+            hailybato.xml
+            **/*.md
+            **/README*
+            **/.gitignore
+            graphify-out/**

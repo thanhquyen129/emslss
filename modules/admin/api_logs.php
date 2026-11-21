@@ -83,10 +83,11 @@ pre { white-space: pre-wrap; word-break: break-word; font-size: 12px; margin: 0;
 </head>
 <body>
 
+<?php include __DIR__ . '/../../templates/admin_topbar.php'; ?>
+
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h4 class="mb-0">API Logs</h4>
-        <a href="admin_dashboard_realtime.php" class="btn btn-secondary btn-sm">← Dashboard</a>
     </div>
 
     <div class="card card-box p-3 mb-3">

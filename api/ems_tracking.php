@@ -26,7 +26,7 @@ safeExecute(function(){
         SELECT status, note, created_at
         FROM emslss_tracking
         WHERE order_id = ?
-        ORDER BY created_at ASC
+        ORDER BY created_at DESC
     ");
     $stmt->bind_param("i", $order['id']);
     $stmt->execute();

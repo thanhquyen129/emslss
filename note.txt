@@ -1,0 +1,11 @@
+- Operation phải nhập kho rồi mới cho phép admin gán delivery (enable delivery dropdownlist ) trên dashboard.
+- thêm chức năng gán pickup và delivery khi hiển thị dạng list và thumb. Khi hiển thị dạng list thì trim bớt các trường nội dung dài (để lại tầm 50 kí tự và ...). Hover (trên máy tính) hoặc touch vào (trên mobile) thì hiển thị đầy đủ.
+- delivery chọn (dropdownlist) giao thành công/thất bại trước. Nếu chọn giao thành công thì enable các trường giao thành công, shipper thao tác xong bấm nút submit. Nếu giao thất bại chọn lý do giao thất bại rồi submit.
+- Phần upload ảnh, ngoài chụp ảnh ra có thể cho shipper chọn nhiều ảnh từ thư viện ảnh trong điện thoại (hiện tại chỉ cho chụp 1 ảnh).
+- Hiện tại giao thất bại chưa cho shipper giao lại. Sửa lại, đơn giao thất bại hiển thị thêm trên dashboard shipper dòng: giao thất bại xx lần, và cho phép shipper thao tác giao lại.
+- Viết 1 page php riêng biệt cho phép chọn và xóa các đơn đã có trong csdl, mục đích là xóa các đơn test cho sạch dữ liệu
+- Trên dashboar shipper, mỗi đơn hiện có nút "chi tiết" và "pickup/delivery", thêm nút "nhận thông tin". Khi shipper click nút "nhận thông tin", admin sẽ biết là shipper đó đã nhận tin và sẽ xử lý. Phần thông tin đơn trên dashboard admin sẽ hiện thị: shipper abc đã nhận xử lý đơn này. 
+- Trong role admin, Dashboard realtime chỉ cho hiển thị những đơn chưa xử lý. Trong menu order mới hiển thị tất cả.
+- Timeline tracking order desc.
+
+

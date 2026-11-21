@@ -25,4 +25,3 @@ $conn->query("SET time_zone = '+07:00'");
 $conn->query("SET NAMES utf8mb4");
 $conn->query("SET CHARACTER SET utf8mb4");
 $conn->query("SET collation_connection = utf8mb4_unicode_ci");
-?>

@@ -1,0 +1,19 @@
+{
+  "name": "emslss-mobile",
+  "version": "1.0.0",
+  "private": true,
+  "description": "EMS-LSS Android WebView + OneSignal",
+  "scripts": {
+    "sync": "npx cap sync android",
+    "build:apk": "cd android && ./gradlew assembleDebug",
+    "build:apk:release": "cd android && ./gradlew assembleRelease"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.5.0",
+    "@capacitor/app": "^8.1.1",
+    "@capacitor/cli": "^8.5.0",
+    "@capacitor/core": "^8.5.0",
+    "@capacitor/splash-screen": "^8.0.2",
+    "@capacitor/status-bar": "^8.0.3"
+  }
+}

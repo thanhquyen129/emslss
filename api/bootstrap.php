@@ -244,4 +244,3 @@ function safeExecute($callback)
         responseError($msg, 500);
     }
 }
-?>

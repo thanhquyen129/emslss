@@ -58,8 +58,6 @@ function sendDeliveryCallback($order_id, $conn)
         $response = 'CURL ERROR: ' . curl_error($ch);
     }
 
-    curl_close($ch);
-
     // log API
     $source = 'delivery_callback';
 

@@ -1,0 +1,34 @@
+---
+description: Quy ước module nghiệp vụ, session, auth và upload
+globs: modules/**/*.php
+alwaysApply: false
+---
+
+# Module nghiệp vụ (`modules/`)
+
+## Khởi đầu file + kiểm tra đăng nhập
+
+```php
+<?php
+session_start();
+require '../../config/db.php';
+if (!isset($_SESSION['user_id'])) {
+    header("Location: ../login.php");
+    exit;
+}
+```
+
+- Session lưu: `user_id`, `role`, `full_name`. Phân nhánh điều hướng theo `$_SESSION['role']`.
+- LUÔN escape output bằng `htmlspecialchars(...)` để chống XSS.
+- Logic SQL tái dùng tách thành helper (vd `shipper_*_sql()` ở `modules/shipper/helpers.php`).
+
+## Auth & mật khẩu
+- Dùng helper ở `config/auth.php`: `emslss_hash_password()`, `emslss_verify_password()`,
+  `emslss_resolve_user_role()`.
+- `emslss_verify_password()` hỗ trợ cả md5 cũ lẫn `password_verify()` — KHÔNG xoá nhánh md5
+  khi chưa migrate xong dữ liệu.
+
+## Upload ảnh
+- Đi qua `config/upload.php`; subdir hợp lệ: `pickup`, `delivery`, `signatures`, `misc`.
+- Cho phép: `jpg, jpeg, png, gif, webp`; giới hạn theo `EMSLSS_UPLOAD_MAX_BYTES`.
+- Lưu **web path** (vd `/uploads/pickup/...`) vào `emslss_images.image_path`.

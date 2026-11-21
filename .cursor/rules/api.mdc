@@ -1,0 +1,37 @@
+---
+description: Quy ước viết API endpoint trong thư mục api/
+globs: api/**/*.php
+alwaysApply: false
+---
+
+# API Endpoints (`api/`)
+
+Mẫu chuẩn cho mọi endpoint:
+
+```php
+<?php
+require_once 'bootstrap.php';
+
+safeExecute(function() {
+    global $conn;
+    requireApiKey();                 // header X-API-KEY
+    requireMethod('POST');
+    [$data, $payload] = getJsonInput();
+    validateRequired($data, ['ems_code', /* ... */]);
+
+    beginTx();
+    // ... prepared statements ...
+    commitTx();
+
+    apiLog('EMS_PUSH', $payload, json_encode(['ems_code'=>$ems_code]));
+    responseSuccess(['ems_code'=>$ems_code]);
+});
+```
+
+## Quy tắc
+- Bảo vệ bằng `requireApiKey()` + `requireMethod()`.
+- Đọc input bằng `getJsonInput()`, validate bằng `validateRequired(...)` / `validateServiceType(...)`.
+- Trả về CHỈ qua helper: `responseSuccess()`, `responseError($msg,$code)`, `responseDuplicate()`.
+  Mọi JSON dùng `JSON_UNESCAPED_UNICODE`.
+- Ghi log mọi request/response qua `apiLog($source,$payload,$response)` vào `emslss_api_logs`.
+- Helper định nghĩa ở `api/bootstrap.php` — tái dùng, không tự viết lại logic response/transaction.

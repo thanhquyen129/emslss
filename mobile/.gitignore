@@ -1,0 +1,10 @@
+node_modules/
+android/.gradle/
+android/**/build/
+android/local.properties
+android/app/google-services.json
+dist/
+*.apk
+*.aab
+.DS_Store
+onesignal.local.json

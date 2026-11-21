@@ -1,0 +1,30 @@
+Mình có 1 chức năng nhỏ, không liên quan gì đến dự án hiện tại nhưng vì quá nhỏ nên không thể thuê domain + hosting riêng, đành để ké ở đây. có thể dùng chung domain, hosting và db với dự án này.
+hãy Tạo giúp mình 1 form riêng biệt hoàn toàn không liên quan gì đến codebase hiện tại. Mục đích nhập các thông tin sau
+-Ngày yêu cầu (default = ngày hiện tại)	
+-Chặng
+-Số hiệu chuyến bay	
+-AIRWAY BILL	 
+-SỐ VIN	 
+-SỐ SERIAL	 
+-Số kiện	 
+-Khối lượng
+Form nhập liệu nằm bên trên.
+Người dùng nhập xong bấm lưu sẽ hiển thị danh sách bên dưới. 
+Trước mỗi dòng có checkbox (có nút chọn tất cả). 
+trên Danh sách có các tab dữ liệu theo tháng giống kiểu excel sheet.
+Trên danh sách Có 2 nút chức năng In bill (file bill mẫu) và xuất bảng kê dạng excel theo mẫu (
+Giao diện bắt mắt, dễ nhìn, danh sách rõ ràng dễ đọc. 
+mình sử dụng domain lsslogistics.vn, đặt tên file là bangke.php
+
+
+
+# Đổi CONTAINER_MYSQL cho đúng tên ở bước 1
+export MYSQL_CTR=$(docker ps -qf "ancestor=mysql:8")
+# hoặc: export MYSQL_CTR=ten_container_mysql
+
+docker exec -it $MYSQL_CTR mysql -uroot -p'Conco@vmlbe321' -e "SHOW DATABASES;"
+docker exec -it $MYSQL_CTR mysql -uroot -p'Conco@vmlbe321' VML-PROD -e "
+SELECT MigrationId FROM __EFMigrationsHistory WHERE MigrationId LIKE '%hr%';
+SHOW TABLES LIKE 'Employee';
+SHOW TABLES LIKE 'HrPosition';
+"

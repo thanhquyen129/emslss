@@ -29,13 +29,7 @@ safeExecute(function(){
     while($row = $res->fetch_assoc()){
         $order_id = (int)$row['id'];
         $retryCount = (int)$row['retry_count'];
-        $isPickup = ($row['status'] === 'picked_up');
-
-        if ($isPickup) {
-            $result = sendPickupCallback($order_id);
-        } else {
-            $result = sendDeliveryCallback($order_id);
-        }
+        $result = emslss_resend_order_callback($order_id);
 
         $status = 'callback_retry';
         $note = $result['success']

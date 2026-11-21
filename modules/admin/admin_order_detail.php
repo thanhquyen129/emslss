@@ -1,12 +1,15 @@
 <?php
 session_start();
 include '../../config/db.php';
-include '../../templates/admin_topbar.php';
+require_once __DIR__ . '/../../config/upload.php';
+require_once __DIR__ . '/../../config/order_helpers.php';
 
 if (!isset($_SESSION['user_id'])) {
-		header("Location: ../login.php");
+    header("Location: ../login.php");
     exit;
 }
+
+include '../../templates/admin_topbar.php';
 
 $order_id = intval($_GET['id'] ?? 0);
 
@@ -46,7 +49,7 @@ $tracking = $conn->query("
     FROM emslss_tracking t
     LEFT JOIN emslss_users u ON t.created_by = u.id
     WHERE t.order_id = $order_id
-    ORDER BY t.created_at ASC
+    ORDER BY t.created_at DESC
 ");
 
 /*
@@ -68,14 +71,20 @@ $images = $conn->query("
 */
 $meta = [];
 $meta_q = $conn->query("
-    SELECT meta_key, meta_value
+    SELECT meta_key, meta_value, created_at
     FROM emslss_order_meta
     WHERE order_id = $order_id
+    ORDER BY id ASC
 ");
 
 while ($m = $meta_q->fetch_assoc()) {
     $meta[$m['meta_key']][] = $m['meta_value'];
+    $meta[$m['meta_key'] . '_rows'][] = $m;
 }
+$latestRecipient = !empty($meta['delivery_recipient_name']) ? end($meta['delivery_recipient_name']) : '-';
+$latestDeliveryNote = !empty($meta['delivery_note']) ? end($meta['delivery_note']) : '-';
+$latestSignature = !empty($meta['customer_signature']) ? end($meta['customer_signature']) : null;
+$failNoteRows = $meta['fail_note_rows'] ?? [];
 
 /*
 |--------------------------------------------------------------------------
@@ -129,7 +138,12 @@ pre{
 
 <div class="d-flex justify-content-between mb-4">
     <h3>📦 Chi tiết đơn: <?= htmlspecialchars($order['ems_code']) ?></h3>
-    <a href="dashboard.php" class="btn btn-secondary">← Quay lại</a>
+    <div class="d-flex gap-2">
+        <?php if (emslss_admin_can_reject_order((string) $order['status'])): ?>
+        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#rejectOrderModal">Từ chối nhận</button>
+        <?php endif; ?>
+        <a href="admin_dashboard_realtime.php" class="btn btn-secondary">← Quay lại</a>
+    </div>
 </div>
 
 <div class="row">
@@ -139,8 +153,17 @@ pre{
 <h5>Thông tin đơn</h5>
 <p><b>Người gửi:</b> <?= $order['sender_name'] ?></p>
 <p><b>Người nhận:</b> <?= $order['receiver_name'] ?></p>
-<p><b>Địa chỉ nhận:</b> <?= $order['receiver_address'] ?></p>
-<p><b>Trạng thái:</b> <span class="badge bg-primary"><?= $order['status'] ?></span></p>
+<p><b>Địa chỉ nhận:</b> <?= htmlspecialchars($order['receiver_address']) ?></p>
+<p><b>Loại hàng:</b> <?= htmlspecialchars($order['cargo_type'] ?: '-') ?></p>
+<?php if (!empty($meta['cargo_description'][0])): ?>
+<p><b>Nội dung hàng hóa:</b> <?= htmlspecialchars($meta['cargo_description'][0]) ?></p>
+<?php endif; ?>
+<p><b>Khối lượng:</b> <?= emslss_format_weight_html($order['weight'] ?? null) ?></p>
+<p><b>Dịch vụ:</b> <?= htmlspecialchars($order['service_type'] ?? '-') ?></p>
+<p><b>Trạng thái:</b> <span class="badge bg-primary"><?= htmlspecialchars($order['status']) ?></span></p>
+<?php if (!empty($meta['lss_reject_reason'][0])): ?>
+<p><b>Lý do từ chối (LSS):</b> <span class="text-danger"><?= htmlspecialchars($meta['lss_reject_reason'][0]) ?></span></p>
+<?php endif; ?>
 <p><b>Pickup shipper:</b> <?= $order['pickup_shipper_name'] ?: '-' ?></p>
 <p><b>Delivery shipper:</b> <?= $order['delivery_shipper_name'] ?: '-' ?></p>
 </div>
@@ -150,12 +173,28 @@ pre{
 <div class="card p-3 mb-4">
 <h5>Meta lỗi / note</h5>
 
+<p><b>Người nhận (đã ký nhận):</b><br>
+<?= htmlspecialchars($latestRecipient) ?>
+</p>
+
 <p><b>Fail note:</b><br>
-<?= $meta['fail_note'][0] ?? '-' ?>
+<?php if (!empty($failNoteRows)): ?>
+    <?php foreach ($failNoteRows as $idx => $fnRow): ?>
+        <span class="d-block">
+            <?php if (count($failNoteRows) > 1): ?><b>Lần <?= $idx + 1 ?>:</b> <?php endif; ?>
+            <?= htmlspecialchars($fnRow['meta_value'] ?? '') ?>
+            <?php if (!empty($fnRow['created_at'])): ?>
+                <small class="text-muted">(<?= htmlspecialchars($fnRow['created_at']) ?>)</small>
+            <?php endif; ?>
+        </span>
+    <?php endforeach; ?>
+<?php else: ?>
+    -
+<?php endif; ?>
 </p>
 
 <p><b>Delivery note:</b><br>
-<?= $meta['delivery_note'][0] ?? '-' ?>
+<?= htmlspecialchars($latestDeliveryNote) ?>
 </p>
 
 <p><b>Retry count:</b><br>
@@ -182,17 +221,32 @@ pre{
 <div class="card p-3 mb-4">
 <h5>🖼 Ảnh pickup / delivery</h5>
 
-<?php while($img = $images->fetch_assoc()): ?>
-    <img src="<?= $img['image_path'] ?>" class="img-thumb">
+<div class="d-flex flex-wrap gap-2">
+<?php while($img = $images->fetch_assoc()):
+    $imgUrl = emslss_upload_url($img['image_path'] ?? '');
+    $stageMeta = emslss_image_stage_meta($img['image_path'] ?? '');
+?>
+    <div class="position-relative d-inline-block text-center">
+        <a href="<?= htmlspecialchars($imgUrl) ?>" target="_blank" class="d-block position-relative">
+            <img src="<?= htmlspecialchars($imgUrl) ?>" class="img-thumb">
+            <span class="badge <?= htmlspecialchars($stageMeta['badge_class']) ?> position-absolute top-0 start-0 m-2">
+                <?= htmlspecialchars($stageMeta['label']) ?>
+            </span>
+        </a>
+        <?php if (!empty($img['created_at'])): ?>
+        <small class="text-muted d-block"><?= htmlspecialchars($img['created_at']) ?></small>
+        <?php endif; ?>
+    </div>
 <?php endwhile; ?>
+</div>
 
 </div>
 
 <div class="card p-3 mb-4">
 <h5>✍️ Chữ ký khách hàng</h5>
 
-<?php if(isset($meta['customer_signature'][0])): ?>
-    <img src="<?= $meta['customer_signature'][0] ?>" class="img-fluid rounded">
+<?php if($latestSignature !== null): ?>
+    <img src="<?= htmlspecialchars(emslss_upload_url($latestSignature)) ?>" class="img-fluid rounded">
 <?php else: ?>
     <p>Chưa có chữ ký</p>
 <?php endif; ?>
@@ -230,6 +284,56 @@ if(isset($meta['callback_retry'])){
 </div>
 
 </div>
+
+<?php if (emslss_admin_can_reject_order((string) $order['status'])): ?>
+<div class="modal fade" id="rejectOrderModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Từ chối nhận đơn <?= htmlspecialchars($order['ems_code']) ?></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Lý do <span class="text-danger">*</span></label>
+                    <select class="form-select" id="rejectReason">
+                        <option value="">-- chọn --</option>
+                        <?php foreach (emslss_order_reject_reasons() as $r): ?>
+                        <option value="<?= htmlspecialchars($r) ?>"><?= htmlspecialchars($r) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="mb-0">
+                    <label class="form-label">Chi tiết thêm</label>
+                    <textarea class="form-control" id="rejectReasonDetail" rows="2"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger" id="btnConfirmReject">Xác nhận</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.getElementById('btnConfirmReject').addEventListener('click', function () {
+    const reason = document.getElementById('rejectReason').value;
+    const reason_detail = document.getElementById('rejectReasonDetail').value.trim();
+    if (!reason) { alert('Vui lòng chọn lý do'); return; }
+    if (reason === 'Lý do khác' && !reason_detail) { alert('Vui lòng nhập chi tiết'); return; }
+    if (!confirm('Xác nhận từ chối nhận đơn?')) return;
+    const fd = new FormData();
+    fd.append('order_id', <?= (int) $order_id ?>);
+    fd.append('reason', reason);
+    fd.append('reason_detail', reason_detail);
+    fetch('reject_order.php', { method: 'POST', body: fd })
+        .then(r => r.json())
+        .then(res => { alert(res.message || 'OK'); if (res.success) location.reload(); })
+        .catch(() => alert('Lỗi kết nối'));
+});
+</script>
+<?php endif; ?>
 
 </body>
 </html>

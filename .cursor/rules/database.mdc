@@ -1,0 +1,33 @@
+---
+description: Quy tắc truy vấn DB, transaction, tên bảng và giá trị enum chuẩn
+alwaysApply: true
+---
+
+# Database & Enum chuẩn
+
+## Truy vấn
+- LUÔN dùng **prepared statement**: `prepare` + `bind_param` + `execute`. KHÔNG nối chuỗi SQL với input.
+- Tên bảng đều có prefix `emslss_`: `emslss_orders`, `emslss_tracking`, `emslss_images`,
+  `emslss_order_meta`, `emslss_api_logs`, `emslss_users`, `emslss_roles`.
+
+```php
+// ✅ ĐÚNG
+$stmt = $conn->prepare("SELECT id,status FROM emslss_orders WHERE ems_code=? LIMIT 1");
+$stmt->bind_param("s", $ems_code);
+$stmt->execute();
+$row = $stmt->get_result()->fetch_assoc();
+
+// ❌ SAI
+$conn->query("SELECT * FROM emslss_orders WHERE ems_code='$ems_code'");
+```
+
+## Transaction
+- Thao tác nhiều bảng (đổi status + insert tracking...) phải bọc transaction:
+  `beginTx()` / `commitTx()` / `rollbackTx()` (định nghĩa ở `api/bootstrap.php`).
+- Mỗi lần đổi trạng thái đơn → INSERT 1 record mới vào `emslss_tracking` (không update đè).
+
+## Giá trị chuẩn — KHÔNG tự đặt mới
+- `status`: `new_order`, `assigned_pickup`, `picked_up`, `in_transit`,
+  `assigned_delivery`, `delivered`, `failed`, `cancelled`.
+- `service_type`: `door_to_door`, `door_to_hub`, `hub_to_door`.
+- `role`: `admin`, `dispatcher`, `shipper`, `operation`, `ems`.
